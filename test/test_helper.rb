@@ -37,6 +37,9 @@ else
   fail "Unknown DB adapter #{adapter}. Valid adapters are: mysql2, postgresql, sqlite3."
 end
 
+# Load babik library
+require 'babik'
+
 # Create tables
 load "#{__dir__}/db/schema.rb"
 
@@ -45,6 +48,4 @@ require 'models/user'
 require 'models/tag'
 require 'models/post'
 
-# Load queryset extension
-require 'queryset'
 
