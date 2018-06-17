@@ -1,7 +1,14 @@
 ActiveRecord::Schema.define do
   self.verbose = false
 
+  create_table :geo_zones, :force => true do |t|
+    t.string :name
+    t.text :description
+    t.timestamps
+  end
+
   create_table :users, :force => true do |t|
+    t.integer :zone_id
     t.string :first_name
     t.string :last_name
     t.string :email
@@ -11,7 +18,7 @@ ActiveRecord::Schema.define do
   create_table :posts, :force => true do |t|
     t.string :title
     t.text :content
-    t.integer :user_id
+    t.integer :author_id
     t.timestamps
   end
 

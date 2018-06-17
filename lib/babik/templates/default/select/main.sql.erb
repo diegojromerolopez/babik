@@ -1,0 +1,58 @@
+<% model = queryset.model %>
+<% filters = queryset.filters %>
+<% is_count = queryset.is_count %>
+<% has_distinct = queryset.has_distinct %>
+<% limit = queryset.limit %>
+<% offset = queryset.offset %>
+<% order = queryset.order %>
+<% lock_type = queryset.lock_type %>
+
+SELECT
+  <% if lock_type %>
+    <%= lock_type %>
+  <% end %>
+  <% if has_distinct %>
+    DISTINCT
+  <% end %>
+  <% if is_count %>
+    COUNT(<%= model.table_name %>.id)
+  <% else %>
+    <%= model.table_name %>.*
+  <% end %>
+FROM <%= model.table_name %>
+<% filters.flatten.each do |conjunction| %>
+  <% if conjunction.respond_to?('sql_left_joins') %>
+    <%= conjunction.sql_left_joins %>
+  <% end %>
+<% end %>
+WHERE (
+  1=1
+  <% filters.each do |conjunction| %>
+    AND (
+      1=1
+      <% if conjunction.class == Array %>
+        AND ( 1=0
+          <% conjunction.each do |disjunction| %>
+            OR <%= disjunction.sql_where_condition %>
+          <% end %>
+        )
+      <% else %>
+        AND (<%= conjunction.sql_where_condition %>)
+      <% end %>
+    )
+  <% end %>
+)
+<%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
+<% unless limit.nil? %>
+  LIMIT <%= limit %>
+  <% unless offset.nil? %>
+    OFFSET <%= offset %>
+  <% end %>
+<% end %>
+<%# Order the results %>
+<% unless order.nil? %>
+  ORDER BY
+    <% order.each do |order_field| %>
+      <%= model.table_name %>.<%= order_field[0] %> <%= order_field[1] %>
+  <% end %>
+<% end %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'minitest/unit'
 require 'minitest/autorun'
@@ -44,6 +46,7 @@ require 'babik'
 load "#{__dir__}/db/schema.rb"
 
 # Load models
+require 'models/geozone'
 require 'models/user'
 require 'models/tag'
 require 'models/post'
