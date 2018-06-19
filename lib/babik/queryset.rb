@@ -61,7 +61,7 @@ class QuerySet
   def count
     @is_count = true
     sql_ = _render_select_sql
-    ActiveRecord::Base.connection.execute(sql_)
+    ActiveRecord::Base.connection.execute(sql_)[0]['number_of_rows']
   end
 
   def distinct

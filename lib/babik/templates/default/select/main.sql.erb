@@ -15,7 +15,7 @@ SELECT
     DISTINCT
   <% end %>
   <% if is_count %>
-    COUNT(<%= model.table_name %>.id)
+    COUNT(<%= model.table_name %>.id) AS number_of_rows
   <% else %>
     <%= model.table_name %>.*
   <% end %>
