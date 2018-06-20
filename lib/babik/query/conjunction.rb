@@ -14,18 +14,18 @@ class Conjunction
     end
   end
 
-  def sql_left_joins
-    left_joins_by_alias = {}
+  def left_joins_by_alias
+    left_joins_by_alias_ = {}
     @selections.each do |selection|
       if selection.respond_to?('left_joins_by_alias')
-        left_joins_by_alias.merge!(selection.left_joins_by_alias)
+        left_joins_by_alias_.merge!(selection.left_joins_by_alias)
       end
     end
-    left_joins_by_alias.values.map{ |join| join.sql }.join("\n")
+    left_joins_by_alias_
   end
 
   def sql_where_condition
-    @selections.map {|selection| selection.sql_where_condition}.join(" AND\n")
+    @selections.map(&:sql_where_condition).join(" AND\n")
   end
 
 end

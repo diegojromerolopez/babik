@@ -5,7 +5,7 @@ module SQL
   class Join
     attr_reader :alias, :sql
 
-    def initialize(join_type, association, earlier_table_alias=nil)
+    def initialize(join_type, association, association_position, earlier_table_alias = nil)
       @join_type = join_type
 
       target_table = association.table_name
@@ -13,7 +13,7 @@ module SQL
       join_keys = association.join_keys
       foreign_key = join_keys.foreign_key
       key = join_keys.key
-      target_table_alias = "#{owner_table}__#{association.name}"
+      target_table_alias = "#{owner_table}__#{association.name}_#{association_position}"
 
       if earlier_table_alias.nil?
         earlier_table_alias = owner_table

@@ -4,6 +4,7 @@ ActiveRecord::Schema.define do
   create_table :geo_zones, :force => true do |t|
     t.string :name
     t.text :description
+    t.integer :parent_zone_id
     t.timestamps
   end
 

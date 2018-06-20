@@ -52,20 +52,17 @@ class ForeignSelection < Selection
     @left_joins = []
     @left_joins_by_alias = {}
     last_owner_table_alias = nil
-    @association_path.each do |association|
-      left_join = SQL::Join.new("LEFT JOIN", association, last_owner_table_alias)
+    @association_path.each_with_index do |association, association_path_index|
+      left_join = SQL::Join.new("LEFT JOIN", association, association_path_index, last_owner_table_alias)
       @left_joins_by_alias[left_join.alias] = left_join
       @left_joins << left_join
       last_owner_table_alias = left_join.alias
     end
-
-    #@sql_left_joins = (@left_joins.map { |left_join| left_join.sql }).join("\n")
   end
 
   def _init_where
-    last_association = @association_path[-1]
-    table_alias = "#{last_association.active_record.table_name}__#{last_association.name}"
-    @sql_where_condition = "#{table_alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
+    last_association = @left_joins[-1]
+    @sql_where_condition = "#{last_association.alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
   end
 
 end

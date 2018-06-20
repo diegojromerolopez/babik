@@ -6,7 +6,7 @@ class Selection
 
   def self.factory(model, selection_path, value)
     @model = model
-    if selection_path.match(RELATIONSHIP_SEPARATOR)
+    if selection_path.match?(RELATIONSHIP_SEPARATOR)
       return ForeignSelection.new(model, selection_path, value)
     end
     LocalSelection.new(model, selection_path, value)

@@ -20,11 +20,9 @@ SELECT
     <%= model.table_name %>.*
   <% end %>
 FROM <%= model.table_name %>
-<% filters.flatten.each do |conjunction| %>
-  <% if conjunction.respond_to?('sql_left_joins') %>
-    <%= conjunction.sql_left_joins %>
-  <% end %>
-<% end %>
+
+<%= queryset._sql_left_joins %>
+
 WHERE (
   1=1
   <% filters.each do |conjunction| %>

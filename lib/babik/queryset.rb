@@ -24,7 +24,7 @@ class QuerySet
   # Select the objects according to some criteria.
   def filter(filters)
     if filters.class == Array
-      disjunctions = filters map do |filter|
+      disjunctions = filters.map do |filter|
         Conjunction.new(@model, filter)
       end
       @filters << disjunctions
@@ -35,7 +35,7 @@ class QuerySet
   end
 
   def all
-    @model_class.find_by_sql(self.sql)
+    @model.find_by_sql(self.sql)
   end
 
   def each(&block)
@@ -43,7 +43,7 @@ class QuerySet
   end
 
   def get
-    @model_class.find_by_sql(self.sql).first
+    @model.find_by_sql(self.sql).first
   end
 
   def empty?
@@ -98,6 +98,14 @@ class QuerySet
 
   def sql
     _render_select_sql
+  end
+
+  def _sql_left_joins
+    left_joins_by_alias = {}
+    @filters.flatten.each do |conjunction|
+      left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
+    end
+    left_joins_by_alias.values.map(&:sql).join("\n")
   end
 
   def _render_select_sql
