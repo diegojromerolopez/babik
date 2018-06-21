@@ -62,4 +62,9 @@ class Selection
       @sql_value = "'#{escaped_value_}'"
     end
   end
+
+  def left_joins_by_alias
+    {}
+  end
+
 end

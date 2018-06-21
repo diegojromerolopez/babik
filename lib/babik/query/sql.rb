@@ -19,10 +19,10 @@ module SQL
         earlier_table_alias = owner_table
       end
 
-      @sql = %[
+      @sql = %(
         #{@join_type} #{target_table} #{target_table_alias}
           ON #{target_table_alias}.#{key} = #{earlier_table_alias}.#{foreign_key}
-      ].gsub("\n", "").gsub(/\s{2,}/, " ").strip()
+      ).delete("\n").gsub(/\s{2,}/, ' ').strip()
 
       @alias = target_table_alias
     end

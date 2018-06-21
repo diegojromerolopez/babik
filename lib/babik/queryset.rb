@@ -4,7 +4,7 @@ require_relative 'query/conjunction'
 require_relative 'query/local_selection'
 require_relative 'query/foreign_selection'
 
-
+# Represents a new type of query result set
 class QuerySet
   include Enumerable
   attr_reader :model, :is_count, :has_distinct, :limit, :offset, :order, :lock_type, :filters
@@ -16,6 +16,7 @@ class QuerySet
     @limit = nil
     @offset = nil
     @order = nil
+    @order_selections = []
     @lock_type = nil
     @other_models = []
     @filters = []
@@ -47,11 +48,11 @@ class QuerySet
   end
 
   def empty?
-    self.count == 0
+    self.count.zero?
   end
 
   def exists?
-    self.count > 0
+    self.count.positive?
   end
 
   def length
@@ -69,8 +70,13 @@ class QuerySet
     self
   end
 
-  def order_by(order_by_list)
+  def order_by(*order_by_list)
     @order = order_by_list
+    @order_selections = []
+    @order.each_with_index do |order_field, order_field_index|
+      order_path = order_field[0]
+      @order_selections << Selection.factory(model, order_path, 'xx')
+    end
     self
   end
 
@@ -85,7 +91,7 @@ class QuerySet
     elsif param.class == Integer
       _limit(limit: param, offset: 0)
     else
-      raise RuntimeError, "Invalid limit passed to query: #{param}"
+      raise "Invalid limit passed to query: #{param}"
     end
     self
   end
@@ -104,6 +110,10 @@ class QuerySet
     left_joins_by_alias = {}
     @filters.flatten.each do |conjunction|
       left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
+    end
+    # FIXME: order selection should be a class with common parts with selection
+    @order_selections.each do |order_selection|
+      left_joins_by_alias.merge!(order_selection.left_joins_by_alias)
     end
     left_joins_by_alias.values.map(&:sql).join("\n")
   end
