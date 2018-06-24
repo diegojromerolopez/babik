@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'minitest/autorun'
-require_relative 'test_helper'
+require_relative '../test_helper'
 
 class CountTest < Minitest::Test
 
@@ -70,7 +70,7 @@ class CountTest < Minitest::Test
   end
 
   # Test the count from a deep belongs to relationship
-  def test_count_from_deep_belongs_to
+  def test_from_deep_belongs_to
     queryset = User.objects.filter(
       "zone::parent_zone::parent_zone::name__equals": 'Roman Empire'
     )
@@ -78,7 +78,7 @@ class CountTest < Minitest::Test
   end
 
   # Test the count from a deep belongs to relationship
-  def test_count_or_to
+  def test_or
     queryset = User.objects.filter(
       [
         { "zone::parent_zone::parent_zone::name__equals": 'Roman Empire' },
@@ -95,10 +95,28 @@ class CountTest < Minitest::Test
   end
 
   # Count the objects using contains
-  def test_lookup_contains_count
+  def test_lookup_contains
     assert_equal 1, User.objects.filter(first_name__contains: 'avi').length
     assert_equal 1, User.objects.filter(first_name__startswith: 'Fla').length
     assert_equal 1, User.objects.filter(first_name__endswith: 'vio').length
+  end
+
+  def test_lookup_isnull
+    assert_equal 0, User.objects.filter('zone::name': 'Rome', email__isnull: true).count
+    assert_equal 1, User.objects.filter('zone::name': 'Rome', email__isnull: false).count
+    assert_equal 2, User.objects.filter('zone::name': 'Jerusalem', email__isnull: false).count
+  end
+
+  def test_date
+    today_start = Time.now.beginning_of_day
+    today_end = Time.now.end_of_day
+    today = Date.today
+
+    number_of_users = User.where('created_at >= ?', today_start).where('created_at <= ?', today_end).count
+
+    assert_equal number_of_users, User.objects.filter(created_at__gte: today_start, created_at__lte: today_end).count
+    assert_equal number_of_users, User.objects.filter(created_at__between: [today_start, today_end]).count
+    assert_equal number_of_users, User.objects.filter(created_at__date: today).count
   end
 
 end
