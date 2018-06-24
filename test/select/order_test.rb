@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
-class CountTest < Minitest::Test
+class OrderTest < Minitest::Test
 
   def setup
 

@@ -22,6 +22,10 @@ class CountTest < Minitest::Test
     @tiberius = User.create!(first_name: 'Tiberius', email: 'tiberius@example.com', zone: @rome)
     @pilate = User.create!(first_name: 'Pontius', last_name: 'Pilate', email: 'pontious@example.com', zone: @jerusalem)
     @flavio = User.create!(first_name: 'Flavio', last_name: 'Josefo', email: 'flaviojosefo@example.com', zone: @jerusalem)
+
+    @noah = User.create!(first_name: 'Noah')
+    @noah.created_at = Time.now - 1000.days
+    @noah.save!
   end
 
   def teardown
@@ -31,6 +35,7 @@ class CountTest < Minitest::Test
     @tiberius.destroy
     @pilate.destroy
     @flavio.destroy
+    @noah.destroy
   end
 
   # Test the count is well implemented when the returned value is 0
@@ -107,6 +112,10 @@ class CountTest < Minitest::Test
     assert_equal 2, User.objects.filter('zone::name': 'Jerusalem', email__isnull: false).count
   end
 
+  def test_lookup_in
+    assert_equal 2, User.objects.filter(first_name__in: %w[Tiberius Pontius Julius Marcus]).length
+  end
+
   def test_date
     today_start = Time.now.beginning_of_day
     today_end = Time.now.end_of_day
@@ -117,6 +126,8 @@ class CountTest < Minitest::Test
     assert_equal number_of_users, User.objects.filter(created_at__gte: today_start, created_at__lte: today_end).count
     assert_equal number_of_users, User.objects.filter(created_at__between: [today_start, today_end]).count
     assert_equal number_of_users, User.objects.filter(created_at__date: today).count
+
+    assert_equal 2, User.objects.filter(created_at__date: today).filter([{first_name: 'Tiberius'}, {first_name: 'Pontius'}]).count
   end
 
 end
