@@ -36,9 +36,7 @@ class QuerySet
   end
 
   def all
-    if self.projection
-      return ActiveRecord::Base.connection.exec_query(self.sql)
-    end
+    return ActiveRecord::Base.connection.exec_query(self.sql) if self.projection
     @model.find_by_sql(self.sql)
   end
 
@@ -46,8 +44,12 @@ class QuerySet
     self.all.each(&block)
   end
 
-  def get
-    self.all.first
+  def get(filters)
+    result_ = self.filter(filters).all
+    result_count = result_.count
+    raise 'Does not exist' if result_count.zero?
+    raise 'Multiple objects returned' if result_count > 1
+    result_.first
   end
 
   def project(*params)
