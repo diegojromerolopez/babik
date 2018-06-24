@@ -136,9 +136,9 @@ users_projection = User.objects.filter('zone::name': 'Castilla').order_by('first
 
 ## Documentation
 
-See the [doc/README.md](documentation) for more information
-about the [doc/README.md#API](API) for information about the
-internals.
+See the [documentation](doc/README.md) for more information
+about the [API](doc/README.md#API) for information about the API and the
+internals of this library.
 
 ## License
 
