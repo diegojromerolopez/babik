@@ -7,19 +7,19 @@ require_relative 'query/foreign_selection'
 # Represents a new type of query result set
 class QuerySet
   include Enumerable
-  attr_reader :model, :is_count, :has_distinct, :limit, :offset, :order, :lock_type, :filters
+  attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :filters, :projection
 
   def initialize(model_class)
     @model = model_class
     @is_count = false
     @has_distinct = false
-    @limit = nil
+    @number_of_rows_limit = nil
     @offset = nil
     @order = nil
     @order_selections = []
     @lock_type = nil
-    @other_models = []
     @filters = []
+    @projection = false
   end
 
   # Select the objects according to some criteria.
@@ -36,6 +36,9 @@ class QuerySet
   end
 
   def all
+    if self.projection
+      return ActiveRecord::Base.connection.exec_query(self.sql)
+    end
     @model.find_by_sql(self.sql)
   end
 
@@ -44,7 +47,12 @@ class QuerySet
   end
 
   def get
-    @model.find_by_sql(self.sql).first
+    self.all.first
+  end
+
+  def project(*params)
+    @projection = params
+    self
   end
 
   def empty?
@@ -59,10 +67,12 @@ class QuerySet
     self.count
   end
 
+  def size
+    self.count
+  end
+
   def count
-    @is_count = true
-    sql_ = _render_select_sql
-    ActiveRecord::Base.connection.execute(sql_)[0]['number_of_rows']
+    self.all.count
   end
 
   def distinct
@@ -73,7 +83,17 @@ class QuerySet
   def order_by(*order_by_list)
     @order = order_by_list
     @order_selections = []
-    @order.each_with_index do |order_field, order_field_index|
+    # Check the types of each order field
+    @order = @order.map do |order|
+      if order.class == String
+        [order, :ASC]
+      elsif order.class == Array
+        order
+      else
+        raise "Invalid value for #{self.class}.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]"
+      end
+    end
+    @order.each_with_index do |order_field, _order_field_index|
       order_path = order_field[0]
       @order_selections << Selection.factory(model, order_path, 'xx')
     end
@@ -87,18 +107,20 @@ class QuerySet
 
   def [](param)
     if param.class == Range
-      _limit(limit: param.min, offset: param.max.to_i - param.min.to_i)
+      offset_ = param.min
+      size_ = param.max.to_i - param.min.to_i
+      limit(size: size_, offset: offset_)
     elsif param.class == Integer
-      _limit(limit: param, offset: 0)
+      limit(size: param, offset: 0)
     else
       raise "Invalid limit passed to query: #{param}"
     end
     self
   end
 
-  def _limit(limit: nil, offset: nil)
+  def limit(size: nil, offset: 0)
     @offset = offset.to_i
-    @limit = limit.to_i
+    @number_of_rows_limit = size.to_i
     self
   end
 

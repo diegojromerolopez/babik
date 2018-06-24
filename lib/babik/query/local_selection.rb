@@ -4,7 +4,7 @@ require_relative 'selection'
 
 class LocalSelection < Selection
 
-  attr_reader :model, :selection_path, :selected_field, :value, :operator, :value, :sql_operator, :sql_value
+  attr_reader :model, :selection_path, :selected_field, :operator, :value, :sql_operator, :sql_value
 
   def initialize(model, selection_path, value)
     @model = model

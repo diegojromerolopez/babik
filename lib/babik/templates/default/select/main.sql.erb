@@ -1,11 +1,11 @@
 <% model = queryset.model %>
 <% filters = queryset.filters %>
-<% is_count = queryset.is_count %>
 <% has_distinct = queryset.has_distinct %>
-<% limit = queryset.limit %>
+<% number_of_rows_limit = queryset.number_of_rows_limit %>
 <% offset = queryset.offset %>
 <% order = queryset.order %>
 <% lock_type = queryset.lock_type %>
+<% projection = queryset.projection %>
 
 SELECT
   <% if lock_type %>
@@ -14,11 +14,28 @@ SELECT
   <% if has_distinct %>
     DISTINCT
   <% end %>
-  <% if is_count %>
-    COUNT(<%= model.table_name %>.id) AS number_of_rows
+  <% if projection %>
+    <%# FIXME: projection should be a proper class extending ForeignSelection %>
+    <% projection.each_with_index do |projected_field, projected_field_index| %>
+      <% projected_field_alias = nil %>
+      <% if projected_field.class == Array %>
+        <% projected_field_alias = projected_field[1] %>
+        <% projected_field = projected_field[0] %>
+      <% end %>
+      <% last_one = projected_field_index == projection.length - 1 %>
+      <% projection_selection = Selection.factory(model, projected_field, '_') %>
+      <% if projection_selection.class == ForeignSelection %>
+        <%= projection_selection.left_joins[-1].alias %>.<%= projection_selection.selected_field %>
+      <% else %>
+        <%= model.table_name %>.<%= projected_field %>
+      <% end %>
+      <% if projected_field_alias %>AS <%= projected_field_alias %><% end %>
+      <% unless last_one %>,<% end %>
+    <% end %>
   <% else %>
     <%= model.table_name %>.*
   <% end %>
+
 FROM <%= model.table_name %>
 
 <%= queryset._sql_left_joins %>
@@ -41,23 +58,24 @@ WHERE (
   <% end %>
 )
 <%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
-<% unless limit.nil? %>
-  LIMIT <%= limit %>
-  <% unless offset.nil? %>
+<% unless number_of_rows_limit.nil? %>
+  LIMIT <%= number_of_rows_limit %>
+  <% unless offset.nil? || offset == 0 %>
     OFFSET <%= offset %>
   <% end %>
 <% end %>
 <%# Order the results %>
 <% unless order.nil? %>
   ORDER BY
-    <% order.each_with_index do |order_field, order_field_index| %>
-      <% last_one = order_field_index == order.length - 1 %>
-      <% order_path = order_field[0] %>
-      <% order_selection = Selection.factory(model, order_path, 'xx') %>
-      <% if order_selection.class == ForeignSelection %>
-        <%= order_selection.left_joins[-1].alias %>.<%= order_selection.selected_field %> <%= order_field[1] %> <% unless last_one %>,<% end %>
-      <% else %>
-        <%= model.table_name %>.<%= order_field[0] %> <%= order_field[1] %> <% unless last_one %>,<% end %>
-      <% end %>
+  <%# FIXME: order should be a proper class extending ForeignSelection %>
+  <% order.each_with_index do |order_field, order_field_index| %>
+    <% last_one = order_field_index == order.length - 1 %>
+    <% order_path = order_field[0] %>
+    <% order_selection = Selection.factory(model, order_path, '_') %>
+    <% if order_selection.class == ForeignSelection %>
+      <%= order_selection.left_joins[-1].alias %>.<%= order_selection.selected_field %> <%= order_field[1] %> <% unless last_one %>,<% end %>
+    <% else %>
+      <%= model.table_name %>.<%= order_field[0] %> <%= order_field[1] %> <% unless last_one %>,<% end %>
+    <% end %>
   <% end %>
 <% end %>

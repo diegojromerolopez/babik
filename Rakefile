@@ -8,7 +8,7 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
-task :default => :test
+task default: :test
 
 desc 'Generates a coverage report'
 task :coverage do

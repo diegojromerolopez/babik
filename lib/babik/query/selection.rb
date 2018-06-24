@@ -22,9 +22,7 @@ class Selection
     when 'in'
       @sql_operator = 'IN'
     when 'isnull'
-      @sql_operator = 'IS NULL'
-    when 'isnotnull'
-      @sql_operator = 'IS NOT NULL'
+      @sql_operator = @value ? 'IS NULL' : 'IS NOT NULL'
     when 'lt'
       @sql_operator = '<'
     when 'lte'
@@ -33,6 +31,8 @@ class Selection
       @sql_operator = '>='
     when 'gte'
       @sql_operator = '>='
+    when 'between', 'date'
+      @sql_operator = 'BETWEEN'
     when 'startswith', 'endswith', 'contains', 'exact'
       @sql_operator = 'LIKE'
     when 'istartswith', 'iendswith', 'icontains', 'iexact'
@@ -44,11 +44,21 @@ class Selection
   end
 
   def _initialize_sql_value
-    if @value.class != String
-      @sql_value = @value
-      return
+    if @value.class == String
+      escaped_value_ = @model.sanitize_sql(@value)
+    elsif @value.class == Date
+      escaped_value_ = Time.parse(@value.to_s).beginning_of_day.utc.to_s(:db)
+    elsif @value.class == DateTime || @value.class == Time
+      escaped_value_ = @value.utc.to_s(:db)
+    else
+      escaped_value_ = @value
     end
-    escaped_value_ = @model.sanitize_sql(@value)
+
+    if @operator == 'date'
+      @operator = 'between'
+      @value = [@value.beginning_of_day, @value.end_of_day]
+    end
+
     case @operator
     when 'startswith', 'istartswith'
       @sql_value = "'#{escaped_value_}%'"
@@ -58,6 +68,23 @@ class Selection
       @sql_value = "'%#{escaped_value_}%'"
     when 'exact', 'iexact'
       @sql_value = "'#{escaped_value_}'"
+    when 'between'
+      if @value.class == Array
+        if [@value[0], @value[1]].map { |v| v.class == DateTime || v.class == Date || v.class == Time } == [true, true]
+          @sql_value = "'#{@value[0].utc.to_s(:db)}' AND '#{@value[1].utc.to_s(:db)}'"
+        else
+          @sql_value = "'#{@value[0]}' AND '#{@value[1]}'"
+        end
+      else
+        raise 'Array is needed if operator is between'
+      end
+    when 'isnull'
+      @sql_value = ''
+    when 'in'
+      escaped_values_ = @value.map do |in_value|
+        in_value.class == String ? "'#{@model.sanitize_sql(in_value)}'" : in_value
+      end
+      @sql_value = "(#{escaped_values_.join(', ')})"
     else
       @sql_value = "'#{escaped_value_}'"
     end

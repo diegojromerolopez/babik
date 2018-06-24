@@ -3,11 +3,12 @@
 This documents contain the documentation of the API
 that can be used to make queries with Babik.
 
-## Design
+## API
 
-All the information about the 
+All the information about how to use this tool:
 
-- [Count](/doc/api/select/count.md)
+- [Select](/doc/api/select.md)
+- [Count](/doc/api/count.md)
 
 ## Yardoc
 
