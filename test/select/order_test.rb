@@ -10,9 +10,9 @@ class OrderTest < Minitest::Test
     @frankish_kingdom = GeoZone.create!(name: 'Frankish Kingdom')
 
     frankish_king_names = [
-        'Merovech',
-        'Childeric I',
-        'Clovis I'
+      'Merovech',
+      'Childeric I',
+      'Clovis I'
     ]
 
     @frankish_kings = []
@@ -47,8 +47,8 @@ class OrderTest < Minitest::Test
   def test_basic_order
     users = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name ASC])
     goth_king_names = [
-        'Alarico I', 'Alarico II', 'Ataulfo', 'Eurico', 'Sigerico', 'Teodorico I', 'Teodorico II', 'Turismundo'
-     ]
+      'Alarico I', 'Alarico II', 'Ataulfo', 'Eurico', 'Sigerico', 'Teodorico I', 'Teodorico II', 'Turismundo'
+    ]
     users.each_with_index do |user, user_index|
       assert_equal goth_king_names[user_index], user.first_name
     end

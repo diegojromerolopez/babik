@@ -3,6 +3,7 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
+# Tests of count method
 class CountTest < Minitest::Test
 
   def setup

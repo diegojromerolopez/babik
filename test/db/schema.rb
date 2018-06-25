@@ -12,6 +12,8 @@ ActiveRecord::Schema.define do
     t.integer :zone_id
     t.string :first_name
     t.string :last_name
+    t.text :biography
+    t.integer :age
     t.string :email
     t.timestamps
   end
