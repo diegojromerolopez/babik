@@ -14,7 +14,7 @@ gem install babik
 
 ## Usage
 
-See [schema](#apendix-1:-example-schema) for information about this example's schema.
+See [schema](/README.md#apendix-1:-example-schema) for information about this example's schema.
 
 ### Examples
 
@@ -29,11 +29,11 @@ User.create!(first_name: 'Cleopatra')
 User.create!(first_name: 'Crassus')
 User.create!(first_name: 'Pompey')
 
-User.filter(first_name__equal: 'Julius').count # => 1
-User.filter(first_name__different: 'Julius').count # => 5
-User.filter(first_name__contains: 'iu').count # => 2
-User.filter(first_name__endswith: 'us').count # => 4
-User.filter(first_name__startswith: 'C').count # => 2
+User.objects.filter(first_name__equal: 'Julius').count # => 1
+User.objects.filter(first_name__different: 'Julius').count # => 5
+User.objects.filter(first_name__contains: 'iu').count # => 2
+User.objects.filter(first_name__endswith: 'us').count # => 4
+User.objects.filter(first_name__startswith: 'C').count # => 2
 
 ```
 
