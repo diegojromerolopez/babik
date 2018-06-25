@@ -14,50 +14,7 @@ gem install babik
 
 ## Usage
 
-### Example schema
-
-Through this documentation this schema will be used, keep it in mind when
-reading the examples.
-
-```ruby
-ActiveRecord::Schema.define do
-  self.verbose = false
-
-  create_table :geo_zones, :force => true do |t|
-    t.string :name
-    t.text :description
-    t.integer :parent_zone_id
-    t.timestamps
-  end
-
-  create_table :users, :force => true do |t|
-    t.integer :zone_id
-    t.string :first_name
-    t.string :last_name
-    t.string :email
-    t.timestamps
-  end
-
-  create_table :posts, :force => true do |t|
-    t.string :title
-    t.text :content
-    t.integer :author_id
-    t.timestamps
-  end
-
-  create_table :post_tags, :force => true do |t|
-    t.integer :post_id
-    t.integer :tag_id
-    t.timestamps
-  end
-
-  create_table :tags, :force => true do |t|
-    t.string :name
-    t.timestamps
-  end
-
-end
-```
+See [schema](#apendix-1:-example-schema) for information about this example's schema.
 
 ### Examples
 
@@ -98,15 +55,15 @@ loaded_josephus_by_name = User.objects.filter(
 
 loaded_josephus_by_inmediate_zone = User.objects.filter(
   'zone::name': 'Roman Empire'
-).get
+).first
 
 loaded_josephus_by_parent_zone = User.objects.filter(
   'zone::parent_zone::name': 'Roman Empire'
-).get
+).first
 
 loaded_josephus_by_grandparent_zone = User.objects.filter(
   'zone::parent_zone::parent_zone::name': 'Roman Empire'
-).get
+).first
 
 ```
 
@@ -144,3 +101,49 @@ internals of this library.
 
 [MIT](LICENSE)
 
+## Apendix 1: Example schema
+
+Through this documentation this schema will be used, keep it in mind when
+reading the examples.
+
+```ruby
+ActiveRecord::Schema.define do
+  self.verbose = false
+
+  create_table :geo_zones, :force => true do |t|
+    t.string :name
+    t.text :description
+    t.integer :parent_zone_id
+    t.timestamps
+  end
+
+  create_table :users, :force => true do |t|
+    t.integer :zone_id
+    t.string :first_name
+    t.string :last_name
+    t.text :biography
+    t.integer :age
+    t.string :email
+    t.timestamps
+  end
+
+  create_table :posts, :force => true do |t|
+    t.string :title
+    t.text :content
+    t.integer :author_id
+    t.timestamps
+  end
+
+  create_table :post_tags, :force => true do |t|
+    t.integer :post_id
+    t.integer :tag_id
+    t.timestamps
+  end
+
+  create_table :tags, :force => true do |t|
+    t.string :name
+    t.timestamps
+  end
+
+end
+```

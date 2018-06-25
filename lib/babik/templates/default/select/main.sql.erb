@@ -1,5 +1,11 @@
 <% model = queryset.model %>
-<% filters = queryset.filters %>
+
+<% inclusion_filters = queryset.inclusion_filters %>
+<% has_inclusion_filters = inclusion_filters.length.positive? %>
+
+<% exclusion_filters = queryset.exclusion_filters %>
+<% has_exclusion_filters = exclusion_filters.length.positive? %>
+
 <% has_distinct = queryset.has_distinct %>
 <% number_of_rows_limit = queryset.number_of_rows_limit %>
 <% offset = queryset.offset %>
@@ -40,23 +46,59 @@ FROM <%= model.table_name %>
 
 <%= queryset._sql_left_joins %>
 
+<% if has_inclusion_filters || has_exclusion_filters  %>
 WHERE (
-  1=1
-  <% filters.each do |conjunction| %>
-    AND (
-      1=1
-      <% if conjunction.class == Array %>
-        AND ( 1=0
-          <% conjunction.each do |disjunction| %>
+  <% if has_inclusion_filters %>
+  (
+    <% inclusion_filters.each_with_index do |condition, condition_index| %>
+      <% last_inclusion_filter = condition_index == inclusion_filters.length - 1 %>
+      (
+        1=1
+        <% if condition.class == Array %>
+          AND ( 1=0
+            <% condition.each do |disjunction| %>
+              OR <%= disjunction.sql_where_condition %>
+            <% end %>
+          )
+        <% else %>
+          AND (<%= condition.sql_where_condition %>)
+        <% end %>
+      )
+      <% unless last_inclusion_filter %>
+      AND
+      <% end %>
+    <% end %>
+  )
+  <% end %>
+
+  <% if has_inclusion_filters && has_exclusion_filters %>
+    AND
+  <% end %>
+
+  <% if has_exclusion_filters %>
+  ( NOT (
+    <% exclusion_filters.each_with_index do |condition, condition_index| %>
+      <% last_exclusion_filter = condition_index == exclusion_filters.length - 1 %>
+      (
+        1=1
+        <% if condition.class == Array %>
+          AND ( 1=0
+          <% condition.each do |disjunction| %>
             OR <%= disjunction.sql_where_condition %>
           <% end %>
-        )
-      <% else %>
-        AND (<%= conjunction.sql_where_condition %>)
+          )
+        <% else %>
+          AND (<%= condition.sql_where_condition %>)
+        <% end %>
+      )
+      <% unless last_exclusion_filter %>
+      AND
       <% end %>
-    )
-  <% end %>
+    <% end %>
+  ) )
+<% end %>
 )
+<% end %>
 <%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
 <% unless number_of_rows_limit.nil? %>
   LIMIT <%= number_of_rows_limit %>

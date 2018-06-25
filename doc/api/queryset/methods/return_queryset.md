@@ -15,6 +15,27 @@ User.objects
     .filter('posts::tags::name': 'history')
 ``` 
 
+## Exclude
+
+Filter out some objects that match some conditions.
+
+Follows the same format than [Filter](#filter) but as an exclusion instead of
+selection.
+
+```ruby
+# Select all users that are not named 'Paulus'
+User.objects.exclude(first_name: 'Marcus')
+```
+
+```ruby
+# Select all users that have not the last name 'Paulus' and that are not
+# from 'Rome'.
+# SELECT users.* FROM users
+# INNER JOIN geo_zones ON users.geo_zone_id = geo_zones_id 
+# WHERE NOT(last_name = 'Paulus' AND geo_zones.name = 'Rome')
+User.objects.exclude(last_name: 'Paulus', 'zone::name': 'Rome')
+```
+
 ## Filter
 
 Filter is a method that allows to select the desired ActiveRecord objects.
@@ -45,6 +66,23 @@ User.objects.filter({first_name: 'Iacobus', last_name: 'Paulus'})
 
 # We can write
 User.objects.filter(first_name: 'Iacobus', last_name: 'Paulus') 
+```
+
+### Combining exclude and filter
+
+You can combine filter and exclude to create complex queries.
+
+```ruby
+# SELECT users.* FROM users
+# INNER JOIN geo_zones ON users.geo_zone_id = geo_zones_id 
+# WHERE last_name <> 'Paulus' AND NOT(geo_zones.name IN ('Rome', 'Utica'))
+User.objects.filter([{first_name: 'Iacobus'}]).exclude('zone::name__in': ['Rome', 'Utica'])
+```
+
+```ruby
+# SELECT users.* FROM users
+# WHERE last_name <> 'Paulus' AND NOT(users.email LIKE '%example.com')
+User.objects.filter({first_name: 'Iacobus'}).exclude({'email__endswith': 'example.com'})
 ```
 
 ## Local filters

@@ -45,13 +45,15 @@ end
 
 ## API
 
-- [Methods that return QuerySets](/doc/api/queryset/return_queryset.md). 
+- [Methods that return a QuerySet](/doc/api/queryset/return_queryset.md). 
   - [Distinct](/doc/api/queryset/return_queryset.md#distinct)
+  - [Exclude](/doc/api/queryset/return_queryset.md#exclude)
   - [Filter](/doc/api/queryset/return_queryset.md#filter)
   - [Limit](/doc/api/queryset/return_queryset.md#limit)
-- [Methods that don't return QuerySets](/doc/api/queryset/dont_return_queryset.md). 
-  - [Count](/doc/api/queryset/dont_return_queryset.md#count)
-  - [Get](/doc/api/queryset/dont_return_queryset.md#get)
-  - [Project](/doc/api/queryset/dont_return_queryset.md#project)
+- [Methods that don't return a QuerySet](/doc/api/queryset/dont_return_queryset.md). 
+  - [Count](/doc/api/queryset/dont_return_queryset.md#count): returns a positive or zero integer.
+  - [First](/doc/api/queryset/dont_return_queryset.md#first): returns an ActiveRecord object or nil.
+  - [Get](/doc/api/queryset/dont_return_queryset.md#get): returns an ActiveRecord object.
+  - [Project](/doc/api/queryset/dont_return_queryset.md#project): returns a [Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html).
 
 

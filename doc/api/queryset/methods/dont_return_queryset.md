@@ -34,8 +34,21 @@ User.filter(last_name: 'Smith', 'zone::description__icontains': 'desert').count
 
 # Number of users with the surname Smith that have a post tagged with 'history'
 User.filter(last_name: 'Smith', 'posts::tags::name': 'history').count
-
 ```
+
+## First
+
+Return the first element of the QuerySet. If the QuerySet is empty, it will return nil.
+
+```ruby
+# Return the user with the first name Marcus, whose last name
+# is the first one (descending order). 
+User.filter(first_name: 'Marcus').order_by([:last_name, :DESC]).first
+
+# Return nil because the first name 'Marcux' is not present in the database
+User.filter(first_name: 'Marcux').order_by([:last_name, :DESC]).first
+```
+
 ## Get
 
 Return the ActiveRecord that matches the condition.

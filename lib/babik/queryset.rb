@@ -7,7 +7,8 @@ require_relative 'query/foreign_selection'
 # Represents a new type of query result set
 class QuerySet
   include Enumerable
-  attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :filters, :projection
+  attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :projection,
+              :inclusion_filters, :exclusion_filters
 
   def initialize(model_class)
     @model = model_class
@@ -18,19 +19,30 @@ class QuerySet
     @order = nil
     @order_selections = []
     @lock_type = nil
-    @filters = []
+    @inclusion_filters = []
+    @exclusion_filters = []
     @projection = false
   end
 
-  # Select the objects according to some criteria.
+  # Exclude objects according to some criteria.
+  def exclude(filters)
+    _filter(filters, @exclusion_filters)
+  end
+
+  # Select objects according to some criteria.
   def filter(filters)
+    _filter(filters, @inclusion_filters)
+  end
+
+  # Select the objects according to some criteria.
+  def _filter(filters, applied_filters)
     if filters.class == Array
       disjunctions = filters.map do |filter|
         Conjunction.new(@model, filter)
       end
-      @filters << disjunctions
+      applied_filters << disjunctions
     elsif filters.class == Hash
-      @filters << Conjunction.new(@model, filters)
+      applied_filters << Conjunction.new(@model, filters)
     end
     self
   end
@@ -38,6 +50,10 @@ class QuerySet
   def all
     return ActiveRecord::Base.connection.exec_query(self.sql) if self.projection
     @model.find_by_sql(self.sql)
+  end
+
+  def first
+    self.all.first
   end
 
   def each(&block)
@@ -132,7 +148,10 @@ class QuerySet
 
   def _sql_left_joins
     left_joins_by_alias = {}
-    @filters.flatten.each do |conjunction|
+    @inclusion_filters.flatten.each do |conjunction|
+      left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
+    end
+    @exclusion_filters.flatten.each do |conjunction|
       left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
     end
     # FIXME: order selection should be a class with common parts with selection
