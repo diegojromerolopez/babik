@@ -51,8 +51,8 @@ class ForeignSelectionTest < Minitest::Test
     assert_equal foreign_selection.sql_operator, '='
 
     assert_equal foreign_selection.left_joins[0].sql, 'LEFT JOIN posts users__posts_0 ON users__posts_0.author_id = users.id'
-    assert_equal foreign_selection.left_joins[1].sql, 'LEFT JOIN tags users__tags_1 ON users__tags_1.post_id = users__posts_0.id'
-    assert_equal foreign_selection.sql_where_condition, 'users__tags_1.name = \'Funny\''
+    assert_equal foreign_selection.left_joins[1].sql, 'LEFT JOIN tags posts__tags_1 ON posts__tags_1.id = users__posts_0.tag_id'
+    assert_equal foreign_selection.sql_where_condition, 'posts__tags_1.name = \'Funny\''
   end
 
   def _associations_are_equal(association_1, association_2)

@@ -19,7 +19,7 @@ class ProjectTest < Minitest::Test
     end
   end
 
-  def end
+  def teardown
     User.destroy_all
     GeoZone.destroy_all
   end

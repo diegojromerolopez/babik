@@ -11,15 +11,35 @@ class FilterTest < Minitest::Test
     @cantabria = GeoZone.new(name: 'Cantabria')
     @cangas_de_onis = GeoZone.new(name: 'Cangas de Onís', parent_zone: @asturias)
 
-    User.create!(first_name: 'Pelayo', zone: @cangas_de_onis)
+    @pelayo = User.create!(first_name: 'Pelayo', zone: @cangas_de_onis)
     User.create!(first_name: 'Favila', zone: @cangas_de_onis)
     User.create!(first_name: 'Alfonso I', last_name: 'Católico', zone: @cantabria)
     User.create!(first_name: 'Fruela I', zone: @cangas_de_onis)
+
+    battle = Tag.create!(name: 'battle')
+    asturias = Tag.create!(name: 'asturias')
+    victory = Tag.create!(name: 'victory')
+    Tag.create!(name: 'chronicle')
+
+    @main_category = Category.create!(name: 'Dialogues')
+
+    first_post = Post.create!(author: @pelayo, title: 'I\'m not an ass', category: @main_category)
+    second_post = Post.create!(author: @pelayo, title: 'Come and get my land', category: @main_category)
+
+    first_post.tags << battle
+    first_post.tags << asturias
+    first_post.tags << victory
+
+    second_post.tags << asturias
+    second_post.tags << victory
   end
 
   def teardown
-    User.delete_all
-    GeoZone.delete_all
+    User.destroy_all
+    GeoZone.destroy_all
+    Post.destroy_all
+    Tag.destroy_all
+    Category.destroy_all
   end
 
   def test_local_filter
@@ -58,6 +78,29 @@ class FilterTest < Minitest::Test
     kings.each_with_index do |king, king_i|
       assert_equal asturian_kings[king_i], king.first_name
     end
+  end
+
+  def test_many_to_many_foreign_filter
+    tags = Tag.objects.distinct.filter('posts::title': 'I\'m not an ass').order_by([:name, :ASC])
+    tag_names = ['asturias', 'battle', 'victory']
+    tags.each_with_index do |tag, tag_index|
+      assert_equal tag_names[tag_index], tag.name
+    end
+  end
+
+  def test_deep_many_to_many_foreign_filter
+    tags = Tag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by([:name, :ASC])
+    tag_names = ['asturias', 'battle', 'victory']
+    tags.each_with_index do |tag, tag_index|
+      assert_equal tag_names[tag_index], tag.name
+    end
+  end
+
+  def test_wrong_many_to_many_foreign_filter
+    exception = assert_raises RuntimeError do
+      BadTag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by([:name, :ASC])
+    end
+    assert_equal('Relationship posts is has_and_belongs_to_many. Convert it to has_many-through', exception.message)
   end
 
 end

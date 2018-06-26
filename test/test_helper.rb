@@ -49,7 +49,10 @@ load "#{__dir__}/db/schema.rb"
 require 'models/geozone'
 require 'models/user'
 require 'models/tag'
+require 'models/category'
 require 'models/post'
+require 'models/post_tag'
+require 'models/bad_tag'
 
 
 

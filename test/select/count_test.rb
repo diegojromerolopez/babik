@@ -54,6 +54,7 @@ class CountTest < Minitest::Test
                         .where.not("geo_zones.name": 'Rome')
     assert_equal active_record_set.count, queryset.count
     assert_equal queryset.length,queryset.count
+    assert_equal queryset.length,queryset.size
     assert queryset.empty?
     assert_equal false, queryset.exists?
   end
@@ -71,6 +72,7 @@ class CountTest < Minitest::Test
                         .where.not("geo_zones.name": 'Madrid')
     assert_equal active_record_set.count, queryset.count
     assert_equal queryset.length, queryset.count
+    assert_equal queryset.length, queryset.size
     assert_equal false, queryset.empty?
     assert_equal true, queryset.exists?
   end
@@ -81,6 +83,7 @@ class CountTest < Minitest::Test
       "zone::parent_zone::parent_zone::name__equals": 'Roman Empire'
     )
     assert_equal 3, queryset.count
+    assert_equal 3, queryset.size
   end
 
   # Test the count from a deep belongs to relationship
@@ -101,10 +104,13 @@ class CountTest < Minitest::Test
   end
 
   # Count the objects using contains
-  def test_lookup_contains
-    assert_equal 1, User.objects.filter(first_name__contains: 'avi').length
-    assert_equal 1, User.objects.filter(first_name__startswith: 'Fla').length
-    assert_equal 1, User.objects.filter(first_name__endswith: 'vio').length
+  def test_lookups
+    assert_equal User.where('first_name LIKE ?', '%avi%').length, User.objects.filter(first_name__contains: 'avi').length
+    assert_equal User.where('first_name LIKE ?', 'Fla%').length, User.objects.filter(first_name__startswith: 'Fla').length
+    assert_equal User.where('first_name LIKE ?', '%vio').length, User.objects.filter(first_name__startswith: 'Fla').length
+    assert_equal User.where(first_name: 'Flavio').length, User.objects.filter(first_name: 'Flavio').length
+    assert_equal User.where(first_name: 'Flavio').length, User.objects.filter(first_name__exact: 'Flavio').length
+    assert_equal User.where(first_name: 'Flavio').length, User.objects.filter(first_name__equal: 'Flavio').length
   end
 
   def test_lookup_isnull

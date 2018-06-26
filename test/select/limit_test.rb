@@ -43,14 +43,23 @@ class LimitTest < Minitest::Test
     page_size = 5
     first_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size)
     first_page_with_brackets = User.objects.filter(last_name: 'LimitTest user')[0..page_size]
+    first_page_with_brackets_single_value = User.objects.filter(last_name: 'LimitTest user')[page_size]
     assert_equal page_size, first_page.count
     assert_equal first_page.count, first_page_with_brackets.count
+    assert_equal first_page.count, first_page_with_brackets_single_value.count
 
     second_page_offset = page_size
     second_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size, offset: second_page_offset)
     second_page_with_brackets = User.objects.filter(last_name: 'LimitTest user')[second_page_offset..(second_page_offset+page_size)]
     assert_equal page_size, second_page.count
     assert_equal second_page.count, second_page_with_brackets.count
+  end
+
+  def test_limit_brackets_error
+    exception = assert_raises RuntimeError do
+      User.objects.filter(last_name: 'Whatever user')['invalid limit value']
+    end
+    assert_equal('Invalid limit passed to query: invalid limit value', exception.message)
   end
 
 end
