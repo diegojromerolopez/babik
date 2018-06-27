@@ -3,12 +3,11 @@
 This documents contain the documentation of the API
 that can be used to make queries with Babik.
 
-## API
+## QuerySet API
 
-All the information about how to use this tool:
+All the information about how to use this tool is
+present in the [QuerySet API](/doc/api/queryset.md)
 
-- [Select](/doc/api/select.md)
-- [Count](/doc/api/count.md)
 
 ## Yardoc
 
