@@ -115,8 +115,10 @@ class CountTest < Minitest::Test
 
   def test_lookup_isnull
     assert_equal 0, User.objects.filter('zone::name': 'Rome', email__isnull: true).count
+    assert_equal 0, User.objects.filter('zone::name': 'Rome', email__exact: nil).count
     assert_equal 1, User.objects.filter('zone::name': 'Rome', email__isnull: false).count
     assert_equal 2, User.objects.filter('zone::name': 'Jerusalem', email__isnull: false).count
+    assert_equal 2, User.objects.filter('zone::name': 'Jerusalem').exclude(email__exact: nil).count
   end
 
   def test_lookup_in

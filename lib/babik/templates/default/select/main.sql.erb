@@ -99,13 +99,6 @@ WHERE (
 <% end %>
 )
 <% end %>
-<%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
-<% unless number_of_rows_limit.nil? %>
-  LIMIT <%= number_of_rows_limit %>
-  <% unless offset.nil? || offset == 0 %>
-    OFFSET <%= offset %>
-  <% end %>
-<% end %>
 <%# Order the results %>
 <% unless order.nil? %>
   ORDER BY
@@ -120,4 +113,12 @@ WHERE (
       <%= model.table_name %>.<%= order_field[0] %> <%= order_field[1] %> <% unless last_one %>,<% end %>
     <% end %>
   <% end %>
+<% end %>
+
+<%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
+<% unless number_of_rows_limit.nil? %>
+LIMIT <%= number_of_rows_limit %>
+<% unless offset.nil? || offset == 0 %>
+OFFSET <%= offset %>
+<% end %>
 <% end %>

@@ -26,14 +26,21 @@ class ForeignSelection < Selection
     associated_model_i = @model
     @association_path.each do |association_i_name|
       association_i = associated_model_i.reflect_on_association(association_i_name.to_sym)
+      # To one relationship
       if association_i.belongs_to? || association_i.has_one?
         @associations << association_i
         associated_model_i = association_i.klass
+      # Classic many-to-many relationship
+      elsif association_i.class == ActiveRecord::Reflection::HasAndBelongsToManyReflection
+        raise "Relationship #{association_i.name} is has_and_belongs_to_many. Convert it to has_many-through"
+      # Many-to-many with through relationship
       else
-        # Add model-through association
+        # Add model-through association (active_record -> klass)
         @associations << association_i.through_reflection
-        # Add through-target association
-        through_target_association = association_i.active_record.reflect_on_association(association_i.source_reflection.name)
+        # Add through-target association (through -> target)
+        target_name = association_i.source_reflection_name
+        through_model = association_i.through_reflection.klass
+        through_target_association = through_model.reflect_on_association(target_name)
         @associations << through_target_association
         # The next association comes from target model
         associated_model_i = through_target_association.klass

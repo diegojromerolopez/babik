@@ -43,10 +43,19 @@ class LimitTest < Minitest::Test
     page_size = 5
     first_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size)
     first_page_with_brackets = User.objects.filter(last_name: 'LimitTest user')[0..page_size]
-    first_page_with_brackets_single_value = User.objects.filter(last_name: 'LimitTest user')[page_size]
-    assert_equal page_size, first_page.count
+    limit_test_user = User.objects.filter(last_name: 'LimitTest user')[page_size]
+    assert_equal 'No user', User.objects.filter(last_name: 'LimitTest user').fetch(10_000, 'No user')
+
+    non_existent_index = User.objects.count + 100
+    exception = assert_raises IndexError do
+      User.objects.filter(last_name: 'LimitTest user').fetch(non_existent_index)
+    end
+    limit_test_count = User.objects.filter(last_name: 'LimitTest user').count
+
+    assert_equal("Index #{non_existent_index} outside of QuerySet bounds", exception.message)
+    assert_equal User, limit_test_user.class
+    assert_equal 'LimitTest user', limit_test_user.last_name
     assert_equal first_page.count, first_page_with_brackets.count
-    assert_equal first_page.count, first_page_with_brackets_single_value.count
 
     second_page_offset = page_size
     second_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size, offset: second_page_offset)

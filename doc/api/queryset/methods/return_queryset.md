@@ -1,5 +1,23 @@
 # Methods that return QuerySets
 
+## Brackets
+
+If the brackets operator takes a range, the resultant QuerySet will be limited
+in the form **[start..end]**.
+
+```ruby
+# Will return 15 users from the 5th one to the 20th one (both included).
+User.objects.filter('first_name': 'Romulus').order_by(first_name: :ASC)[5..20]
+
+# SELECT users.*
+# FROM users
+# WHERE first_name = 'Romulus'
+# ORDER BY first_name ASC
+# LIMIT 15 OFFSET 5
+```
+
+[There is also other way to use to return single ActiveRecord objects](/doc/api/queryset/dont_return_queryset.md#brackets).
+
 ### Distinct
 
 Call **distinct** method when we are sure the result of your QuerySet
@@ -169,3 +187,4 @@ User.objects.filter('zone::name': 'Rome').limit(size: 5)
 # Will return the next 5 users starting from the sixth one.
 User.objects.filter('zone::name': 'Rome').limit(size: 5, offset: 6)
 ```
+

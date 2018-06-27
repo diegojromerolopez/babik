@@ -15,8 +15,15 @@ class Selection
   def _initialize_sql_operator
     # TODO: startswith, endswith, between, contains, icontains, jsonb operators
     case @operator
-    when 'equal'
+    when 'equal', 'equals_to'
       @sql_operator = '='
+    when 'exact', 'iexact'
+      if @value.nil?
+        @sql_operator = 'IS NULL'
+      else
+        @sql_operator = 'LIKE' if @operator == 'exact'
+        @sql_operator = 'ILIKE' if @operator == 'iexact'
+      end
     when 'different'
       @sql_operator = '<>'
     when 'in'
@@ -28,14 +35,14 @@ class Selection
     when 'lte'
       @sql_operator = '<='
     when 'gt'
-      @sql_operator = '>='
+      @sql_operator = '>'
     when 'gte'
       @sql_operator = '>='
     when 'between', 'date'
       @sql_operator = 'BETWEEN'
-    when 'startswith', 'endswith', 'contains', 'exact'
+    when 'startswith', 'endswith', 'contains'
       @sql_operator = 'LIKE'
-    when 'istartswith', 'iendswith', 'icontains', 'iexact'
+    when 'istartswith', 'iendswith', 'icontains'
       @sql_operator = 'ILIKE'
     else
       @operator = 'equal'
@@ -45,11 +52,11 @@ class Selection
 
   def _initialize_sql_value
     if @value.class == String
-      escaped_value_ = @model.sanitize_sql(@value)
+      escaped_value_ = _escape(@value)
     elsif @value.class == Date
-      escaped_value_ = Time.parse(@value.to_s).beginning_of_day.utc.to_s(:db)
+      escaped_value_ = "'#{Time.parse(@value.to_s).beginning_of_day.utc.to_s(:db)}'"
     elsif @value.class == DateTime || @value.class == Time
-      escaped_value_ = @value.utc.to_s(:db)
+      escaped_value_ = "'#{@value.utc.to_s(:db)}'"
     else
       escaped_value_ = @value
     end
@@ -61,13 +68,17 @@ class Selection
 
     case @operator
     when 'startswith', 'istartswith'
-      @sql_value = "'#{escaped_value_}%'"
+      @sql_value = "'#{@model.sanitize_sql_like(@value)}%'"
     when 'endswith', 'iendswith'
-      @sql_value = "'%#{escaped_value_}'"
+      @sql_value = "'%#{@model.sanitize_sql_like(@value)}'"
     when 'contains', 'icontains'
-      @sql_value = "'%#{escaped_value_}%'"
+      @sql_value = "'%#{@model.sanitize_sql_like(@value)}%'"
     when 'exact', 'iexact'
-      @sql_value = "'#{escaped_value_}'"
+      if @value.nil?
+        @sql_value = ''
+      else
+        @sql_value = escaped_value_
+      end
     when 'between'
       if @value.class == Array
         if [@value[0], @value[1]].map { |v| v.class == DateTime || v.class == Date || v.class == Time } == [true, true]
@@ -86,8 +97,13 @@ class Selection
       end
       @sql_value = "(#{escaped_values_.join(', ')})"
     else
-      @sql_value = "'#{escaped_value_}'"
+      @sql_value = escaped_value_
     end
+  end
+
+  def _escape(str)
+    conn = ActiveRecord::Base.connection
+    conn.quote(str)
   end
 
   def left_joins_by_alias

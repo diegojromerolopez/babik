@@ -46,14 +46,17 @@ end
 ## API
 
 - [Methods that return a QuerySet](/doc/api/queryset/return_queryset.md). 
-  - [Distinct](/doc/api/queryset/return_queryset.md#distinct)
-  - [Exclude](/doc/api/queryset/return_queryset.md#exclude)
-  - [Filter](/doc/api/queryset/return_queryset.md#filter)
-  - [Limit](/doc/api/queryset/return_queryset.md#limit)
+  - [Distinct](/doc/api/queryset/return_queryset.md#distinct): make the query to return unique rows.
+  - [Exclude](/doc/api/queryset/return_queryset.md#exclude): add more excluding conditions to the query.
+  - [Filter](/doc/api/queryset/return_queryset.md#filter): add more including conditions to the query.
+  - [Limit](/doc/api/queryset/return_queryset.md#limit): returns an slice of the QuerySet.
+  - [\[\] operator](/doc/api/queryset/return_queryset.md#brackets): returns an slice of the QuerySet.
 - [Methods that don't return a QuerySet](/doc/api/queryset/dont_return_queryset.md). 
   - [Count](/doc/api/queryset/dont_return_queryset.md#count): returns a positive or zero integer.
+  - [Fetch](/doc/api/queryset/dont_return_queryset.md#fetch): returns an ActiveRecord object or default value.
   - [First](/doc/api/queryset/dont_return_queryset.md#first): returns an ActiveRecord object or nil.
   - [Get](/doc/api/queryset/dont_return_queryset.md#get): returns an ActiveRecord object.
   - [Project](/doc/api/queryset/dont_return_queryset.md#project): returns a [Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html).
+  - [\[\] operator](/doc/api/queryset/dont_return_queryset.md#brackets): returns an ActiveRecord object or nil.
 
 

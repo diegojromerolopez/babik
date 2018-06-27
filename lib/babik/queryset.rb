@@ -106,7 +106,17 @@ class QuerySet
       if order.class == String
         [order, :ASC]
       elsif order.class == Array
+        unless %i[ASC DES].include?(order[1].to_sym)
+          raise "Invalid order type for #{self.class}.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]"
+        end
         order
+      elsif order.class == Hash
+        if order.keys.length > 1
+          raise "More than one key found in order by for class #{self.class}"
+        end
+        order_field = order.keys[0]
+        order_value = order[order_field]
+        [order_field, order_value]
       else
         raise "Invalid value for #{self.class}.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]"
       end
@@ -118,22 +128,40 @@ class QuerySet
     self
   end
 
-  def lock
+  def for_update
     @lock_type = 'FOR UPDATE'
     self
   end
 
+  def lock
+    self.for_update
+  end
+
+  def fetch(index, default_value = nil)
+    element = self.[](index)
+    if element
+      return element
+    end
+    if default_value
+      return default_value
+    end
+    raise IndexError, "Index #{index} outside of QuerySet bounds"
+  end
+
   def [](param)
+    # Section selection
     if param.class == Range
       offset_ = param.min
       size_ = param.max.to_i - param.min.to_i
-      limit(size: size_, offset: offset_)
-    elsif param.class == Integer
-      limit(size: param, offset: 0)
-    else
-      raise "Invalid limit passed to query: #{param}"
+      return limit(size: size_, offset: offset_)
     end
-    self
+
+    # Element selection
+    if param.class == Integer
+      return limit(size: 1, offset: param).first
+    end
+
+    raise "Invalid limit passed to query: #{param}"
   end
 
   def limit(size: nil, offset: 0)

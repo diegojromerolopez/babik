@@ -1,5 +1,25 @@
 # Methods that don't return QuerySets
 
+
+## Brackets
+
+If the brackets operator takes an integer, it will return the ActiveRecord of this QuerySet in that position.
+
+```ruby
+# Will return 15 users from the 5th one
+User.objects.filter('first_name': 'Romulus').order_by(first_name: :ASC)[5]
+
+# SELECT users.*
+# FROM users
+# WHERE first_name = 'Romulus'
+# ORDER BY first_name ASC
+# LIMIT 1 OFFSET 5
+```
+
+If there is no ActiveRecord in that position, nill will be returned.
+
+[There is also other way to use to return a section of the QuerySet](/doc/api/queryset/return_queryset.md#brackets).
+
 ## Count
 
 Just call **count** method on the QuerySet to return the number of objects
@@ -36,9 +56,32 @@ User.filter(last_name: 'Smith', 'zone::description__icontains': 'desert').count
 User.filter(last_name: 'Smith', 'posts::tags::name': 'history').count
 ```
 
+## Fetch
+
+Returns the elemnt with the index parameter.
+
+If there is no element at that position, if it has a default value, will return it.
+
+If there is no default value, will raise an IndexError exception.
+
+```ruby
+# There are only 10 users 'Smith'
+
+# Returns an user (index is in bounds because is less than 10) 
+fifth_smith = User.filter(last_name: 'Smith').fetch(5)
+
+# Returns the default value
+# (index is not in bounds and a default value is present)
+default_value_for_smith = User.filter(last_name: 'Smith').fetch(10_000, 'No user')
+
+# Will raise an IndexError exception
+# (index is not in bounds and there is no default value) 
+bad_luck_smith = User.filter(last_name: 'Smith').fetch(10_000)
+```
+
 ## First
 
-Return the first element of the QuerySet. If the QuerySet is empty, it will return nil.
+Returns the first element of the QuerySet. If the QuerySet is empty, it will return nil.
 
 ```ruby
 # Return the user with the first name Marcus, whose last name
@@ -94,3 +137,4 @@ User.objects
     .order_by('first_name')
     .project('first_name', 'email', %w[zone::name country])
 ```
+
