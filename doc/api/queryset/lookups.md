@@ -116,3 +116,37 @@ User.objects.filter('last_name__startswith': 'CaNo')
 # SELECT users.* FROM users WHERE last_name ILIKE '%CaNo'
 ```
 
+## between
+
+Match those objects with a datetime field between two dates:
+
+```ruby
+User.objects.filter('created_at__between': [Time.zone.now - 3.days, Time.zone.now])
+# SELECT users.* FROM users WHERE last_name between '2018-06-26 14:07:00' AND '2018-06-29 14:07:00'
+```
+
+## range
+
+Alias for [between](#between).
+
+## regex
+
+Math ActiveRecord objects by regex expression.
+
+```ruby
+Post.objects.filter('first_name__regex': /\d+ stars/)
+# SELECT * FROM posts WHERE title REGEXP BINARY '\\d+ stars'; -- MySQL
+# SELECT * FROM posts WHERE title ~ '\\d+ stars'; -- PostgreSQL
+# SELECT * FROM posts WHERE title REGEXP '^\\d+ stars'; -- SQLite
+```
+
+## iregex
+
+Math ActiveRecord objects by regex expression (case-insensitive).
+
+```ruby
+Post.objects.filter('first_name__iregex': /\d+ stars/)
+# SELECT * FROM posts WHERE title REGEXP '\\d+ stars'; -- MySQL
+# SELECT * FROM posts title ~* '\\d+ stars'; -- PostgreSQL
+# SELECT * FROM posts title REGEXP '(?i)\\d+ stars'; -- SQLite
+```

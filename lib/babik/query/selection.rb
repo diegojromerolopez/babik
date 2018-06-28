@@ -38,12 +38,16 @@ class Selection
       @sql_operator = '>'
     when 'gte'
       @sql_operator = '>='
-    when 'between', 'date'
+    when 'between', 'range', 'date'
       @sql_operator = 'BETWEEN'
     when 'startswith', 'endswith', 'contains'
       @sql_operator = 'LIKE'
     when 'istartswith', 'iendswith', 'icontains'
       @sql_operator = 'ILIKE'
+    when 'regex'
+      @sql_operator = regex
+    when 'iregex'
+      @sql_operator = iregex
     else
       @operator = 'equal'
       @sql_operator = '='
@@ -79,7 +83,7 @@ class Selection
       else
         @sql_value = escaped_value_
       end
-    when 'between'
+    when 'between', 'range'
       if @value.class == Array
         if [@value[0], @value[1]].map { |v| v.class == DateTime || v.class == Date || v.class == Time } == [true, true]
           @sql_value = "'#{@value[0].utc.to_s(:db)}' AND '#{@value[1].utc.to_s(:db)}'"
@@ -96,6 +100,10 @@ class Selection
         in_value.class == String ? "'#{@model.sanitize_sql(in_value)}'" : in_value
       end
       @sql_value = "(#{escaped_values_.join(', ')})"
+    when 'regex'
+      @sql_value = regex_value
+    when 'iregex'
+      @sql_value = iregex_value
     else
       @sql_value = escaped_value_
     end
@@ -108,6 +116,46 @@ class Selection
 
   def left_joins_by_alias
     {}
+  end
+
+  def regex
+    dbms = ENV.fetch('DB', 'sqlite3')
+    if dbms == 'mysql'
+      return 'REGEXP BINARY'
+    end
+    if dbms == 'postgresql'
+      return '~'
+    end
+    if dbms == 'sqlite3'
+      return 'REGEXP'
+    end
+    raise "Invalid dbms #{dbms}. Only mysql, postgresql, and sqlite3 are accpeted"
+  end
+
+  def iregex
+    dbms = ENV.fetch('DB', 'sqlite3')
+    if dbms == 'mysql'
+      return 'REGEXP'
+    end
+    if dbms == 'postgresql'
+      return '~*'
+    end
+    if dbms == 'sqlite3'
+      return 'REGEXP'
+    end
+    raise "Invalid dbms #{dbms}. Only mysql, postgresql, and sqlite3 are accpeted"
+  end
+
+  def regex_value
+    _escape(@value.inspect[1..-1])
+  end
+
+  def iregex_value
+    dbms = ENV.fetch('DB', 'sqlite3')
+    if dbms == 'sqlite3'
+      return _escape("(?i)#{@value.inspect[1..-1]}")
+    end
+    regex_value
   end
 
 end
