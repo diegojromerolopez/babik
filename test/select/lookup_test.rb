@@ -72,6 +72,17 @@ class LookupTest < Minitest::Test
     assert_equal 'Old post 1', old_posts_range[0].title
   end
 
+  def test_date
+    today_posts = Post.objects.filter(created_at__date: Date.today).order_by(created_at: :ASC)
+    assert_equal 5, today_posts.count
+  end
+
+  def test_year
+    today_posts = Post.objects.filter(created_at__year: Date.today.year).order_by(created_at: :ASC)
+    #puts today_posts.sql
+   # assert_equal 7, today_posts.count
+  end
+
   def test_regex
     other_posts = Post.objects.filter(title__regex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
     assert other_posts.sql.include?("(posts.title REGEXP '^This other[\\w\\d\\s]+$/')")

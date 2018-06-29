@@ -122,12 +122,22 @@ Match those objects with a datetime field between two dates:
 
 ```ruby
 User.objects.filter('created_at__between': [Time.zone.now - 3.days, Time.zone.now])
-# SELECT users.* FROM users WHERE last_name between '2018-06-26 14:07:00' AND '2018-06-29 14:07:00'
+# SELECT users.* FROM users WHERE last_name BETWEEN '2018-06-26 14:07:00' AND '2018-06-29 14:07:00'
 ```
 
 ## range
 
 Alias for [between](#between).
+
+## date
+
+Cast of a datetime field to date.
+
+```ruby
+Post.objects.filter('created_at__date': today)
+# SELECT * FROM posts WHERE BETWEEN '2018-06-26 00:00:00' AND '2018-06-26 23:59:59'
+
+```
 
 ## regex
 
