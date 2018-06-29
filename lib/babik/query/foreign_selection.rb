@@ -10,9 +10,7 @@ class ForeignSelection < Selection
               :sql_operator, :sql_value
 
   def initialize(model, selection_path, value)
-    @model = model
-    @value = value
-    @selection_path = selection_path
+    super
     @association_path = selection_path.to_s.split(RELATIONSHIP_SEPARATOR)
     selection_path = @association_path.pop
     @selected_field, @operator = selection_path.split(OPERATOR_SEPARATOR)

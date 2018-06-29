@@ -5,11 +5,17 @@ class Selection
   OPERATOR_SEPARATOR = '__'
 
   def self.factory(model, selection_path, value)
-    @model = model
     if selection_path.match?(RELATIONSHIP_SEPARATOR)
       return ForeignSelection.new(model, selection_path, value)
     end
     LocalSelection.new(model, selection_path, value)
+  end
+
+  def initialize(model, selection_path, value)
+    @model = model
+    @selection_path = selection_path
+    @value = value
+    @db_conf = ActiveRecord::Base.connection_config
   end
 
   def _initialize_sql_operator
@@ -119,28 +125,28 @@ class Selection
   end
 
   def regex
-    dbms = ENV.fetch('DB', 'sqlite3')
-    if dbms == 'mysql'
+    dbms_adapter = @db_conf[:adapter]
+    if dbms_adapter == 'mysql'
       return 'REGEXP BINARY'
     end
-    if dbms == 'postgresql'
+    if dbms_adapter == 'postgresql'
       return '~'
     end
-    if dbms == 'sqlite3'
+    if dbms_adapter == 'sqlite3'
       return 'REGEXP'
     end
-    raise "Invalid dbms #{dbms}. Only mysql, postgresql, and sqlite3 are accpeted"
+    raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accpeted"
   end
 
   def iregex
-    dbms = ENV.fetch('DB', 'sqlite3')
-    if dbms == 'mysql'
+    dbms_adapter = @db_conf[:adapter]
+    if dbms_adapter == 'mysql'
       return 'REGEXP'
     end
-    if dbms == 'postgresql'
+    if dbms_adapter == 'postgresql'
       return '~*'
     end
-    if dbms == 'sqlite3'
+    if dbms_adapter == 'sqlite3'
       return 'REGEXP'
     end
     raise "Invalid dbms #{dbms}. Only mysql, postgresql, and sqlite3 are accpeted"
@@ -151,8 +157,8 @@ class Selection
   end
 
   def iregex_value
-    dbms = ENV.fetch('DB', 'sqlite3')
-    if dbms == 'sqlite3'
+    dbms_adapter = @db_conf[:adapter]
+    if dbms_adapter == 'sqlite3'
       return _escape("(?i)#{@value.inspect[1..-1]}")
     end
     regex_value

@@ -38,17 +38,19 @@ class LookupTest < Minitest::Test
 
   def test_lt
     posts_with_less_than_4_starts = Post.objects.filter(stars__lt: 4).order_by(created_at: :ASC)
-    assert_equal 2, posts_with_less_than_4_starts.count
-    assert_equal 'This a post of 3 stars', posts_with_less_than_4_starts[0].title
-    assert_equal 'This other post with 3 stars', posts_with_less_than_4_starts[1].title
+    assert_equal 4, posts_with_less_than_4_starts.count
+    assert_equal 'Old post 2', posts_with_less_than_4_starts[0].title
+    assert_equal 'Old post 1', posts_with_less_than_4_starts[1].title
   end
 
   def test_lte
     posts_with_less_or_equal_than_4_starts = Post.objects.filter(stars__lte: 4).order_by(created_at: :ASC)
-    assert_equal 3, posts_with_less_or_equal_than_4_starts.count
-    assert_equal 'This a post of 4 stars', posts_with_less_or_equal_than_4_starts[0].title
-    assert_equal 'This a post of 3 stars', posts_with_less_or_equal_than_4_starts[1].title
-    assert_equal 'This other post with 3 stars', posts_with_less_or_equal_than_4_starts[2].title
+    assert_equal 5, posts_with_less_or_equal_than_4_starts.count
+    assert_equal 'Old post 2', posts_with_less_or_equal_than_4_starts[0].title
+    assert_equal 'Old post 1', posts_with_less_or_equal_than_4_starts[1].title
+    assert_equal 'This a post of 4 stars', posts_with_less_or_equal_than_4_starts[2].title
+    assert_equal 'This a post of 3 stars', posts_with_less_or_equal_than_4_starts[3].title
+    assert_equal 'This a post of 3 stars', posts_with_less_or_equal_than_4_starts[3].title
   end
 
   def test_between
