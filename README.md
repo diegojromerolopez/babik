@@ -18,71 +18,198 @@ See [schema](/README.md#apendix-1:-example-schema) for information about this ex
 
 ### Examples
 
+#### Selection
 
-#### Selection operators
-
-```ruby
-User.create!(first_name: 'Julius')
-User.create!(first_name: 'Octavius')
-User.create!(first_name: 'Augustus')
-User.create!(first_name: 'Cleopatra')
-User.create!(first_name: 'Crassus')
-User.create!(first_name: 'Pompey')
-
-User.objects.filter(first_name__equal: 'Julius').count # => 1
-User.objects.filter(first_name__different: 'Julius').count # => 5
-User.objects.filter(first_name__contains: 'iu').count # => 2
-User.objects.filter(first_name__endswith: 'us').count # => 4
-User.objects.filter(first_name__startswith: 'C').count # => 2
-
-```
-
-#### Select by foreign model field
+Basic selection is made by passing a hash to filter function:
 
 ```ruby
-parthian_empire = GeoZone.create!(name: 'Parthian Empire')
-User.create!(first_name: 'Seleucus', zone: parthian_empire)
-
-roman_empire = GeoZone.create!(name: 'Roman Empire')
-judea = GeoZone.create!(name: 'Judea', parent_zone: roman_empire)
-jerusalem = GeoZone.create!(name: 'Jerusalem', parent_zone: judea )
-User.create!(first_name: 'Flavius', last_name: 'Josephux', zone: jerusalem)
-
-loaded_josephus_by_name = User.objects.filter(
-  first_name: 'Flavius',
-  last_name: 'Josephus'
-)
-
-loaded_josephus_by_inmediate_zone = User.objects.filter(
-  'zone::name': 'Roman Empire'
-).first
-
-loaded_josephus_by_parent_zone = User.objects.filter(
-  'zone::parent_zone::name': 'Roman Empire'
-).first
-
-loaded_josephus_by_grandparent_zone = User.objects.filter(
-  'zone::parent_zone::parent_zone::name': 'Roman Empire'
-).first
-
+User.objects.filter(first_name: 'Flavius', last_name: 'Josephus')
+# SELECT users.* FROM users WHERE first_name = 'Flavius' AND last_name = 'Josephus'
 ```
+
+To make an OR condition, pass an array of hashes:
+
+```ruby
+User.objects.filter([{first_name: 'Flavius', last_name: 'Josephus'}, {last_name: 'Iosephus'}])
+# SELECT users.*
+# FROM users
+# WHERE (first_name = 'Flavius' AND last_name = 'Josephus') OR last_name = 'Iosephus'
+```
+
+#### Selection by exclusion
+
+You can make negative conditions easily by using **exclude** function:
+
+```ruby
+User.objects.exclude(first_name: 'Flavius', last_name: 'Josephus')
+# SELECT users.* FROM users WHERE NOT(first_name = 'Flavius' AND last_name = 'Josephus')
+```
+
+You can combine **filter** and **exclude** to create complex queries:
+
+```ruby
+User.objects.filter([{first_name: 'Marcus'}, {first_name: 'Julius'}]).exclude(last_name: 'Servilia')
+# SELECT users.*
+# FROM users
+# WHERE (first_name = 'Marcus' OR first_name = 'Julius') AND NOT(last_name = 'Servilia')
+```
+
+##### Lookups
+
+There are other operators than equal to, these are implemented by using lookups:
+
+###### equal
+
+```ruby
+User.objects.filter(first_name: 'Julius')
+User.objects.filter(first_name__equal: 'Julius')
+# SELECT users.*
+# FROM users
+# WHERE first_name = 'Julius' 
+```
+
+###### exact/iexact
+
+```ruby
+User.objects.filter(last_name__exact: nil)
+# SELECT users.*
+# FROM users
+# WHERE last_name IS NULL 
+```
+
+```ruby
+User.objects.filter(last_name__exact: 'Postumia')
+# SELECT users.*
+# FROM users
+# WHERE last_name LIKE 'Postumia' 
+```
+
+###### contains/icontains
+
+```ruby
+User.objects.filter(first_name__contains: 'iu')
+# SELECT users.*
+# FROM users
+# WHERE last_name LIKE '%iu%' 
+```
+
+###### endswith/iendswith
+
+```ruby
+User.objects.filter(first_name__endswith: 'us')
+# SELECT users.*
+# FROM users
+# WHERE last_name LIKE '%us' 
+```
+
+###### startswith/istartswith
+
+```ruby
+User.objects.filter(first_name__startswith: 'Mark')
+# SELECT users.*
+# FROM users
+# WHERE first_name LIKE 'Mark%' 
+```
+
+###### in
+
+```ruby
+User.objects.filter(first_name__in: ['Marcus', 'Julius', 'Crasus'])
+# SELECT users.*
+# FROM users
+# WHERE first_name IN ('Marcus', 'Julius', 'Crasus')
+```
+
+###### Comparison operators: gt, gte, lt, lte
+
+```ruby
+Posts.objects.filter(score__gt: 4)
+# SELECT posts.*
+# FROM posts
+# WHERE score > 4
+```
+
+```ruby
+Posts.objects.filter(score__lt: 4)
+# SELECT posts.*
+# FROM posts
+# WHERE score < 4
+```
+
+```ruby
+Posts.objects.filter(score__gte: 4)
+# SELECT posts.*
+# FROM posts
+# WHERE score >= 4
+```
+
+```ruby
+Posts.objects.filter(score__lte: 4)
+# SELECT posts.*
+# FROM posts
+# WHERE score <= 4
+```
+
+
+###### Other lookups
+
+See more [here](/doc/api/queryset/lookups.md).
+
+
+
+#### Selection by foreign model field
+
+The main feature is the filter by foreign keys. This can be done by only 
+
+**NOTE many-to-many relationships are only supported when based on has_many through**
+
+**NO has_and_belongs_to_many support**. [Reason](https://github.com/rubocop-hq/rails-style-guide#has-many-through). 
+
+##### Belongs to relationships
+
+```ruby
+User.objects.filter('zone::name': 'Roman Empire')
+# SELECT users.*
+# FOR users
+# LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+# WHERE  users_zone_0 = 'Roman Empire'
+```
+
+All depth levels are accepted:
+
+```ruby
+User.objects.filter('zone::parent_zone::parent_zone::name': 'Roman Empire')
+# SELECT users.*
+# FOR users
+# LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+# LEFT JOIN geo_zones parent_zones_0 ON users_zone_0.parent_id = parent_zones_0.id
+# LEFT JOIN geo_zones parent_zones_1 ON parent_zones_0.parent_id = parent_zones_1.id
+# WHERE  parent_zones_1 = 'Roman Empire'
+```
+
+##### Has many relationships
+
+```ruby
+User.objects.distinct.filter('posts::tag::name': 'history')
+# SELECT DISTINCT users.*
+# FOR users
+# LEFT JOIN posts posts_0 ON users.id = posts_0.author_id
+# LEFT JOIN post_tag post_tags_0 ON posts_0.id = post_tags_0.post_id
+# LEFT JOIN tags tags_0 ON post_tags_0.tag_id = tags_0.id
+# WHERE  post_tag_tags_0 = 'history'
+```
+
+Note by using [distinct](/doc/api/queryset/methods/return_queryset.md#distinct)
+we have avoided duplicated users (in case the same user has more than one post
+with tagged as 'history').
 
 #### Projections
 
-```ruby
-castille = GeoZone.create!(name: 'Castilla')
-['Juan II', 'Isabel I', 'Juana I'].each do |name|
-  User.create!(
-    first_name: name,
-    last_name: 'de Castilla',
-    email: "#{name.downcase.delete(' ')}@example.com",
-    zone: castille)
-end
-```
+If you are not interested in returned a QuerySet of ActiveRecord objects, it is possible to return
+a Result with only the fields you are interested in:
 
 ```ruby
-users_projection = User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('first_name', 'email')
-# p users_projection
+p User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('first_name', 'email')
 # [
 #   { first_name: 'Isabel I', email: 'isabeli@example.com' },
 #   { first_name: 'Juan II', email: 'juanii@example.com' },
@@ -97,14 +224,46 @@ See the [documentation](doc/README.md) for more information
 about the [API](doc/README.md#API) for information about the API and the
 internals of this library.
 
+## TODO
+
+### Aggregations
+
+[Aggregation functions](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#aggregation-functions)
+are not implemented yet.
+
+### Lookups
+
+Django QuerySets have several datetime
+lookups that Babik has not implemented:
+- [year](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#year)
+- [month](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#month)
+- [day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#day)
+- [hour](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#hour)
+- [minute](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#minute)
+- [second](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#second)
+- [time](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#time)
+- [quarter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#quarter)
+- [week_day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week_day)
+- [week](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week)
+
+### Prefect
+
+Nor [Object prefecthing](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects),
+nor [select_realated](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related) are
+implemented yet.
+
+### Set operations
+
+- [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
+- [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
+- [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
+
 ## License
 
 [MIT](LICENSE)
 
 ## Apendix 1: Example schema
 
-Through this documentation this schema will be used, keep it in mind when
-reading the examples.
 
 ```ruby
 ActiveRecord::Schema.define do
@@ -130,6 +289,7 @@ ActiveRecord::Schema.define do
   create_table :posts, :force => true do |t|
     t.string :title
     t.text :content
+    t.integer :stars
     t.integer :author_id
     t.timestamps
   end
