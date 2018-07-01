@@ -72,17 +72,37 @@ User.objects.filter('last_name__in': ['Magallanes', 'Gómez de Espinosa', 'Elcan
 
 Greater than selection.
 
+```ruby
+Post.objects.filter('score__gt': 4)
+# SELECT posts.* FROM posts WHERE posts.score > 4
+```
+
 ## gte
 
 Greater than or equal selection.
+
+```ruby
+Post.objects.filter('score__gte': 4)
+# SELECT posts.* FROM posts WHERE posts.score >= 4
+```
 
 ## lt
 
 Less than selection.
 
+```ruby
+Post.objects.filter('score__lt': 4)
+# SELECT posts.* FROM posts WHERE posts.score < 4
+```
+
 ## lte
 
 Less than or equal selection.
+
+```ruby
+Post.objects.filter('score__lte': 4)
+# SELECT posts.* FROM posts WHERE posts.score <= 4
+```
 
 ## startswith
 
@@ -135,7 +155,7 @@ Alias for [between](#between).
 
 ## date
 
-Cast of a datetime field to date.
+Select records by date part of a timestamp (datetime) field.
 
 ```ruby
 Post.objects.filter('created_at__date': today)
