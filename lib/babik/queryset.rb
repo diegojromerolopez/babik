@@ -68,6 +68,11 @@ class QuerySet
     result_.first
   end
 
+  # Return an empty ActiveRecord ResultSet
+  def none
+    @model.find_by_sql("SELECT * FROM #{@model.table_name} WHERE 1 = 0")
+  end
+
   def project(*params)
     @projection = params
     self

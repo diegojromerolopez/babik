@@ -1,5 +1,12 @@
 # Methods that don't return QuerySets
 
+## All
+
+This method will run the QuerySet and return a query result for your query
+(e.g. [PG Result](https://www.rubydoc.info/gems/pg/PG/Result)). 
+
+You don't have to call this method directly unless you want to explicitly
+use the query result instead of the QuerySet.
 
 ## Brackets
 
@@ -115,6 +122,13 @@ User.objects.get(last_name: 'Lothbrok')
 User.objects.get(last_name: 'Ring')
 ```
 
+## None
+
+Return an empty database-specific query result.
+
+Use when you want to emptying of a QuerySet.
+
+See [all](#all).
 
 ## Project
 
