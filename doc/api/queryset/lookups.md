@@ -20,8 +20,12 @@ User.objects.filter('email__exact': 'peters@example.com')
 
 ```ruby
 # These two calls are equivalent
-User.objects.filter('zone::name': 'Jerusalem', email__isnull: false).count
+User.objects.filter('zone::name': 'Jerusalem', email__isnull: true).count
 User.objects.filter('zone::name': 'Jerusalem').exclude(email__exact: nil).count
+# SELECT COUNT(users.id)
+# FROM users
+# LEFT JOIN geo_zones users_zone_0 ON users.zone_id = users_zone_0.id
+# WHERE users_zone_0.name = 'Jerusalem' AND users.email IS NULL
 ```
 
 ## iexact

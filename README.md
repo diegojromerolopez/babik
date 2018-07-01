@@ -12,6 +12,20 @@ Add to Gemfile:
 gem install babik
 ```
 
+## Database support
+
+PostgreSQL, MySQL, MariaDB and Sqlite are supported.
+
+Accepting contributors to port this library to MSSQL or Oracle.
+
+## Main differents with Django QuerySet system
+- Django does not make any distinct agains relationships, local fields or lookups when selecting by
+calling **filter**, **exclude** or **get**. Babik uses **::** for foreign fields.
+- Django has a [Q objects](https://docs.djangoproject.com/en/2.0/topics/db/queries/#complex-lookups-with-q-objects)
+that allows the construction of complex queries. Babik allows passing an array to selection methods so
+there is no need of this artifact.
+
+
 ## Usage
 
 See [schema](/README.md#apendix-1:-example-schema) for information about this example's schema.
@@ -54,6 +68,16 @@ User.objects.filter([{first_name: 'Marcus'}, {first_name: 'Julius'}]).exclude(la
 # WHERE (first_name = 'Marcus' OR first_name = 'Julius') AND NOT(last_name = 'Servilia')
 ```
 
+#### Selecting one object
+
+```ruby
+# Returns an exception if more than one object matches the selection
+User.objects.get(id: 258) 
+
+# Returns the first object that matches the selection
+User.objects.filter(id: 258).first
+```
+
 ##### Lookups
 
 There are other operators than equal to, these are implemented by using lookups:
@@ -84,6 +108,15 @@ User.objects.filter(last_name__exact: 'Postumia')
 # WHERE last_name LIKE 'Postumia' 
 ```
 
+i preceding a comparison operator means case-insensitive version:
+
+```ruby
+User.objects.filter(last_name__iexact: 'Postumia')
+# SELECT users.*
+# FROM users
+# WHERE last_name ILIKE 'Postumia' 
+```
+
 ###### contains/icontains
 
 ```ruby
@@ -91,6 +124,13 @@ User.objects.filter(first_name__contains: 'iu')
 # SELECT users.*
 # FROM users
 # WHERE last_name LIKE '%iu%' 
+```
+
+```ruby
+User.objects.filter(first_name__icontains: 'iu')
+# SELECT users.*
+# FROM users
+# WHERE last_name ILIKE '%iu%' 
 ```
 
 ###### endswith/iendswith
@@ -102,6 +142,13 @@ User.objects.filter(first_name__endswith: 'us')
 # WHERE last_name LIKE '%us' 
 ```
 
+```ruby
+User.objects.filter(first_name__iendswith: 'us')
+# SELECT users.*
+# FROM users
+# WHERE last_name ILIKE '%us' 
+```
+
 ###### startswith/istartswith
 
 ```ruby
@@ -109,6 +156,13 @@ User.objects.filter(first_name__startswith: 'Mark')
 # SELECT users.*
 # FROM users
 # WHERE first_name LIKE 'Mark%' 
+```
+
+```ruby
+User.objects.filter(first_name__istartswith: 'Mark')
+# SELECT users.*
+# FROM users
+# WHERE first_name ILIKE 'Mark%' 
 ```
 
 ###### in
@@ -205,11 +259,22 @@ with tagged as 'history').
 
 #### Projections
 
-If you are not interested in returned a QuerySet of ActiveRecord objects, it is possible to return
-a Result with only the fields you are interested in:
+Return
+an [ActiveRecord Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html)
+with only the fields you are interested
+by using a [projection](/doc/api/queryset/methods/dont_return_queryset.md#project):
 
 ```ruby
 p User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('first_name', 'email')
+
+# Query:
+# SELECT users.first_name, users.email
+# FROM users
+# LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+# WHERE users_zone_0.name = 'Castilla'
+# ORDER BY users.first_name ASC 
+
+# Result:
 # [
 #   { first_name: 'Isabel I', email: 'isabeli@example.com' },
 #   { first_name: 'Juan II', email: 'juanii@example.com' },
@@ -217,6 +282,47 @@ p User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('
 # ]
 ```
 
+### Order
+
+#### Basic usage
+
+##### Ordering by one field (ASC)
+
+```ruby
+User.objects.order_by(:last_name)
+# SELECT users.*
+# FOR users
+# ORDER BY users.last_name ASC 
+```
+
+##### Ordering by one field (DESC)
+
+```ruby
+User.objects.order_by(%i[last_name, DESC])
+# SELECT users.*
+# FOR users
+# ORDER BY users.last_name DESC 
+```
+
+##### Ordering by several fields
+
+```ruby
+User.objects.order_by(%i[last_name, ASC], %i[first_name, ASC])
+# SELECT users.*
+# FOR users
+# ORDER BY users.last_name ASC, users.first_name ASC
+```
+
+#### Ordering by foreign fields
+
+```ruby
+User.objects.filter('zone::name': 'Roman Empire').order_by(%i[zone::name, ASC], %i[created_at, DESC])
+# SELECT users.*
+# FOR users
+# LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+# WHERE  users_zone_0 = 'Roman Empire'
+# ORDER BY parent_zones_0.name ASC, users.created_at DESC 
+```
 
 ## Documentation
 
