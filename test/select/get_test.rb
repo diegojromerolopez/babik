@@ -3,6 +3,7 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
+# Test for get method of QuerySet
 class GetTest < Minitest::Test
 
   def setup

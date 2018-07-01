@@ -3,6 +3,7 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
+# Limit method tests
 class LimitTest < Minitest::Test
 
   def setup

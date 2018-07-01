@@ -3,6 +3,7 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
+# Project method test
 class ProjectTest < Minitest::Test
 
   def setup

@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
-# Tests of count method
+# Tests of different lookups available in both methods filter and exclude
 class LookupTest < Minitest::Test
 
   def setup

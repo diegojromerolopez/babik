@@ -103,4 +103,28 @@ class FilterTest < Minitest::Test
     assert_equal('Relationship posts is has_and_belongs_to_many. Convert it to has_many-through', exception.message)
   end
 
+  def test_instance_belongs_to_or_has_one
+    pelayo_zone = @pelayo.objects(:zone)
+    assert_equal @cangas_de_onis.class, pelayo_zone.class
+    assert_equal @cangas_de_onis.id, pelayo_zone.id
+  end
+
+  def test_instance_direct_has_many
+    # Direct has_many relationship
+    users_from_cangas_de_onis = @cangas_de_onis.objects(:users).order_by(first_name: :ASC)
+    assert_equal @cangas_de_onis.users.count, users_from_cangas_de_onis.count
+    first_names = ['Favila', 'Fruela I', 'Pelayo']
+    users_from_cangas_de_onis.each_with_index do |user, user_index|
+      assert_equal first_names[user_index], user.first_name
+    end
+  end
+
+  def test_instance_through_has_many
+    # has_many through relationship
+    assert_equal(
+      Tag.objects.filter('posts::author': @pelayo.id).count,
+      @pelayo.objects('posts::tags').count
+    )
+  end
+
 end
