@@ -327,7 +327,7 @@ User.objects.filter('zone::name': 'Roman Empire').order_by(%i[zone::name, ASC], 
 ## Documentation
 
 See the [documentation](doc/README.md) for more information
-about the [API](doc/README.md#API) for information about the API and the
+about the [API](doc/README.md#API) and the
 internals of this library.
 
 ## TODO
