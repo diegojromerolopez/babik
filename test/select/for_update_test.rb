@@ -11,7 +11,7 @@ class ForUpdateTest < Minitest::Test
   end
 
   def test_lock_sql
-    assert User.objects.for_update.filter(first_name: 'Marcus').sql.match?('FOR UPDATE')
+    assert User.objects.lock.filter(first_name: 'Marcus').sql.match?('FOR UPDATE')
   end
 
 end

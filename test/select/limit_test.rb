@@ -65,6 +65,11 @@ class LimitTest < Minitest::Test
     assert_equal second_page.count, second_page_with_brackets.count
   end
 
+  def test_limit_brackets_index
+    first_user = User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC)[0]
+    assert_equal 'User 1', first_user.first_name
+  end
+
   def test_limit_brackets_error
     exception = assert_raises RuntimeError do
       User.objects.filter(last_name: 'Whatever user')['invalid limit value']
