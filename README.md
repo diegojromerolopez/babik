@@ -78,6 +78,21 @@ User.objects.get(id: 258)
 User.objects.filter(id: 258).first
 ```
 
+#### Selecting from an ActiveRecord
+
+You can filter from an actual ActiveRecord object:
+
+```ruby
+user = User.objects.get(id: 258)
+user.objects('posts::tags').filter(name__in: %w[battle history]).order_by(name: :ASC)
+# SELECT users.*
+# FROM users
+# LEFT JOIN posts posts_0 ON users.id = posts_0.author_id
+# LEFT JOIN post_tag post_tags_0 ON posts_0.id = post_tags_0.post_id 
+# WHERE post_tags_0.name IN ['battle', 'history']
+# ORDER BY post_tags_0.name ASC
+```
+
 ##### Lookups
 
 There are other operators than equal to, these are implemented by using lookups:

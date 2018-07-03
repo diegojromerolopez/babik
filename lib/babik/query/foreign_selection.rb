@@ -34,14 +34,22 @@ class ForeignSelection < Selection
       # Many-to-many with through relationship
       else
         # Add model-through association (active_record -> klass)
-        @associations << association_i.through_reflection
-        # Add through-target association (through -> target)
-        target_name = association_i.source_reflection_name
-        through_model = association_i.through_reflection.klass
-        through_target_association = through_model.reflect_on_association(target_name)
-        @associations << through_target_association
-        # The next association comes from target model
-        associated_model_i = through_target_association.klass
+        if association_i.through_reflection
+          @associations << association_i.through_reflection
+          # Add through-target association (through -> target)
+          target_name = association_i.source_reflection_name
+          through_model = association_i.through_reflection.klass
+          through_target_association = through_model.reflect_on_association(target_name)
+          @associations << through_target_association
+          # The next association comes from target model
+          associated_model_i = through_target_association.klass
+        # Add direct has_many association
+        else
+          @associations << association_i
+          target_class = Object.const_get(association_i.class_name)
+          # The next association comes from target model
+          associated_model_i = target_class
+        end
       end
     end
   end
