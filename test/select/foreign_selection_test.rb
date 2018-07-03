@@ -41,9 +41,9 @@ class ForeignSelectionTest < Minitest::Test
   end
 
   def test_equal_in_has_many_relationship
-    foreign_selection = ForeignSelection.new(User, 'tags::name', 'Funny')
+    foreign_selection = ForeignSelection.new(User, 'posts::tags::name', 'Funny')
     assert_equal foreign_selection.model, User
-    assert_equal foreign_selection.selection_path, 'tags::name'
+    assert_equal foreign_selection.selection_path, 'posts::tags::name'
     assert_equal foreign_selection.selected_field, 'name'
     assert_equal foreign_selection.value, 'Funny'
     assert_equal foreign_selection.sql_value, '\'Funny\''
@@ -51,8 +51,8 @@ class ForeignSelectionTest < Minitest::Test
     assert_equal foreign_selection.sql_operator, '='
 
     assert_equal foreign_selection.left_joins[0].sql, 'LEFT JOIN posts users__posts_0 ON users__posts_0.author_id = users.id'
-    assert_equal foreign_selection.left_joins[1].sql, 'LEFT JOIN tags posts__tags_1 ON posts__tags_1.id = users__posts_0.tag_id'
-    assert_equal foreign_selection.sql_where_condition, 'posts__tags_1.name = \'Funny\''
+    assert_equal foreign_selection.left_joins[1].sql, 'LEFT JOIN post_tags posts__post_tags_1 ON posts__post_tags_1.post_id = users__posts_0.id'
+    assert_equal foreign_selection.sql_where_condition, 'post_tags__tag_2.name = \'Funny\''
   end
 
   def _associations_are_equal(association_1, association_2)

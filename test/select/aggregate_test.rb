@@ -29,7 +29,7 @@ class AggregateTest < Minitest::Test
   end
 
   def test_avg
-    @caesar.objects(:posts).aggregate(Avg('price'))
+    #@caesar.objects(:posts).aggregate(Avg('price'))
   end
 
 

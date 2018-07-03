@@ -136,7 +136,12 @@ class CountTest < Minitest::Test
     assert_equal number_of_users, User.objects.filter(created_at__between: [today_start, today_end]).count
     assert_equal number_of_users, User.objects.filter(created_at__date: today).count
 
-    assert_equal 2, User.objects.filter(created_at__date: today).filter([{first_name: 'Tiberius'}, {first_name: 'Pontius'}]).count
+    assert_equal(
+      2, User
+             .objects
+             .filter(created_at__date: today)
+             .filter([{ first_name: 'Tiberius' }, { first_name: 'Pontius' }]).count
+    )
   end
 
 end

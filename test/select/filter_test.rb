@@ -43,88 +43,82 @@ class FilterTest < Minitest::Test
   end
 
   def test_local_filter
-    kings = User.objects.filter(first_name__endswith: 'I').order_by([:first_name, :ASC])
+    kings = User.objects.filter(first_name__endswith: 'I').order_by(%i[first_name ASC])
     asturian_kings = ['Alfonso I', 'Fruela I']
+    user_count = 0
     kings.each_with_index do |king, king_i|
       assert_equal asturian_kings[king_i], king.first_name
+      user_count += 1
     end
+    assert_equal asturian_kings.count, user_count
   end
 
   def test_local_or_filter
     kings = User.objects
                 .filter([{ first_name: 'Pelayo' }, {'last_name': 'Católico'}])
-                .order_by([:first_name, :ASC])
+                .order_by(%i[first_name ASC])
     asturian_kings = ['Alfonso I', 'Pelayo']
+    user_count = 0
     kings.each_with_index do |king, king_i|
       assert_equal asturian_kings[king_i], king.first_name
+      user_count += 1
     end
+    assert_equal asturian_kings.count, user_count
   end
 
   def test_foreign_filter
     kings = User.objects
                 .filter('zone::parent_zone::name': 'Asturias')
-                .order_by([:first_name, :ASC])
+                .order_by(%i[first_name ASC])
     asturian_kings = ['Favila', 'Fruela I', 'Pelayo']
+    user_count = 0
     kings.each_with_index do |king, king_i|
       assert_equal asturian_kings[king_i], king.first_name
+      user_count += 1
     end
+    assert_equal asturian_kings.count, user_count
   end
 
   def test_foreign_or_filter
     kings = User.objects
                 .filter([{first_name: 'Pelayo'}, {'zone::name': 'Cantabria'}])
-                .order_by([:first_name, :ASC])
+                .order_by(%i[first_name ASC])
     asturian_kings = ['Alfonso I', 'Pelayo']
+    user_count = 0
     kings.each_with_index do |king, king_i|
       assert_equal asturian_kings[king_i], king.first_name
+      user_count += 1
     end
+    assert_equal asturian_kings.count, user_count
   end
 
   def test_many_to_many_foreign_filter
-    tags = Tag.objects.distinct.filter('posts::title': 'I\'m not an ass').order_by([:name, :ASC])
+    tags = Tag.objects.distinct.filter('posts::title': 'I\'m not an ass').order_by(%i[name ASC])
     tag_names = ['asturias', 'battle', 'victory']
+    tag_count = 0
     tags.each_with_index do |tag, tag_index|
       assert_equal tag_names[tag_index], tag.name
+      tag_count += 1
     end
+    assert_equal tag_names.count, tag_count
   end
 
   def test_deep_many_to_many_foreign_filter
-    tags = Tag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by([:name, :ASC])
+    tags = Tag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by(%i[name ASC])
     tag_names = ['asturias', 'battle', 'victory']
+    tag_count = 0
     tags.each_with_index do |tag, tag_index|
       assert_equal tag_names[tag_index], tag.name
+      tag_count += 1
     end
+    assert_equal tag_names.count, tag_count
   end
 
   def test_wrong_many_to_many_foreign_filter
     exception = assert_raises RuntimeError do
-      BadTag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by([:name, :ASC])
+      BadTag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by(%i[name ASC])
     end
     assert_equal('Relationship posts is has_and_belongs_to_many. Convert it to has_many-through', exception.message)
-  end
-
-  def test_instance_belongs_to_or_has_one
-    pelayo_zone = @pelayo.objects(:zone)
-    assert_equal @cangas_de_onis.class, pelayo_zone.class
-    assert_equal @cangas_de_onis.id, pelayo_zone.id
-  end
-
-  def test_instance_direct_has_many
-    # Direct has_many relationship
-    users_from_cangas_de_onis = @cangas_de_onis.objects(:users).order_by(first_name: :ASC)
-    assert_equal @cangas_de_onis.users.count, users_from_cangas_de_onis.count
-    first_names = ['Favila', 'Fruela I', 'Pelayo']
-    users_from_cangas_de_onis.each_with_index do |user, user_index|
-      assert_equal first_names[user_index], user.first_name
-    end
-  end
-
-  def test_instance_through_has_many
-    # has_many through relationship
-    assert_equal(
-      Tag.objects.filter('posts::author': @pelayo.id).count,
-      @pelayo.objects('posts::tags').count
-    )
   end
 
 end
