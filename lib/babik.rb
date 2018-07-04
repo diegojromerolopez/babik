@@ -18,7 +18,7 @@ module Babik
     # Get a queryset that contains the foreign model filtered by the current instance
     # @param [String] selection_path Association name whose objects we want to return.
     # @return [QuerySet] QuerySet with the foreign objects filtered by this instance.
-    def objects(selection_path)
+    def objects(selection_path = nil)
       # Instance based deep association
       instance_based_queryset = _objects_with_selection_path(selection_path)
       return instance_based_queryset if instance_based_queryset
@@ -32,9 +32,14 @@ module Babik
     end
 
     # Return a QuerySet following the passed selection path.
-    # @param [String, Symbol] selection_path Path of relationships that will be used as filter.
+    # @param [String, Symbol, nil] selection_path Path of relationships that will be used as filter.
+    #   If nil, a QuerySet with the current object selected will be returned. Otherwise, a QuerySet with the selection
+    #   described by the __ and :: operators.
     # @return [QuerySet] QuerySet for the selection_path passed as parameter.
-    def _objects_with_selection_path(selection_path)
+    def _objects_with_selection_path(selection_path = nil)
+      # By default, a nil selection_path means the caller object wants to return a QuerySet with only itself
+      return self.class.objects.filter(id: self.id) unless selection_path
+
       selection_path = selection_path.to_s
       is_a_selection_path = selection_path.include?(Selection::RELATIONSHIP_SEPARATOR)
       return nil unless is_a_selection_path

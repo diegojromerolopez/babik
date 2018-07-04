@@ -14,7 +14,11 @@ class LocalSelection < Selection
   end
 
   def sql_where_condition
-    "#{@model.table_name}.#{@selected_field} #{@sql_operator} #{@sql_value}"
+    "#{self.table_alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
+  end
+
+  def table_alias
+    @model.table_name
   end
 
 end

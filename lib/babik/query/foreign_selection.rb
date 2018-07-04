@@ -74,8 +74,12 @@ class ForeignSelection < Selection
   end
 
   def _init_where
+    @sql_where_condition = "#{self.table_alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
+  end
+
+  def table_alias
     last_association = @left_joins[-1]
-    @sql_where_condition = "#{last_association.alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
+    last_association.alias
   end
 
 end

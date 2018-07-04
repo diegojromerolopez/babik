@@ -12,6 +12,7 @@
 <% order = queryset.order %>
 <% lock_type = queryset.lock_type %>
 <% projection = queryset.projection %>
+<% aggregations = queryset.aggregations %>
 
 SELECT
   <% if lock_type %>
@@ -20,26 +21,33 @@ SELECT
   <% if has_distinct %>
     DISTINCT
   <% end %>
-  <% if projection %>
-    <%# FIXME: projection should be a proper class extending ForeignSelection %>
-    <% projection.each_with_index do |projected_field, projected_field_index| %>
-      <% projected_field_alias = nil %>
-      <% if projected_field.class == Array %>
-        <% projected_field_alias = projected_field[1] %>
-        <% projected_field = projected_field[0] %>
-      <% end %>
-      <% last_one = projected_field_index == projection.length - 1 %>
-      <% projection_selection = Selection.factory(model, projected_field, '_') %>
-      <% if projection_selection.class == ForeignSelection %>
-        <%= projection_selection.left_joins[-1].alias %>.<%= projection_selection.selected_field %>
-      <% else %>
-        <%= model.table_name %>.<%= projected_field %>
-      <% end %>
-      <% if projected_field_alias %>AS <%= projected_field_alias %><% end %>
-      <% unless last_one %>,<% end %>
+
+  <% if aggregations.length > 0 %>
+    <% aggregations.each do |aggregation| %>
+      <%= aggregation.sql_select %>
     <% end %>
   <% else %>
-    <%= model.table_name %>.*
+    <% if projection %>
+      <%# FIXME: projection should be a proper class extending ForeignSelection %>
+      <% projection.each_with_index do |projected_field, projected_field_index| %>
+        <% projected_field_alias = nil %>
+        <% if projected_field.class == Array %>
+          <% projected_field_alias = projected_field[1] %>
+          <% projected_field = projected_field[0] %>
+        <% end %>
+        <% last_one = projected_field_index == projection.length - 1 %>
+        <% projection_selection = Selection.factory(model, projected_field, '_') %>
+        <% if projection_selection.class == ForeignSelection %>
+          <%= projection_selection.left_joins[-1].alias %>.<%= projection_selection.selected_field %>
+        <% else %>
+          <%= model.table_name %>.<%= projected_field %>
+        <% end %>
+        <% if projected_field_alias %>AS <%= projected_field_alias %><% end %>
+        <% unless last_one %>,<% end %>
+      <% end %>
+    <% else %>
+      <%= model.table_name %>.*
+    <% end %>
   <% end %>
 
 FROM <%= model.table_name %>
@@ -117,8 +125,8 @@ WHERE (
 
 <%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
 <% unless number_of_rows_limit.nil? %>
-LIMIT <%= number_of_rows_limit %>
-<% unless offset.nil? || offset == 0 %>
-OFFSET <%= offset %>
-<% end %>
+  LIMIT <%= number_of_rows_limit %>
+  <% unless offset.nil? || offset == 0 %>
+    OFFSET <%= offset %>
+  <% end %>
 <% end %>

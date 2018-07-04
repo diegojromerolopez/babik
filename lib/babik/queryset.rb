@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'query/aggregation'
 require_relative 'query/conjunction'
 require_relative 'query/local_selection'
 require_relative 'query/foreign_selection'
@@ -8,7 +9,7 @@ require_relative 'query/foreign_selection'
 class QuerySet
   include Enumerable
   attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :projection,
-              :inclusion_filters, :exclusion_filters
+              :inclusion_filters, :exclusion_filters, :aggregations
 
   def initialize(model_class)
     @model = model_class
@@ -21,7 +22,15 @@ class QuerySet
     @lock_type = nil
     @inclusion_filters = []
     @exclusion_filters = []
+    @aggregations = []
     @projection = false
+  end
+
+  def aggregate(aggregations)
+    aggregations.each do |aggregation_field_name, aggregation|
+      @aggregations << aggregation.prepare(@model, aggregation_field_name)
+    end
+    ActiveRecord::Base.connection.exec_query(self.sql).first.symbolize_keys
   end
 
   # Exclude objects according to some criteria.
@@ -128,7 +137,7 @@ class QuerySet
     end
     @order.each_with_index do |order_field, _order_field_index|
       order_path = order_field[0]
-      @order_selections << Selection.factory(model, order_path, 'xx')
+      @order_selections << Selection.factory(model, order_path, '_')
     end
     self
   end
@@ -191,6 +200,11 @@ class QuerySet
     @order_selections.each do |order_selection|
       left_joins_by_alias.merge!(order_selection.left_joins_by_alias)
     end
+    # Merge aggregation
+    @aggregations.each do |aggregation|
+      left_joins_by_alias.merge!(aggregation.left_joins_by_alias)
+    end
+    # Join all left joins and return a string with the SQL code
     left_joins_by_alias.values.map(&:sql).join("\n")
   end
 
