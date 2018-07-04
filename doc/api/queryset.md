@@ -52,6 +52,7 @@ end
   - [Filter](/doc/api/queryset/methods/return_queryset.md#filter): add more including conditions to the query.
   - [Limit](/doc/api/queryset/rmethods/eturn_queryset.md#limit): returns an slice of the QuerySet.
 - [Methods that don't return a QuerySet](/doc/api/queryset/methods/dont_return_queryset.md). 
+  - [aggregate](/doc/api/queryset/methods/dont_return_queryset.md#aggregate): returns a hash with the result of one valid aggregation (AVG, MIN, MAX, SUM).
   - [All](/doc/api/queryset/methods/dont_return_queryset.md#all): returns the query result corresponding to your query.
   - [\[\] operator](/doc/api/queryset/methods/dont_return_queryset.md#brackets): returns an ActiveRecord object or nil.
   - [Count](/doc/api/queryset/methods/dont_return_queryset.md#count): returns a positive or zero integer.

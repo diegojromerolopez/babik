@@ -93,6 +93,21 @@ user.objects('posts::tags').filter(name__in: %w[battle history]).order_by(name: 
 # ORDER BY post_tags_0.name ASC
 ```
 
+```ruby
+julius = User.objects.get(first_name: 'Julius', last_name: 'Caesar')
+
+# Will return a QuerySet with only the Julius Caesar user (useful for aggregations) 
+julius.objects
+
+# Will return a QuerySet with all tags of posts of Julius Caesar
+julius.objects('posts::tags') 
+
+# Will return a QuerySet with the GeoZone of Julius Caesar
+julius.objects('zone')
+
+```
+
+
 ##### Lookups
 
 There are other operators than equal to, these are implemented by using lookups:
@@ -347,9 +362,9 @@ internals of this library.
 
 ## TODO
 
-### Aggregations
+### Annotations
 
-[Aggregation functions](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#aggregation-functions)
+[Annotations](https://docs.djangoproject.com/en/2.0/topics/db/aggregation/#aggregation)
 are not implemented yet.
 
 ### Lookups

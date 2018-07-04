@@ -1,5 +1,35 @@
 # Methods that don't return QuerySets
 
+## Aggregate
+
+This method will return a hash with the aggregation result.
+
+Valid aggregations are: MAX, MIN, SUM and AVG.
+
+```ruby
+caesar = User.objects.get(first_name: 'Julius', last_name: 'Caesar')
+
+# Average number of stars of the posts written by Julius Caesar
+caesar.objects.aggregate(avg_stars: Babik.agg(:avg, 'posts::stars')) # {avg_stars: 3.45}
+
+# Other way to do it
+caesar.objects(:posts).aggregate(avg_stars: Babik.agg(:avg, 'stars')) # {avg_stars: 3.45}
+```
+
+```ruby
+# Average number of stars of users with last name 'Fabia'
+User.objects.filter(last_name: 'Favbia').aggregate(avg_stars: Babik.agg(:avg, 'posts::stars')) # {avg_stars: 4.5}
+
+# Min number of stars of users with last name 'Fabia'
+User.objects.filter(last_name: 'Favbia').aggregate(min_stars: Babik.agg(:min, 'posts::stars')) # {min_stars: 1}
+
+# Max number of stars of users with last name 'Fabia'
+User.objects.filter(last_name: 'Favbia').aggregate(min_stars: Babik.agg(:min, 'posts::stars')) # {max_stars: 5}
+
+# Sum of number of stars of users with last name 'Fabia'
+User.objects.filter(last_name: 'Favbia').aggregate(sum_of_stars: Babik.agg(:sum, 'posts::stars')) # {sum_of_stars: 5}
+```
+
 ## All
 
 This method will run the QuerySet and return a query result for your query
