@@ -1,0 +1,23 @@
+<% inclusion_filters = queryset.inclusion_filters %>
+<% has_inclusion_filters = inclusion_filters.length.positive? %>
+
+<% exclusion_filters = queryset.exclusion_filters %>
+<% has_exclusion_filters = exclusion_filters.length.positive? %>
+
+<% if has_inclusion_filters || has_exclusion_filters  %>
+  WHERE (
+    <% if has_inclusion_filters %>
+      <%= ERB.new(File.new("#{__dir__}/where_filter.sql.erb").read).result_with_hash(filters: inclusion_filters) %>
+    <% end %>
+
+    <% if has_inclusion_filters && has_exclusion_filters %>
+      AND
+    <% end %>
+
+    <% if has_exclusion_filters %>
+    (
+      NOT
+      <%= ERB.new(File.new("#{__dir__}/where_filter.sql.erb").read).result_with_hash(filters: exclusion_filters) %>
+    )
+    <% end %>
+<% end %>

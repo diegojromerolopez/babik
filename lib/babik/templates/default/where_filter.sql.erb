@@ -1,0 +1,20 @@
+(
+  <% filters.each_with_index do |condition, condition_index| %>
+    <% last_filter = condition_index == filters.length - 1 %>
+    (
+      1=1
+      <% if condition.class == Array %>
+        AND ( 1=0
+          <% condition.each do |disjunction| %>
+            OR <%= disjunction.sql_where_condition %>
+          <% end %>
+        )
+      <% else %>
+        AND (<%= condition.sql_where_condition %>)
+      <% end %>
+    )
+      <% unless last_filter %>
+        AND
+      <% end %>
+  <% end %>
+)

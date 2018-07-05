@@ -12,6 +12,7 @@ class QuerySet
               :inclusion_filters, :exclusion_filters, :aggregations
 
   def initialize(model_class)
+    @db_conf = ActiveRecord::Base.connection_config
     @model = model_class
     @is_count = false
     @has_distinct = false
@@ -209,11 +210,25 @@ class QuerySet
   end
 
   def _render_select_sql
-    self._render_sql("#{__dir__}/templates/default/select/main.sql.erb")
+    self._render_sql('select/main.sql.erb')
   end
 
-  def _render_sql(template_path)
-    template_content = File.read(template_path)
+  def _render_delete_sql
+    self._render_sql('delete/main.sql.erb')
+  end
+
+  def _render_update_sql
+    self._render_sql('update/main.sql.erb')
+  end
+
+  def _render_sql(path)
+    dbms_adapter = @db_conf[:adapter]
+    file_path = if File.exist?("#{__dir__}/templates/#{dbms_adapter}/#{path}")
+                  "#{__dir__}/templates/#{dbms_adapter}/#{path}"
+                else
+                  "#{__dir__}/templates/default/#{path}"
+                end
+    template_content = File.read(file_path)
     ERB.new(template_content).result_with_hash(queryset: self)
   end
 
