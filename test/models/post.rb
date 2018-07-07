@@ -6,7 +6,10 @@ class Post < ActiveRecord::Base
   has_many :tags, through: :post_tags, inverse_of: :posts
 
   def add_tag(tag)
-    PostTag.create!(post: self, tag: tag)
+    begin
+      PostTag.create!(post: self, tag: tag)
+    rescue ActiveRecord::RecordNotUnique
+    end
   end
 
 end

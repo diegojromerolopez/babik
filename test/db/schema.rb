@@ -48,4 +48,8 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
+  add_index :users, :email, unique: true
+  add_index :categories, :name, unique: true
+  add_index :post_tags, [:post_id, :tag_id], unique: true
+  add_index :posts, [:title, :author_id], unique: true
 end
