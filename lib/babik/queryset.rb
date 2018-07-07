@@ -12,6 +12,7 @@ class QuerySet
               :inclusion_filters, :exclusion_filters, :aggregations
 
   def initialize(model_class)
+    @db_conf = ActiveRecord::Base.connection_config
     @model = model_class
     @is_count = false
     @has_distinct = false
@@ -189,13 +190,13 @@ class QuerySet
 
   def delete_sql
     self.project(['id'])
-    sql = self._render_sql("#{__dir__}/templates/default/delete/main.sql.erb")
+    sql = self._render_sql('delete/main.sql.erb')
     self.unproject
     sql
   end
 
   def select_sql
-    self._render_sql("#{__dir__}/templates/default/select/main.sql.erb")
+    self._render_sql('select/main.sql.erb')
   end
 
   def self._execute_sql(sql)
@@ -224,11 +225,22 @@ class QuerySet
 
   def _render_sql(template_path)
     render = lambda do |partial_template_path, replacements|
-      partial_template_content = File.read("#{__dir__}/templates/default/#{partial_template_path}")
-      ERB.new(partial_template_content).result_with_hash(**replacements)
+      _base_render_sql(partial_template_path, **replacements)
     end
+    _base_render_sql(template_path, queryset: self, render: render)
+  end
+
+  def _base_render_sql(template_path, replacements)
+    dbms_adapter = @db_conf[:adapter]
+    parent_templates_path = "#{__dir__}/templates/"
+    dbms_adapter_template_path = "#{parent_templates_path}/#{dbms_adapter}#{template_path}"
+    template_path = if File.exist?(dbms_adapter_template_path)
+                      dbms_adapter_template_path
+                    else
+                      "#{parent_templates_path}/default/#{template_path}"
+                    end
     template_content = File.read(template_path)
-    ERB.new(template_content).result_with_hash(queryset: self, render: render)
+    ERB.new(template_content).result_with_hash(**replacements)
   end
 
 end

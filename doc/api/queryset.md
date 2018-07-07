@@ -55,7 +55,7 @@ end
   - [aggregate](/doc/api/queryset/methods/dont_return_queryset.md#aggregate): returns a hash with the result of one valid aggregation (AVG, MIN, MAX, SUM).
   - [All](/doc/api/queryset/methods/dont_return_queryset.md#all): returns the query result corresponding to your query.
   - [\[\] operator](/doc/api/queryset/methods/dont_return_queryset.md#brackets): returns an ActiveRecord object or nil.
-  - [Delete](/doc/api/queryset/methods/dont_return_queryset.md#delete): returns the raw result from your connection adapter.
+  - [Delete](/doc/api/queryset/methods/dont_return_queryset.md#delete): returns nothing.
   - [Count](/doc/api/queryset/methods/dont_return_queryset.md#count): returns a positive or zero integer.
   - [Fetch](/doc/api/queryset/methods/dont_return_queryset.md#fetch): returns an ActiveRecord object or default value.
   - [First](/doc/api/queryset/methods/dont_return_queryset.md#first): returns an ActiveRecord object or nil.

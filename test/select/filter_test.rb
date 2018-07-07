@@ -121,4 +121,13 @@ class FilterTest < Minitest::Test
     assert_equal('Relationship posts is has_and_belongs_to_many. Convert it to has_many-through', exception.message)
   end
 
+  def test_wrong_association_in_foreign_filter
+    exception = assert_raises RuntimeError do
+      Tag.objects.filter('posts::bad_association::name': 'Dialogues').order_by(%i[name ASC])
+    end
+    assert_equal('Bad selection path: posts::bad_association::name. '\
+                      'bad_association not found in model Post when filtering Tag objects', exception.message)
+
+  end
+
 end

@@ -24,6 +24,11 @@ class ForeignSelection < Selection
     associated_model_i = @model
     @association_path.each do |association_i_name|
       association_i = associated_model_i.reflect_on_association(association_i_name.to_sym)
+      unless association_i
+        raise "Bad selection path: #{selection_path}. #{association_i_name} not found " \
+              "in model #{associated_model_i} when filtering #{@model} objects"
+      end
+
       # To one relationship
       if association_i.belongs_to? || association_i.has_one?
         @associations << association_i

@@ -125,7 +125,7 @@ aulus_user.objects('posts::tags').filter(name: 'war').delete
 
 ## Fetch
 
-Returns the elemnt with the index parameter.
+Returns the element with the index parameter.
 
 If there is no element at that position, if it has a default value, will return it.
 

@@ -354,6 +354,43 @@ User.objects.filter('zone::name': 'Roman Empire').order_by(%i[zone::name, ASC], 
 # ORDER BY parent_zones_0.name ASC, users.created_at DESC 
 ```
 
+## Delete
+
+There is no standard DELETE from foreign field SQL statement, so for now
+the default implementation makes use of DELETE WHERE id IN SELECT subqueries.
+
+Future implementations will use joins.
+
+### Delete by local field
+
+```ruby
+User.objects.filter('name': 'Julius', 'last_name': 'Caesar').delete
+# DELETE
+# FROM users
+# WHERE id IN ( 
+#   SELECT users.*
+#   FOR users
+#   WHERE users.first_name = 'Julius' AND users.last_name = 'Caesar'
+# ) 
+```
+
+### Delete by foreign field
+
+```ruby
+GeoZone.get('name': 'Roman Empire').objects('users').delete
+User.objects.filter('zone::name': 'Roman Empire').delete
+# Both statements are equal:
+# DELETE
+# FROM users
+# WHERE id IN ( 
+#   SELECT users.*
+#   FOR users
+#   LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+#   WHERE  users_zone_0 = 'Roman Empire'
+#   ORDER BY parent_zones_0.name ASC, users.created_at DESC
+# ) 
+```
+
 ## Documentation
 
 See the [documentation](doc/README.md) for more information
