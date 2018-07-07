@@ -30,7 +30,11 @@ class QuerySet
     aggregations.each do |aggregation_field_name, aggregation|
       @aggregations << aggregation.prepare(@model, aggregation_field_name)
     end
-    ActiveRecord::Base.connection.exec_query(self.sql).first.symbolize_keys
+    self.class._execute_sql(self.select_sql).first.symbolize_keys
+  end
+
+  def delete
+    @model.connection.execute(self.delete_sql)
   end
 
   # Exclude objects according to some criteria.
@@ -57,8 +61,8 @@ class QuerySet
   end
 
   def all
-    return ActiveRecord::Base.connection.exec_query(self.sql) if self.projection
-    @model.find_by_sql(self.sql)
+    return self.class._execute_sql(self.select_sql) if self.projection
+    @model.find_by_sql(self.select_sql)
   end
 
   def first
@@ -84,6 +88,11 @@ class QuerySet
 
   def project(*params)
     @projection = params
+    self
+  end
+
+  def unproject
+    @projection = nil
     self
   end
 
@@ -153,12 +162,8 @@ class QuerySet
 
   def fetch(index, default_value = nil)
     element = self.[](index)
-    if element
-      return element
-    end
-    if default_value
-      return default_value
-    end
+    return element if element
+    return default_value if default_value
     raise IndexError, "Index #{index} outside of QuerySet bounds"
   end
 
@@ -171,9 +176,7 @@ class QuerySet
     end
 
     # Element selection
-    if param.class == Integer
-      return limit(size: 1, offset: param).first
-    end
+    return limit(size: 1, offset: param).first if param.class == Integer
 
     raise "Invalid limit passed to query: #{param}"
   end
@@ -184,8 +187,19 @@ class QuerySet
     self
   end
 
-  def sql
-    _render_select_sql
+  def delete_sql
+    self.project(['id'])
+    sql = self._render_sql("#{__dir__}/templates/default/delete/main.sql.erb")
+    self.unproject
+    sql
+  end
+
+  def select_sql
+    self._render_sql("#{__dir__}/templates/default/select/main.sql.erb")
+  end
+
+  def self._execute_sql(sql)
+    ActiveRecord::Base.connection.exec_query(sql)
   end
 
   def _sql_left_joins
@@ -208,13 +222,13 @@ class QuerySet
     left_joins_by_alias.values.map(&:sql).join("\n")
   end
 
-  def _render_select_sql
-    self._render_sql("#{__dir__}/templates/default/select/main.sql.erb")
-  end
-
   def _render_sql(template_path)
+    render = lambda do |partial_template_path, replacements|
+      partial_template_content = File.read("#{__dir__}/templates/default/#{partial_template_path}")
+      ERB.new(partial_template_content).result_with_hash(**replacements)
+    end
     template_content = File.read(template_path)
-    ERB.new(template_content).result_with_hash(queryset: self)
+    ERB.new(template_content).result_with_hash(queryset: self, render: render)
   end
 
 end

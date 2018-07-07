@@ -1,0 +1,18 @@
+<% model = queryset.model %>
+<% order = queryset.order %>
+
+<%# Order the results %>
+<% unless order.nil? %>
+  ORDER BY
+  <%# FIXME: order should be a proper class extending ForeignSelection %>
+  <% order.each_with_index do |order_field, order_field_index| %>
+    <% last_one = order_field_index == order.length - 1 %>
+    <% order_path = order_field[0] %>
+    <% order_selection = Selection.factory(model, order_path, '_') %>
+    <% if order_selection.class == ForeignSelection %>
+      <%= order_selection.left_joins[-1].alias %>.<%= order_selection.selected_field %> <%= order_field[1] %> <% unless last_one %>,<% end %>
+    <% else %>
+      <%= model.table_name %>.<%= order_field[0] %> <%= order_field[1] %> <% unless last_one %>,<% end %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -1,0 +1,9 @@
+<% number_of_rows_limit = queryset.number_of_rows_limit %>
+<% offset = queryset.offset %>
+
+<% unless number_of_rows_limit.nil? %>
+  LIMIT <%= number_of_rows_limit %>
+  <% unless offset.nil? || offset == 0 %>
+    OFFSET <%= offset %>
+  <% end %>
+<% end %>
