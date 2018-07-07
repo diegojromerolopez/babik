@@ -93,6 +93,36 @@ User.filter(last_name: 'Smith', 'zone::description__icontains': 'desert').count
 User.filter(last_name: 'Smith', 'posts::tags::name': 'history').count
 ```
 
+## Delete
+
+Delete a bunch of objects by selecting a local or foreign condition.
+
+### Local conditions
+
+```ruby
+# Deletes the tags with name 'book'
+Tag.objects.filter(name: 'book').delete
+
+# Deletes the users with a gmail email
+User.objects.filter(email__endswith: '@gmail.com').delete
+```
+
+### Foreign conditions
+
+```ruby
+# Deletes the posts tagged as 'war'
+Post.objects.filter('tags::name': 'war').delete
+```
+
+```ruby
+# Deletes the tags of all posts of user called 'Aulus'
+Tag.objects.filter('posts::author::first_name': 'Aulus').delete
+
+# Other way to do it by calling delete operation by using an user instance
+aulus_user = User.objects.get(first_name: 'Aulus')
+aulus_user.objects('posts::tags').filter(name: 'war').delete
+```
+
 ## Fetch
 
 Returns the elemnt with the index parameter.
