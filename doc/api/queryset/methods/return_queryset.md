@@ -133,6 +133,14 @@ today = DateTime.today
 User.objects
     .filter(created_at__date: today)
     .filter([{'zone::name': 'Tiberius'}, {'zone::name': 'Utica'}])
+
+# Also, if there is a belongs_to relationship, there is the option of
+# passing directly the parent object 
+tiberius = GeoZone.objects.get('Tiberius')
+utica = GeoZone.objects.get('Utica')
+User.objects
+    .filter(created_at__date: today)
+    .filter([{'zone': tiberius}, {zone: utica}])
 ```
 
 ```ruby

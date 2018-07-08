@@ -115,11 +115,29 @@ class FilterTest < Minitest::Test
   end
 
   def test_several_foreign_filters
-    canguians_called_pelayo = User.objects.distinct.filter(
+    cangueses_called_pelayo = User.objects.distinct.filter(
       first_name: 'Pelayo', 'zone::name': @cangas_de_onis.name, 'posts::tags::name': 'asturias'
     )
-    assert_equal 1, canguians_called_pelayo.count
-    assert_equal @pelayo.id, canguians_called_pelayo.first.id
+    assert_equal 1, cangueses_called_pelayo.count
+    assert_equal @pelayo.id, cangueses_called_pelayo.first.id
+  end
+
+  def test_foreign_filter_by_object
+    cangueses = User.objects.distinct.filter('zone': @cangas_de_onis).order_by(%i[first_name ASC])
+    names = ['Favila', 'Fruela I', 'Pelayo']
+    cangueses.each_with_index do |cangues, cangues_index|
+      assert_equal names[cangues_index], cangues.first_name
+    end
+    assert_equal names.length, cangueses.count
+  end
+
+  def test_wrong_local_filter
+    exception = assert_raises RuntimeError do
+      User.objects.filter(this_local_field_does_not_exists: 'whatever').all
+    end
+    assert_equal(
+      'Unrecognized field this_local_field_does_not_exists for model User in filter/exclude', exception.message
+    )
   end
 
   def test_wrong_many_to_many_foreign_filter
