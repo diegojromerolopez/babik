@@ -30,6 +30,36 @@ there is no need of this artifact.
 
 See [schema](/README.md#apendix-1:-example-schema) for information about this example's schema.
 
+### objects method
+
+A new **objects** method will be injected in your ActiveRecord classes and instances.
+
+#### Classes
+
+When called from a class, it will return a QuerySet of objects of this class.
+
+```ruby
+User.objects.filter(last_name: 'Fabia')
+# Returning all users with last name equals to 'Fabia'
+
+User.objects.filter(last_name: 'Fabia', 'zone::name': 'Rome')
+# Returning all users with last name equals to 'Fabia' that are from Rome
+```
+
+#### Instances
+
+When called from an instance, it will return the foreign related instances:
+
+```ruby
+julius = User.objects.get(first_name: 'Julius')
+julius.objects('posts').filter(stars__gte: 3)
+# Will return the posts written by Julius with 3 or more stars
+
+julius.objects('posts::tags').filter(name__in: ['war', 'battle', 'victory'])
+# Will return the tags of posts written by Julius with the names 'war', 'battle' and 'victory'
+```
+ 
+
 ### Examples
 
 #### Selection
@@ -312,11 +342,11 @@ p User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('
 # ]
 ```
 
-### Order
+##### Order
 
-#### Basic usage
+###### Basic usage
 
-##### Ordering by one field (ASC)
+Ordering by one field (ASC)
 
 ```ruby
 User.objects.order_by(:last_name)
@@ -325,7 +355,7 @@ User.objects.order_by(:last_name)
 # ORDER BY users.last_name ASC 
 ```
 
-##### Ordering by one field (DESC)
+Ordering by one field (DESC)
 
 ```ruby
 User.objects.order_by(%i[last_name, DESC])
@@ -334,7 +364,7 @@ User.objects.order_by(%i[last_name, DESC])
 # ORDER BY users.last_name DESC 
 ```
 
-##### Ordering by several fields
+Ordering by several fields
 
 ```ruby
 User.objects.order_by(%i[last_name, ASC], %i[first_name, ASC])
@@ -343,7 +373,7 @@ User.objects.order_by(%i[last_name, ASC], %i[first_name, ASC])
 # ORDER BY users.last_name ASC, users.first_name ASC
 ```
 
-#### Ordering by foreign fields
+Ordering by foreign fields
 
 ```ruby
 User.objects.filter('zone::name': 'Roman Empire').order_by(%i[zone::name, ASC], %i[created_at, DESC])
@@ -354,14 +384,14 @@ User.objects.filter('zone::name': 'Roman Empire').order_by(%i[zone::name, ASC], 
 # ORDER BY parent_zones_0.name ASC, users.created_at DESC 
 ```
 
-## Delete
+#### Delete
 
 There is no standard DELETE from foreign field SQL statement, so for now
 the default implementation makes use of DELETE WHERE id IN SELECT subqueries.
 
 Future implementations will use joins.
 
-### Delete by local field
+##### Delete by local field
 
 ```ruby
 User.objects.filter('name': 'Julius', 'last_name': 'Caesar').delete
@@ -374,7 +404,7 @@ User.objects.filter('name': 'Julius', 'last_name': 'Caesar').delete
 # ) 
 ```
 
-### Delete by foreign field
+##### Delete by foreign field
 
 ```ruby
 GeoZone.get('name': 'Roman Empire').objects('users').delete
