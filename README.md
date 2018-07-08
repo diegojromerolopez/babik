@@ -2,7 +2,46 @@
 
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
-This project is not ready to use in production!
+**This project is not ready to use in production!**
+See [Roadmap](#roadmap) to check what is keeping it from being stable.
+
+Contact [me](mailto:diegojromerolopez@gmail.com) if you are interested in
+help developing it.
+
+## What's this?
+
+This is a library to help you to make queries based on associations without having
+to worry about doing joins or writing the exact name of the related table as a prefix
+of the foreign field conditions.
+
+### Example: Blog platform in Rails
+
+Suppose you are developing a blog platform with the following [schema](#apendix-1:-example-schema).
+Compare these two queries and check what is more easier to write:
+
+Returning all users with last name equals to 'Fabia' that are from Rome:
+```ruby
+User.joins(:zones).where('last_name': 'Fabia').where('geo_zones.name': 'Rome')
+# vs.
+User.objects.filter(last_name: 'Fabia', 'zone::name': 'Rome')
+```
+
+Returning all users with posts tagged with 'gallic' that are from Rome:
+```ruby
+User.joins(:zones).joins(posts: :tags)
+    .where('last_name': 'Fabia')
+    .where('geo_zones.name': 'Rome')
+    .where('tags.name': 'gallic')
+# vs.
+User.objects.filter(
+  last_name: 'Fabia',
+  'zone::name': 'Rome',
+  'posts::tags::name': 'gallic'
+)
+```
+
+The second alternative is done by using the powerful [Babik querysets](/doc/api/queryset.md).
+
 
 ## Install
 
@@ -20,8 +59,8 @@ PostgreSQL, MySQL, MariaDB and Sqlite are supported.
 
 Accepting contributors to port this library to MSSQL or Oracle.
 
-## Main differents with Django QuerySet system
-- Django does not make any distinct agains relationships, local fields or lookups when selecting by
+## Main differences with Django QuerySet system
+- Django does not make any distinct against relationships, local fields or lookups when selecting by
 calling **filter**, **exclude** or **get**. Babik uses **::** for foreign fields.
 - Django has a [Q objects](https://docs.djangoproject.com/en/2.0/topics/db/queries/#complex-lookups-with-q-objects)
 that allows the construction of complex queries. Babik allows passing an array to selection methods so
@@ -431,7 +470,7 @@ See the [documentation](doc/README.md) for more information
 about the [API](doc/README.md#API) and the
 internals of this library.
 
-## TODO
+## Roadmap
 
 ### Update
 
@@ -453,6 +492,15 @@ implemented yet.
 Code quality is poor. Comment all with yard and increase code maintainability
 and improve its structure.
 
+### Make a babik-test project
+
+Make a repository with the test schema to check the library is really working.
+
+### Deploy in rubygems
+
+Deploy gem in rubygems.
+
+
 ### Annotations
 
 [Annotations](https://docs.djangoproject.com/en/2.0/topics/db/aggregation/#aggregation)
@@ -473,13 +521,16 @@ lookups that Babik has not implemented:
 - [week_day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week_day)
 - [week](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week)
 
-
-
 ### Set operations
 
 - [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
 - [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
 - [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
+
+### Support other DBMS
+
+Oracle and MSSQL are not supported at the moment because of they lack LIMIT clause
+in SELECT queries.
 
 ## License
 

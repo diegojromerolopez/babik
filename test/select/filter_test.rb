@@ -114,6 +114,14 @@ class FilterTest < Minitest::Test
     assert_equal tag_names.count, tag_count
   end
 
+  def test_several_foreign_filters
+    canguians_called_pelayo = User.objects.distinct.filter(
+      first_name: 'Pelayo', 'zone::name': @cangas_de_onis.name, 'posts::tags::name': 'asturias'
+    )
+    assert_equal 1, canguians_called_pelayo.count
+    assert_equal @pelayo.id, canguians_called_pelayo.first.id
+  end
+
   def test_wrong_many_to_many_foreign_filter
     exception = assert_raises RuntimeError do
       BadTag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by(%i[name ASC])
