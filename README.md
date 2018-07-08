@@ -42,6 +42,7 @@ User.objects.filter(
 
 The second alternative is done by using the powerful [Babik querysets](/doc/api/queryset.md).
 
+[See Usage for more examples](#usage).
 
 ## Install
 
@@ -478,8 +479,9 @@ There is no update operation (yet).
 
 ### Optimized update & delete
 
-Both operation will have to be rewritten by DBMS. SQL has no DELETE and UPDATE
-with joins and the current alternative (a subquery) does not scale.
+Both operation will have to be rewritten by DBMS. Standard SQL has no 
+DELETE or UPDATE with joins and the current alternative
+(a IN-based-subquery) does not scale.
 
 ### Prefect
 
@@ -492,6 +494,8 @@ implemented yet.
 Code quality is poor. Comment all with yard and increase code maintainability
 and improve its structure.
 
+This project must follow Rubocop directives and pass Reek checks.
+
 ### Make a babik-test project
 
 Make a repository with the test schema to check the library is really working.
@@ -499,7 +503,6 @@ Make a repository with the test schema to check the library is really working.
 ### Deploy in rubygems
 
 Deploy gem in rubygems.
-
 
 ### Annotations
 
