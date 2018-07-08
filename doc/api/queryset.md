@@ -62,5 +62,6 @@ end
   - [Get](/doc/api/queryset/methods/dont_return_queryset.md#get): returns an ActiveRecord object.
   - [None](/doc/api/queryset/methods/dont_return_queryset.md#none): returns an empty query result.
   - [Project](/doc/api/queryset/methods/dont_return_queryset.md#project): returns a [Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html).
+  - [Update](/doc/api/queryset/methods/dont_return_queryset.md#update): update the records that match the condition. Returns empty array.
 
 

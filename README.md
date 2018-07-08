@@ -420,7 +420,9 @@ User.objects.order_by(%i[last_name, ASC], %i[first_name, ASC])
 Ordering by foreign fields
 
 ```ruby
-User.objects.filter('zone::name': 'Roman Empire').order_by(%i[zone::name, ASC], %i[created_at, DESC])
+User.objects
+    .filter('zone::name': 'Roman Empire')
+    .order_by(%i[zone::name, ASC], %i[created_at, DESC])
 # SELECT users.*
 # FOR users
 # LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
@@ -438,7 +440,7 @@ Future implementations will use joins.
 ##### Delete by local field
 
 ```ruby
-User.objects.filter('name': 'Julius', 'last_name': 'Caesar').delete
+User.objects.filter('first_name': 'Julius', 'last_name': 'Caesar').delete
 # DELETE
 # FROM users
 # WHERE id IN ( 
@@ -461,7 +463,57 @@ User.objects.filter('zone::name': 'Roman Empire').delete
 #   FOR users
 #   LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
 #   WHERE  users_zone_0 = 'Roman Empire'
-#   ORDER BY parent_zones_0.name ASC, users.created_at DESC
+# ) 
+```
+
+## Update
+
+Similar to what happens in when running SQL-delete statements, there is no
+standard UPDATE from foreign field SQL statement, so for now
+the default implementation makes use of UPDATE SET ... WHERE id IN SELECT subqueries.
+
+Future implementations will use joins.
+
+##### Update by local field
+
+```ruby
+User.objects.filter('first_name': 'Julius', 'last_name': 'Caesar').update(first_name: 'Iulius')
+# UPDATE SET first_name = 'Iulius'
+# FROM users
+# WHERE id IN ( 
+#   SELECT users.*
+#   FOR users
+#   WHERE users.first_name = 'Julius' AND users.last_name = 'Caesar'
+# ) 
+```
+
+##### Update by foreign field
+
+```ruby
+GeoZone.get(name: 'Roman Empire').objects('users').filter(last_name__isnull: true).update(last_name: 'Romanum')
+User.objects.filter('zone::name': 'Roman Empire', last_name__isnull: true).update(last_name: 'Romanum')
+# Both statements are equal:
+# UPDATE SET last_name = 'Romanum'
+# FROM users
+# WHERE id IN ( 
+#   SELECT users.*
+#   FOR users
+#   LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+#   WHERE  users_zone_0 = 'Roman Empire' AND users.last_name IS NULL
+# ) 
+```
+
+##### Update field by using an actual value of the record
+
+```ruby
+Post.objects.filter(stars__gte: 1, stars__lte: 4)
+    .update(stars: Babik::Update::Increment.new('stars'))
+# UPDATE SET stars = stars + 1
+# FROM posts
+# WHERE id IN ( 
+#   SELECT posts.*
+#   FOR posts
+#   WHERE  posts.stars >= 1 AND posts.stars <= 4
 # ) 
 ```
 
@@ -472,10 +524,6 @@ about the [API](doc/README.md#API) and the
 internals of this library.
 
 ## Roadmap
-
-### Update
-
-There is no update operation (yet).
 
 ### Optimized update & delete
 

@@ -212,3 +212,27 @@ User.objects
     .project('first_name', 'email', %w[zone::name country])
 ```
 
+# Update
+
+Updates the objects according to the queryset filter/exclude condition.
+
+```ruby
+# Set 5 stars to all posts whose title starts with 'Hello'
+Post.filter(title__startswith: 'Hello')
+    .update(stars: 5)
+```
+
+```ruby
+# Increment by one the stars of the 222 user's posts that starts with 'Hello'
+user = User.objects.get(id=222)
+user.objects(:posts)
+    .filter(title__startswith: 'Hello')
+    .update(stars: Babik::Update::Increment.new('stars'))
+```
+
+```ruby
+# Set the title_length attribute of all posts
+# Note the SQL inserted as a string in Function object.
+Post.objects
+    .update(stars: Babik::Update::Function.new('title_length', 'LENGTH(title)'))
+```
