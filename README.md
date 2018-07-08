@@ -9,8 +9,10 @@ This project is not ready to use in production!
 Add to Gemfile:
 
 ```
-gem install babik
+gem install babik, git: 'git://github.com/diegojromerolopez/babik.git'
 ```
+
+No rubygem version for the moment.
 
 ## Database support
 
@@ -431,6 +433,26 @@ internals of this library.
 
 ## TODO
 
+### Update
+
+There is no update operation (yet).
+
+### Optimized update & delete
+
+Both operation will have to be rewritten by DBMS. SQL has no DELETE and UPDATE
+with joins and the current alternative (a subquery) does not scale.
+
+### Prefect
+
+Nor [Object prefecthing](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects),
+nor [select_realated](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related) are
+implemented yet.
+
+### Increase code quality
+
+Code quality is poor. Comment all with yard and increase code maintainability
+and improve its structure.
+
 ### Annotations
 
 [Annotations](https://docs.djangoproject.com/en/2.0/topics/db/aggregation/#aggregation)
@@ -451,11 +473,7 @@ lookups that Babik has not implemented:
 - [week_day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week_day)
 - [week](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week)
 
-### Prefect
 
-Nor [Object prefecthing](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects),
-nor [select_realated](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related) are
-implemented yet.
 
 ### Set operations
 
