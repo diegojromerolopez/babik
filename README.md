@@ -533,7 +533,7 @@ DELETE or UPDATE with joins and the current alternative
 
 ### Prefect
 
-Nor [Object prefecthing](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects),
+Nor [Object prefetching](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects),
 nor [select_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related) are
 implemented yet.
 
