@@ -52,6 +52,9 @@ class QuerySet
   end
 
   # Select objects according to some criteria.
+  # @param filters [Array, Hash] if array, it is considered an disjunction (OR clause),
+  #        if a hash, it is considered a conjunction (AND clause).
+  # @return [QuerySet] Reference to self.
   def filter(filters)
     _filter(filters, @inclusion_filters)
   end
@@ -69,11 +72,15 @@ class QuerySet
     self
   end
 
+  # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.
+  # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
   def all
     return self.class._execute_sql(self.select_sql) if self.projection
     @model.find_by_sql(self.select_sql)
   end
 
+  # Return the first element of the QuerySet.
+  # @return [ActiveRecord::Base] First element of the QuerySet.
   def first
     self.all.first
   end
