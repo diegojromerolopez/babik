@@ -28,6 +28,8 @@ there is no need of this artifact.
 
 ## Usage
 
+For a complete reference and full examples of methods, see [documentation](/doc/README.md).
+
 See [schema](/README.md#apendix-1:-example-schema) for information about this example's schema.
 
 ### objects method
