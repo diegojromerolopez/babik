@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative 'query/aggregation'
-require_relative 'query/conjunction'
-require_relative 'query/local_selection'
-require_relative 'query/foreign_selection'
-require_relative 'query/field'
-require_relative 'query/update'
+require 'babik/query/aggregation'
+require 'babik/query/conjunction'
+require 'babik/query/local_selection'
+require 'babik/query/foreign_selection'
+require 'babik/query/field'
+require 'babik/query/update'
 
 # Represents a new type of query result set
 class QuerySet
