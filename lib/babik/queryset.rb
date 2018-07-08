@@ -4,12 +4,14 @@ require_relative 'query/aggregation'
 require_relative 'query/conjunction'
 require_relative 'query/local_selection'
 require_relative 'query/foreign_selection'
+require_relative 'query/field'
+require_relative 'query/update'
 
 # Represents a new type of query result set
 class QuerySet
   include Enumerable
   attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :projection,
-              :inclusion_filters, :exclusion_filters, :aggregations
+              :inclusion_filters, :exclusion_filters, :aggregations, :update_command
 
   def initialize(model_class)
     @db_conf = ActiveRecord::Base.connection_config
@@ -25,8 +27,12 @@ class QuerySet
     @exclusion_filters = []
     @aggregations = []
     @projection = false
+    @update_command = nil
   end
 
+  # Aggregate a set of objects.
+  # @param aggregations [Hash{symbol: Babik.agg}] hash with the different aggregations that will be computed.
+  # @return [Hash{symbol: float}] Result of computing each one of the aggregations.
   def aggregate(aggregations)
     aggregations.each do |aggregation_field_name, aggregation|
       @aggregations << aggregation.prepare(@model, aggregation_field_name)
@@ -34,11 +40,13 @@ class QuerySet
     self.class._execute_sql(self.select_sql).first.symbolize_keys
   end
 
+  # Delete the selected records
   def delete
     @model.connection.execute(self.delete_sql)
   end
 
   # Exclude objects according to some criteria.
+  # @return [QuerySet] Reference to self.
   def exclude(filters)
     _filter(filters, @exclusion_filters)
   end
@@ -186,6 +194,18 @@ class QuerySet
     @offset = offset.to_i
     @number_of_rows_limit = size.to_i
     self
+  end
+
+  def update(update_command)
+    @update_command = update_command
+    @model.connection.execute(self.update_sql)
+  end
+
+  def update_sql
+    self.project(['id'])
+    sql = self._render_sql('update/main.sql.erb')
+    self.unproject
+    sql
   end
 
   def delete_sql

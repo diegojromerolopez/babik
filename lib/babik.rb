@@ -6,6 +6,7 @@ require_relative 'babik/queryset'
 # Babik module
 module Babik
 
+  # @!method included(base)
   # Inject both class methods and instance methods to classes that include this mixin
   # @param [Class] base Class to be extended by mixin.
   def self.included(base)
@@ -15,6 +16,8 @@ module Babik
 
   # All instance methods that are injected to ActiveRecord models
   module InstanceMethods
+
+    # @!method objects(selection_path = nil)
     # Get a queryset that contains the foreign model filtered by the current instance
     # @param [String] selection_path Association name whose objects we want to return.
     # @return [QuerySet] QuerySet with the foreign objects filtered by this instance.
@@ -31,6 +34,7 @@ module Babik
       self._objects_direct_has_many(selection_path)
     end
 
+    # @!method _objects_with_selection_path(selection_path = nil)
     # Return a QuerySet following the passed selection path.
     # @param [String, Symbol, nil] selection_path Path of relationships that will be used as filter.
     #   If nil, a QuerySet with the current object selected will be returned. Otherwise, a QuerySet with the selection
@@ -68,6 +72,7 @@ module Babik
       model_i.objects.filter("#{instance_selection_path}::id": self.id)
     end
 
+    # @!method _objects_to_one(association_name)
     # Return a QuerySet with the relationship to one
     # @param [String, Symbol] association_name Association name that identifies a relationship with other object.
     # @return [QuerySet, nil] QuerySet based on the association_name, nil if the relationship is not found.
@@ -80,6 +85,7 @@ module Babik
       nil
     end
 
+    # @!method _objects_direct_has_many(association_name)
     # Return a QuerySet with a direct relationship to many
     # @param [String, Symbol] association_name Association name that identifies a relationship with other objects.
     # @return [QuerySet, nil] QuerySet based on the association_name, nil if the relationship is not found.
@@ -99,6 +105,7 @@ module Babik
   # All class methods that are injected to ActiveRecord models
   module ClassMethods
 
+    # @!method objects
     # QuerySet for the current model.
     # @return [QuerySet] queryset for the current model.
     def objects
