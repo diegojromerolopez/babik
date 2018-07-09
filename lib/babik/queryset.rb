@@ -11,7 +11,7 @@ require 'babik/query/update'
 class QuerySet
   include Enumerable
   attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :projection,
-              :inclusion_filters, :exclusion_filters, :aggregations, :update_command
+              :inclusion_filters, :exclusion_filters, :aggregations, :update_command, :select_related_associations
 
   def initialize(model_class)
     @db_conf = ActiveRecord::Base.connection_config
@@ -28,6 +28,7 @@ class QuerySet
     @aggregations = []
     @projection = false
     @update_command = nil
+    @select_related_associations = []
   end
 
   # Aggregate a set of objects.
@@ -162,7 +163,7 @@ class QuerySet
     end
     @order.each_with_index do |order_field, _order_field_index|
       order_path = order_field[0]
-      @order_selections << Selection.factory(model, order_path, '_')
+      @order_selections << Selection.factory(@model, order_path, '_')
     end
     self
   end
@@ -208,6 +209,15 @@ class QuerySet
     @model.connection.execute(self.update_sql)
   end
 
+  # Will mark some belongs_to or has_one associated models to be loaded when each model object is loaded
+  # @param associations_to_load [Array] An array with the association paths of related objects that will be loaded
+  #        for each one of the this model objects.
+  def select_related(associations_to_load)
+    associations_to_load.each do |association_path|
+      @select_related_associations << SelectRelatedAssociation.factory(@model, association_path)
+    end
+  end
+
   def update_sql
     self.project(['id'])
     sql = self._render_sql('update/main.sql.erb')
@@ -245,6 +255,10 @@ class QuerySet
     # Merge aggregation
     @aggregations.each do |aggregation|
       left_joins_by_alias.merge!(aggregation.left_joins_by_alias)
+    end
+    # Merge prefetchs
+    @associations_to_prefetch.each do |association|
+      left_joins_by_alias.merge!(association.left_joins_by_alias)
     end
     # Join all left joins and return a string with the SQL code
     left_joins_by_alias.values.map(&:sql).join("\n")
