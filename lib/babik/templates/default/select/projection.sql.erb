@@ -1,0 +1,23 @@
+<% model = queryset.model %>
+<% projection = queryset.projection %>
+
+<%# FIXME: projection should be a proper class extending ForeignSelection %>
+<% projection.each_with_index do |projected_field, projected_field_index| %>
+  <% projected_field_alias = nil %>
+
+  <% if projected_field.class == Array %>
+    <% projected_field_alias = projected_field[1] %>
+    <% projected_field = projected_field[0] %>
+  <% end %>
+
+  <% last_one = projected_field_index == projection.length - 1 %>
+  <% projection_selection = Selection.factory(model, projected_field, '_') %>
+  <% if projection_selection.class == ForeignSelection %>
+    <%= projection_selection.left_joins[-1].alias %>.<%= projection_selection.selected_field %>
+  <% else %>
+    <%= model.table_name %>.<%= projected_field %>
+  <% end %>
+
+  <% if projected_field_alias %>AS <%= projected_field_alias %><% end %>
+  <% unless last_one %>,<% end %>
+<% end %>
