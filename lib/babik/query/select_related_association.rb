@@ -3,21 +3,24 @@
 require_relative 'sql'
 
 class SelectRelatedAssociation
-
-  attr_reader :model, :association_path, :associations, :left_joins, :left_joins_by_alias, :target_model
+  RELATIONSHIP_SEPARATOR = '::'
+  attr_reader :model, :association_path, :associations, :left_joins, :left_joins_by_alias, :target_model, :id
 
   def initialize(model, association_path)
     @model = model
-    @association_path = association_path.to_s.split(RELATIONSHIP_SEPARATOR)
+    @association_path = association_path
+    @association_path_parts = association_path.to_s.split(RELATIONSHIP_SEPARATOR)
+    @id = @association_path_parts.join('__')
     @target_model = nil
 
     _initialize_associations
+    _init_left_join
   end
 
   def _initialize_associations
     @associations = []
     associated_model_i = @model
-    @association_path.each do |association_i_name|
+    @association_path_parts.each do |association_i_name|
       association_i = associated_model_i.reflect_on_association(association_i_name.to_sym)
       unless association_i
         raise "Bad association path: #{association_i_name} not found " \

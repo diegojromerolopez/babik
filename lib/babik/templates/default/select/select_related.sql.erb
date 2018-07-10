@@ -1,15 +1,18 @@
 <% select_related_associations = queryset.select_related_associations %>
 
+<% select_related_associations_count = select_related_associations.length %>
 <% select_related_associations.each_with_index do |select_related_association, association_index| %>
 
-  <% last_one = association_index == select_related_association.length - 1 %>
+  <% last_one_association = association_index == select_related_associations_count - 1 %>
 
   <% target_alias = select_related_association.target_alias %>
   <% target_model = select_related_association.target_model %>
-  <% target_model.class.columns.each do |target_field| %>
+  <% target_model.column_names.each_with_index do |target_field, target_field_index| %>
+    <% last_one_target_field = target_field_index == target_model.column_names.length - 1 %>
     <%= target_alias %>.<%= target_field %>
     AS
-    <%= target_alias %>__<%= target_field %>
+    <%= select_related_association.id %>__<%= target_field %>
+    <% unless last_one_target_field %>,<% end %>
   <% end %>
-  <% unless last_one %>,<% end %>
+  <% unless last_one_association %>,<% end %>
 <% end %>

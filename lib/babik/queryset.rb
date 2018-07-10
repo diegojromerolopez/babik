@@ -6,6 +6,7 @@ require 'babik/query/local_selection'
 require 'babik/query/foreign_selection'
 require 'babik/query/field'
 require 'babik/query/update'
+require 'babik/query/select_related_association'
 
 # Represents a new type of query result set
 class QuerySet
@@ -29,6 +30,7 @@ class QuerySet
     @projection = false
     @update_command = nil
     @select_related_associations = []
+    @selected_related = {}
   end
 
   # Aggregate a set of objects.
@@ -76,7 +78,8 @@ class QuerySet
   # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.
   # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
   def all
-    return self.class._execute_sql(self.select_sql) if self.projection
+    return self.class._execute_sql(self.select_sql) if @projection
+    return self._find_by_sql_with_select_related if @select_related_associations.length.positive?
     @model.find_by_sql(self.select_sql)
   end
 
@@ -213,9 +216,11 @@ class QuerySet
   # @param associations_to_load [Array] An array with the association paths of related objects that will be loaded
   #        for each one of the this model objects.
   def select_related(associations_to_load)
+    associations_to_load = [associations_to_load] if associations_to_load.class != Array
     associations_to_load.each do |association_path|
-      @select_related_associations << SelectRelatedAssociation.factory(@model, association_path)
+      @select_related_associations << SelectRelatedAssociation.new(@model, association_path)
     end
+    self
   end
 
   def update_sql
@@ -234,6 +239,30 @@ class QuerySet
 
   def select_sql
     self._render_sql('select/main.sql.erb')
+  end
+
+  def _find_by_sql_with_select_related
+    result_set = self.class._execute_sql(self.select_sql)
+    result_set.map do |record|
+      object = @model.new
+      object.assign_attributes(record.select { |attr| @model.column_names.include?(attr) })
+      select_related_objects = {}
+      @select_related_associations.each do |association|
+        target_model = association.target_model
+        target_object = target_model.new
+        target_attributes_with_prefix = (
+          record.select { |attr, value| attr.start_with?("#{association.id}__") }
+        )
+        target_attributes = {}
+        target_attributes_with_prefix.each do |attr, value|
+          attr_name = attr.split('__')[1]
+          target_attributes[attr_name.to_sym] = value
+        end
+        target_object.assign_attributes(target_attributes)
+        select_related_objects[association.association_path] = target_object
+      end
+      [object, select_related_objects]
+    end
   end
 
   def self._execute_sql(sql)
@@ -257,7 +286,7 @@ class QuerySet
       left_joins_by_alias.merge!(aggregation.left_joins_by_alias)
     end
     # Merge prefetchs
-    @associations_to_prefetch.each do |association|
+    @select_related_associations.each do |association|
       left_joins_by_alias.merge!(association.left_joins_by_alias)
     end
     # Join all left joins and return a string with the SQL code

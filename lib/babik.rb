@@ -119,3 +119,4 @@ end
 
 # Include mixin into parent of all active record models (ActiveRecord::Base)
 ActiveRecord::Base.send(:include, Babik)
+ActiveRecord::Base.send(:include, ActiveModel::AttributeAssignment)

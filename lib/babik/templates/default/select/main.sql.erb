@@ -12,7 +12,7 @@
 <% projection = queryset.projection %>
 <% aggregations = queryset.aggregations %>
 
-<% associations_to_prefetch = queryset.associations_to_prefetch %>
+<% is_select_related = queryset.select_related_associations.length.positive? %>
 
 SELECT
   <% if lock_type %>
@@ -31,8 +31,8 @@ SELECT
       <%# Projection of the results %>
       <%= render.('select/projection.sql.erb', {queryset: queryset}) %>
     <% else %>
-      <%= model.table_name %>.*
-      <% if associations_to_prefetch %>
+      <%= model.table_name %>.*<% if is_select_related %>,<% end %>
+      <% if is_select_related %>
         <%= render.('select/select_related.sql.erb', {queryset: queryset}) %>
       <% end %>
     <% end %>
