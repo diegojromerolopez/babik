@@ -109,7 +109,7 @@ module Babik
     # QuerySet for the current model.
     # @return [QuerySet] queryset for the current model.
     def objects
-      QuerySet.new(self)
+      Babik::QuerySet::Base.new(self)
     end
 
   end

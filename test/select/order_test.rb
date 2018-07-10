@@ -77,14 +77,14 @@ class OrderTest < Minitest::Test
     exception = assert_raises RuntimeError do
       User.objects.filter('zone::name': 'Hispania').order_by([:first_name, 'XXXX'])
     end
-    assert_equal('Invalid order type for QuerySet.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]', exception.message)
+    assert_equal('Invalid order type for Babik::QuerySet::Base.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]', exception.message)
   end
 
   def test_wrong_order_param_type
     exception = assert_raises RuntimeError do
       User.objects.filter('zone::name': 'Hispania').order_by(2222)
     end
-    assert_equal('Invalid value for QuerySet.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]', exception.message)
+    assert_equal('Invalid value for Babik::QuerySet::Base.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]', exception.message)
   end
 
 end

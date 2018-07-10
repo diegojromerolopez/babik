@@ -28,7 +28,7 @@ class SelectRelatedTest < Minitest::Test
     number_of_returned_users = 0
     User
       .objects
-      .select_related([:zone])
+      .select_related(:zone)
       .order_by('first_name')
       .each_with_index do |user_with_related, user_with_related_index|
       # Loop through each user with his/her related objects
