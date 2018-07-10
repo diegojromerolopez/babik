@@ -54,6 +54,12 @@ gem install babik, git: 'git://github.com/diegojromerolopez/babik.git'
 
 No rubygem version for the moment.
 
+## Requirements
+
+Include all [inverse relationships](http://guides.rubyonrails.org/association_basics.html#bi-directional-associations).
+
+**It is required to compute the object selection from instance**.
+
 ## Database support
 
 PostgreSQL, MySQL, MariaDB and Sqlite are supported.
@@ -66,6 +72,9 @@ calling **filter**, **exclude** or **get**. Babik uses **::** for foreign fields
 - Django has a [Q objects](https://docs.djangoproject.com/en/2.0/topics/db/queries/#complex-lookups-with-q-objects)
 that allows the construction of complex queries. Babik allows passing an array to selection methods so
 there is no need of this artifact.
+- Django [select_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related)
+method cache the objects in the returned object.
+We return a pair of object and a hash with the associated objects.
 
 
 ## Usage
@@ -386,6 +395,17 @@ p User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('
 # ]
 ```
 
+#### Select related
+
+**select_related** method allows fetching an object and its related ones at once.
+
+```ruby
+User.filter(first_name: 'Julius').select_related(:zone)
+# Will return in each iteration a list with two elements, the first one
+# will be the User instance, and the other one a hash where the keys are
+# each one of the association names and the value the associated object 
+```
+
 ##### Order
 
 ###### Basic usage
@@ -525,6 +545,12 @@ internals of this library.
 
 ## Roadmap
 
+## Allow easy use of subqueries
+
+Nowadays, it is not easy to use Babik for making subqueries.
+
+The idea is allowing the value to be a QuerySet and setting the operator as IN.
+
 ### Optimized update & delete
 
 Both operation will have to be rewritten by DBMS. Standard SQL has no 
@@ -533,9 +559,8 @@ DELETE or UPDATE with joins and the current alternative
 
 ### Prefect
 
-Nor [Object prefetching](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects),
-nor [select_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related) are
-implemented yet.
+[Object prefetching](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects)
+is not implemented yet.
 
 ### Increase code quality
 

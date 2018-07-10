@@ -46,11 +46,12 @@ end
 ## API
 
 - [Methods that return a QuerySet](/doc/api/queryset/methods/return_queryset.md). 
-  - [\[\] operator](/doc/api/queryset/return_queryset.md#brackets): returns an slice of the QuerySet.
+  - [\[\] operator](/doc/api/queryset/methods/return_queryset.md#brackets): returns an slice of the QuerySet.
   - [Distinct](/doc/api/queryset/methods/return_queryset.md#distinct): make the query to return unique rows.
   - [Exclude](/doc/api/queryset/methods/return_queryset.md#exclude): add more excluding conditions to the query.
   - [Filter](/doc/api/queryset/methods/return_queryset.md#filter): add more including conditions to the query.
-  - [Limit](/doc/api/queryset/rmethods/eturn_queryset.md#limit): returns an slice of the QuerySet.
+  - [Limit](/doc/api/queryset/methods/return_queryset.md#limit): returns an slice of the QuerySet.
+  - [Select related](/doc/api/queryset/methods/return_queryset.md#select-related): returns a QuerySet.
 - [Methods that don't return a QuerySet](/doc/api/queryset/methods/dont_return_queryset.md). 
   - [aggregate](/doc/api/queryset/methods/dont_return_queryset.md#aggregate): returns a hash with the result of one valid aggregation (AVG, MIN, MAX, SUM).
   - [All](/doc/api/queryset/methods/dont_return_queryset.md#all): returns the query result corresponding to your query.
