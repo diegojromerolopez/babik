@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SQL
+module Babik
 
   class Join
     attr_reader :alias, :sql

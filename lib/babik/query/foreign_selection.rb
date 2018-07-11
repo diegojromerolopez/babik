@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'sql'
+require_relative 'join'
 
 class ForeignSelection < Selection
 
@@ -71,7 +71,7 @@ class ForeignSelection < Selection
     @left_joins_by_alias = {}
     last_owner_table_alias = nil
     @associations.each_with_index do |association, association_path_index|
-      left_join = SQL::Join.new("LEFT JOIN", association, association_path_index, last_owner_table_alias)
+      left_join = Babik::Join.new("LEFT JOIN", association, association_path_index, last_owner_table_alias)
       @left_joins_by_alias[left_join.alias] = left_join
       @left_joins << left_join
       last_owner_table_alias = left_join.alias

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'babik/mixins/countable'
-require 'babik/delegators/select_related'
+require 'babik/delegates/select_related'
 require 'babik/query/aggregation'
 require 'babik/query/conjunction'
 require 'babik/query/local_selection'
@@ -121,12 +121,8 @@ module Babik
         self
       end
 
-      def empty?
-        self.count.zero?
-      end
-
       def select_related(association_paths)
-        @select_related_manager = Babik::QuerySetDelegate::SelectRelated.new(@model, association_paths)
+        @select_related_manager = Babik::QuerySet::Delegate::SelectRelated.new(@model, association_paths)
         self
       end
 
