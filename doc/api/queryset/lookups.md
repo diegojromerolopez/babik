@@ -63,9 +63,27 @@ User.objects.filter('last_name__contains': 'de la')
 
 Check if the field is one of a series of elements.
 
+It can be used by passing an array of strings (or integers):
+
 ```ruby
 User.objects.filter('last_name__in': ['Magallanes', 'Gómez de Espinosa', 'Elcano'])
 # SELECT users.* FROM users WHERE last_name IN ('Magallanes', 'Gómez de Espinosa', 'Elcano')
+```
+
+Or it can be used with a subquery:
+
+```ruby
+expedition_members = Group.get(name: 'Magallanges & Elcano Expedition').objects(:users)
+User.objects
+    .filter('id__in': expedition_members.project(:id))
+# SELECT users.*
+# FROM users
+# WHERE id IN (
+#   SELECT id
+#   FROM users
+#   LEFT JOIN user_groups_0 ON users.id = user_groups_0.user_id
+#   WHERE user_groups_0.name = 'Magallanges & Elcano Expedition'
+# )
 ```
 
 ## gt

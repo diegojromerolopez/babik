@@ -79,6 +79,7 @@ module Babik
         self
       end
 
+      # @!method all
       # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.
       # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
       def all
@@ -221,6 +222,10 @@ module Babik
 
       def select_sql
         self._render_sql('select/main.sql.erb')
+      end
+
+      def to_s
+        select_sql
       end
 
       def self._execute_sql(sql)

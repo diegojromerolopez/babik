@@ -20,6 +20,9 @@ class LocalSelection < Selection
     # Only if the real field is an association and the value is an ActiveRecord,
     # then the real value is that ActiveRecord id
     sql_value = @sql_value.id if actual_field != @selected_field && @sql_value.is_a?(ActiveRecord::Base)
+    # If the value is a QuerySet, include the SQL code
+    sql_value = "(#{@sql_value.select_sql})" if @sql_value.class == Babik::QuerySet::Base
+    # Return the condition
     "#{self.table_alias}.#{actual_field} #{@sql_operator} #{sql_value}"
   end
 

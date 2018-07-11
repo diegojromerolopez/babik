@@ -287,6 +287,16 @@ User.objects.filter(first_name__in: ['Marcus', 'Julius', 'Crasus'])
 # WHERE first_name IN ('Marcus', 'Julius', 'Crasus')
 ```
 
+There is also the possibility to use a subquery instead of a list of elements:
+
+```ruby
+Post.objects.filter(id__in: @seneca_sr.objects(:posts).project(:id))
+# SELECT posts.*
+# FROM posts
+# WHERE id IN (SELECT posts.id FROM posts WHERE author_id = 2)
+```
+
+
 ###### Comparison operators: gt, gte, lt, lte
 
 ```ruby
@@ -544,12 +554,6 @@ about the [API](doc/README.md#API) and the
 internals of this library.
 
 ## Roadmap
-
-## Allow easy use of subqueries
-
-Nowadays, it is not easy to use Babik for making subqueries.
-
-The idea is allowing the value to be a QuerySet and setting the operator as IN.
 
 ### Optimized update & delete
 

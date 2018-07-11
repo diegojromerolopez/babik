@@ -5,9 +5,7 @@ class Selection
   OPERATOR_SEPARATOR = '__'
 
   def self.factory(model, selection_path, value)
-    if selection_path.match?(RELATIONSHIP_SEPARATOR)
-      return ForeignSelection.new(model, selection_path, value)
-    end
+    return ForeignSelection.new(model, selection_path, value) if selection_path.match?(RELATIONSHIP_SEPARATOR)
     LocalSelection.new(model, selection_path, value)
   end
 
@@ -19,10 +17,13 @@ class Selection
   end
 
   def _initialize_sql_operator
-    # TODO: startswith, endswith, between, contains, icontains, jsonb operators
     case @operator
     when 'equal', 'equals_to'
       @sql_operator = '='
+      if @value.class == Array || @value.class == Babik::QuerySet::Base
+        @operator = 'in'
+        @sql_operator = 'IN'
+      end
     when 'exact', 'iexact'
       if @value.nil?
         @sql_operator = 'IS NULL'
@@ -57,6 +58,10 @@ class Selection
     else
       @operator = 'equal'
       @sql_operator = '='
+      if @value.class == Array || @value.class == Babik::QuerySet::Base
+        @operator = 'in'
+        @sql_operator = 'IN'
+      end
     end
   end
 
@@ -67,6 +72,8 @@ class Selection
       escaped_value_ = "'#{Time.parse(@value.to_s).beginning_of_day.utc.to_s(:db)}'"
     elsif @value.class == DateTime || @value.class == Time
       escaped_value_ = "'#{@value.utc.to_s(:db)}'"
+    elsif @value.class == Babik::QuerySet::Base
+      escaped_value_ = @value.select_sql
     else
       escaped_value_ = @value
     end
@@ -102,10 +109,21 @@ class Selection
     when 'isnull'
       @sql_value = ''
     when 'in'
-      escaped_values_ = @value.map do |in_value|
-        in_value.class == String ? "'#{@model.sanitize_sql(in_value)}'" : in_value
+      if @value.class == Array
+        escaped_values_ = @value.map do |in_value|
+          in_value.class == String ? "'#{@model.sanitize_sql(in_value)}'" : in_value
+        end
+        @sql_value = "(#{escaped_values_.join(', ')})"
+      elsif @value.class == Babik::QuerySet::Base
+        @sql_value = "(#{@value.select_sql})"
+      else
+        if @value.class == String
+          @sql_value = "('#{@model.sanitize_sql(@value)}')"
+        else
+        @sql_value = "(#{@value})"
+        end
       end
-      @sql_value = "(#{escaped_values_.join(', ')})"
+
     when 'regex'
       @sql_value = regex_value
     when 'iregex'
@@ -126,29 +144,17 @@ class Selection
 
   def regex
     dbms_adapter = @db_conf[:adapter]
-    if dbms_adapter == 'mysql'
-      return 'REGEXP BINARY'
-    end
-    if dbms_adapter == 'postgresql'
-      return '~'
-    end
-    if dbms_adapter == 'sqlite3'
-      return 'REGEXP'
-    end
+    return 'REGEXP BINARY' if dbms_adapter == 'mysql'
+    return '~' if dbms_adapter == 'postgresql'
+    return 'REGEXP' if dbms_adapter == 'sqlite3'
     raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accpeted"
   end
 
   def iregex
     dbms_adapter = @db_conf[:adapter]
-    if dbms_adapter == 'mysql'
-      return 'REGEXP'
-    end
-    if dbms_adapter == 'postgresql'
-      return '~*'
-    end
-    if dbms_adapter == 'sqlite3'
-      return 'REGEXP'
-    end
+    return 'REGEXP' if dbms_adapter == 'mysql'
+    return '~*' if dbms_adapter == 'postgresql'
+    return 'REGEXP' if dbms_adapter == 'sqlite3'
     raise "Invalid dbms #{dbms}. Only mysql, postgresql, and sqlite3 are accpeted"
   end
 
@@ -158,9 +164,7 @@ class Selection
 
   def iregex_value
     dbms_adapter = @db_conf[:adapter]
-    if dbms_adapter == 'sqlite3'
-      return _escape("(?i)#{@value.inspect[1..-1]}")
-    end
+    return _escape("(?i)#{@value.inspect[1..-1]}") if dbms_adapter == 'sqlite3'
     regex_value
   end
 
