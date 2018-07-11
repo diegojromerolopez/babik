@@ -8,6 +8,18 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
+  create_table :group, :force => true do |t|
+    t.string :name
+    t.string :description
+    t.timestamps
+  end
+
+  create_table :group_users, :force => true do |t|
+    t.integer :group_id
+    t.integer :user_id
+    t.timestamps
+  end
+
   create_table :users, :force => true do |t|
     t.integer :zone_id
     t.string :first_name
@@ -49,6 +61,7 @@ ActiveRecord::Schema.define do
   end
 
   add_index :users, :email, unique: true
+  add_index :group_users, [:group_id, :user_id], unique: true
   add_index :categories, :name, unique: true
   add_index :post_tags, [:post_id, :tag_id], unique: true
   add_index :posts, [:title, :author_id], unique: true

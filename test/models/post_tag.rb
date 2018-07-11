@@ -1,5 +1,5 @@
 
 class PostTag < ActiveRecord::Base
-  belongs_to :post
-  belongs_to :tag
+  belongs_to :post, inverse_of: :post_tags
+  belongs_to :tag, inverse_of: :post_tags
 end
