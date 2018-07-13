@@ -37,6 +37,7 @@ module Babik
 
       alias count? _count
       alias distinct? _distinct
+      alias select_related? _select_related
 
       def initialize(model_class)
         @model = model_class

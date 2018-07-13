@@ -53,9 +53,11 @@ User.objects.filter('first_name': 'Romulus').order_by(first_name: :ASC)[5]
 # LIMIT 1 OFFSET 5
 ```
 
-If there is no ActiveRecord in that position, nill will be returned.
+If there is no ActiveRecord in that position, nil will be returned.
 
 [There is also other way to use to return a section of the QuerySet](/doc/api/queryset/return_queryset.md#brackets).
+
+No negative index is allowed.
 
 ## Count
 
@@ -145,6 +147,8 @@ default_value_for_smith = User.filter(last_name: 'Smith').fetch(10_000, 'No user
 # (index is not in bounds and there is no default value) 
 bad_luck_smith = User.filter(last_name: 'Smith').fetch(10_000)
 ```
+
+No negative index is allowed.
 
 ## First
 

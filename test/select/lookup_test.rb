@@ -85,11 +85,11 @@ class LookupTest < Minitest::Test
 
   def test_regex
     other_posts = Post.objects.filter(title__regex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
-    assert other_posts.select_sql.include?("(posts.title REGEXP '^This other[\\w\\d\\s]+$/')")
+    assert other_posts.sql.select.include?("(posts.title REGEXP '^This other[\\w\\d\\s]+$/')")
   end
 
   def test_iregex
     other_posts = Post.objects.filter(title__iregex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
-    assert other_posts.select_sql.include?("(posts.title REGEXP '(?i)^This other[\\w\\d\\s]+$/')")
+    assert other_posts.sql.select.include?("(posts.title REGEXP '(?i)^This other[\\w\\d\\s]+$/')")
   end
 end

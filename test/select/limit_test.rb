@@ -22,7 +22,7 @@ class LimitTest < Minitest::Test
     page_size = 5
 
     # Check the first page of users
-    first_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size)
+    first_page = User.objects.filter(last_name: 'LimitTest user').limit(page_size)
     # Check with each
     loops = 0
     first_page.each do |user|
@@ -33,7 +33,7 @@ class LimitTest < Minitest::Test
 
     # Check the second page of users
     second_page_offset = page_size
-    second_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size, offset: second_page_offset)
+    second_page = User.objects.filter(last_name: 'LimitTest user').limit(page_size, second_page_offset)
     assert_equal 5, second_page.count
     second_page.each_with_index do |user, user_index|
       assert_equal "User #{user_index + second_page_offset + 1}", user.first_name
@@ -42,7 +42,7 @@ class LimitTest < Minitest::Test
 
   def test_limit_brackets
     page_size = 5
-    first_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size)
+    first_page = User.objects.filter(last_name: 'LimitTest user').limit(page_size)
     first_page_with_brackets = User.objects.filter(last_name: 'LimitTest user')[0..page_size]
     limit_test_user = User.objects.filter(last_name: 'LimitTest user')[page_size]
     assert_equal 'No user', User.objects.filter(last_name: 'LimitTest user').fetch(10_000, 'No user')
@@ -59,7 +59,7 @@ class LimitTest < Minitest::Test
     assert_equal first_page.count, first_page_with_brackets.count
 
     second_page_offset = page_size
-    second_page = User.objects.filter(last_name: 'LimitTest user').limit(size: page_size, offset: second_page_offset)
+    second_page = User.objects.filter(last_name: 'LimitTest user').limit(page_size, second_page_offset)
     second_page_with_brackets = User.objects.filter(last_name: 'LimitTest user')[second_page_offset..(second_page_offset+page_size)]
     assert_equal page_size, second_page.count
     assert_equal second_page.count, second_page_with_brackets.count
@@ -70,11 +70,15 @@ class LimitTest < Minitest::Test
     assert_equal 'User 1', first_user.first_name
   end
 
-  def test_limit_brackets_error
-    exception = assert_raises RuntimeError do
-      User.objects.filter(last_name: 'Whatever user')['invalid limit value']
+  def test_brackets_index_out_of_range
+    assert_nil User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC)[1000]
+  end
+
+  def test_fetch_index_out_of_range
+    exception = assert_raises IndexError do
+      assert_raises User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC).fetch(1000)
     end
-    assert_equal('Invalid limit passed to query: invalid limit value', exception.message)
+    assert_equal('Index 1000 outside of QuerySet bounds', exception.message)
   end
 
 end

@@ -8,8 +8,6 @@
 
 <% aggregations = queryset.aggregations %>
 
-<% has_select_related = queryset._select_related && true %>
-
 SELECT
 
   <% if queryset.lock? %>
@@ -29,8 +27,9 @@ SELECT
       <%# Projection of the results %>
       <%= render.('select/projection.sql.erb', {queryset: queryset}) %>
     <% else %>
-      <%= model.table_name %>.*<% if has_select_related %>,<% end %>
-      <% if has_select_related %>
+      <%= model.table_name %>.*
+      <% if queryset.select_related? %>
+        ,
         <%= render.('select/select_related.sql.erb', {queryset: queryset}) %>
       <% end %>
     <% end %>

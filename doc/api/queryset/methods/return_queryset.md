@@ -190,16 +190,18 @@ Note this method will only works with DBMS that support LIMIT statement
 
 ```ruby
 # Will return the next 5 users starting from the first one.
-User.objects.filter('zone::name': 'Rome').limit(size: 5)
+User.objects.filter('zone::name': 'Rome').limit(5)
 
 # Will return the next 5 users starting from the sixth one.
-User.objects.filter('zone::name': 'Rome').limit(size: 5, offset: 6)
+User.objects.filter('zone::name': 'Rome').limit(5, 6)
 ```
+
+No negative offset is allowed.
 
 ## Select related
 
 When looping through a set of objects, it is usual to have to load the same
-foreign objects in each loop. Traditionaly, the simplest way to do it is to
+foreign objects in each loop. Traditionally, the simplest way to do it is to
 make a query in each loop.
 
 Hovewer, the best way to do it, is by loading the required foreign objects
