@@ -4,7 +4,7 @@ require 'babik/query/select_related_association'
 
 module Babik
   module QuerySet
-    # Manages the order or the QuerySet
+    # Manages the order of the QuerySet
     class Order
 
       attr_reader :order_fields

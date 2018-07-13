@@ -4,7 +4,7 @@
 %>
 
 <% model = queryset.model %>
-<% update_command = queryset.update_command %>
+<% update_command = queryset._update %>
 
 UPDATE <%= model.table_name %>
 SET
@@ -12,5 +12,5 @@ SET
     <%= Babik::Update.sql_field(model, field) %> = <%= Babik::Update.sql_value(value) %>
   <% end %>
 WHERE id IN (
-  <%= queryset.select_sql %>
+  <%= queryset.sql.select %>
 )

@@ -73,7 +73,7 @@ class Selection
     elsif @value.class == DateTime || @value.class == Time
       escaped_value_ = "'#{@value.utc.to_s(:db)}'"
     elsif @value.class == Babik::QuerySet::Base
-      escaped_value_ = @value.select_sql
+      escaped_value_ = @value.sql.select
     else
       escaped_value_ = @value
     end
@@ -115,7 +115,7 @@ class Selection
         end
         @sql_value = "(#{escaped_values_.join(', ')})"
       elsif @value.class == Babik::QuerySet::Base
-        @sql_value = "(#{@value.select_sql})"
+        @sql_value = "(#{@value.sql.select})"
       else
         if @value.class == String
           @sql_value = "('#{@model.sanitize_sql(@value)}')"

@@ -1,0 +1,10 @@
+<% limit = queryset._limit %>
+
+<% if limit %>
+
+  LIMIT <%= limit.size %>
+  <% if limit.offset %>
+    OFFSET <%= limit.offset %>
+  <% end %>
+
+<% end %>
