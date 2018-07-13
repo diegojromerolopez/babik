@@ -12,7 +12,7 @@
 <% projection = queryset.projection %>
 <% aggregations = queryset.aggregations %>
 
-<% has_select_related = queryset.select_related_manager && true %>
+<% has_select_related = queryset._select_related && true %>
 
 SELECT
   <% if lock_type %>

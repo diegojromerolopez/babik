@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require 'babik/mixins/countable'
-require 'babik/delegates/select_related'
+require 'babik/queryset/mixins/countable'
+require 'babik/queryset/order'
+require 'babik/queryset/select_related'
 require 'babik/query/aggregation'
 require 'babik/query/conjunction'
 require 'babik/query/local_selection'
@@ -12,12 +13,13 @@ require 'babik/query/update'
 # Represents a new type of query result set
 module Babik
   module QuerySet
+    # Base class for QuerySet, implements a container for database results.
     class Base
       include Enumerable
       include Babik::QuerySet::Countable
 
-      attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :order, :lock_type, :projection,
-                  :inclusion_filters, :exclusion_filters, :aggregations, :update_command, :select_related_manager
+      attr_reader :model, :is_count, :has_distinct, :number_of_rows_limit, :offset, :lock_type, :projection,
+                  :inclusion_filters, :exclusion_filters, :aggregations, :update_command, :_select_related, :_order
 
       def initialize(model_class)
         @db_conf = ActiveRecord::Base.connection_config
@@ -26,15 +28,14 @@ module Babik
         @has_distinct = false
         @number_of_rows_limit = nil
         @offset = nil
-        @order = nil
-        @order_selections = []
+        @_order = nil
         @lock_type = nil
         @inclusion_filters = []
         @exclusion_filters = []
         @aggregations = []
         @projection = false
         @update_command = nil
-        @select_related_manager = nil
+        @_select_related = nil
       end
 
       # Aggregate a set of objects.
@@ -84,7 +85,7 @@ module Babik
       # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
       def all
         return self.class._execute_sql(self.select_sql) if @projection
-        return @select_related_manager.all_with_related(self.class._execute_sql(self.select_sql)) if @select_related_manager
+        return @_select_related.all_with_related(self.class._execute_sql(self.select_sql)) if @_select_related
         @model.find_by_sql(self.select_sql)
       end
 
@@ -121,8 +122,19 @@ module Babik
         self
       end
 
+      # Load the related objects of each model object specified by the association_paths
+      #
+      # e.g.
+      # - User.objects.filter(first_name: 'Julius').select_related(:group)
+      # - User.objects.filter(first_name: 'Cassius').select_related([:group, :zone])
+      # - Post.objects.select_related(:author)
+      #
+      # @param association_paths [Array<Symbol>, Symbol] Array of association paths
+      #        of belongs_to and has_one related objects.
+      #        A passed symbol will be considered as an array of one symbol.
+      #        That is, select_related(:group) is equal to select_related([:group])
       def select_related(association_paths)
-        @select_related_manager = Babik::QuerySet::Delegate::SelectRelated.new(@model, association_paths)
+        @_select_related = Babik::QuerySet::SelectRelated.new(@model, association_paths)
         self
       end
 
@@ -131,34 +143,13 @@ module Babik
         self
       end
 
-      def order_by(*order_by_list)
-        @order = order_by_list
-        @order_selections = []
-        # Check the types of each order field
-        @order = @order.map do |order|
-          if order.class == String
-            [order, :ASC]
-          elsif order.class == Array
-            unless %i[ASC DES].include?(order[1].to_sym)
-              raise "Invalid order type for #{self.class}.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]"
-            end
-            order
-          elsif order.class == Hash
-            if order.keys.length > 1
-              raise "More than one key found in order by for class #{self.class}"
-            end
-            order_field = order.keys[0]
-            order_value = order[order_field]
-            [order_field, order_value]
-          else
-            raise "Invalid value for #{self.class}.order_by: order_by_list. Expecting an array [<field>: :ASC|:DESC]"
-          end
-        end
-        @order.each_with_index do |order_field, _order_field_index|
-          order_path = order_field[0]
-          @order_selections << Selection.factory(@model, order_path, '_')
-        end
+      def order_by(*order)
+        @_order = Babik::QuerySet::Order.new(@model, *order)
         self
+      end
+
+      def order(*order)
+        order_by(*order)
       end
 
       def for_update
@@ -236,16 +227,14 @@ module Babik
         @exclusion_filters.flatten.each do |conjunction|
           left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
         end
-        # FIXME: order selection should be a class with common parts with selection
-        @order_selections.each do |order_selection|
-          left_joins_by_alias.merge!(order_selection.left_joins_by_alias)
-        end
+        # Merge order
+        left_joins_by_alias.merge!(@_order.left_joins_by_alias) if @_order
         # Merge aggregation
         @aggregations.each do |aggregation|
           left_joins_by_alias.merge!(aggregation.left_joins_by_alias)
         end
         # Merge prefetchs
-        left_joins_by_alias.merge!(@select_related_manager.left_joins_by_alias) if @select_related_manager
+        left_joins_by_alias.merge!(@_select_related.left_joins_by_alias) if @_select_related
         # Join all left joins and return a string with the SQL code
         left_joins_by_alias.values.map(&:sql).join("\n")
       end

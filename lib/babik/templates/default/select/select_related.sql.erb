@@ -1,5 +1,5 @@
-<% select_related_manager = queryset.select_related_manager %>
-<% associations = select_related_manager.associations %>
+<% select_related = queryset._select_related %>
+<% associations = select_related.associations %>
 
 <%# Include each association target model in the select_related call in the SQL SELECT %>
 <% associations.each_with_index do |association, association_index| %>
