@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
+require 'babik/queryset/mixins/aggregatable'
 require 'babik/queryset/mixins/countable'
+require 'babik/queryset/mixins/deletable'
 require 'babik/queryset/mixins/distinguishable'
+require 'babik/queryset/mixins/filterable'
 require 'babik/queryset/mixins/limitable'
 require 'babik/queryset/mixins/lockable'
 require 'babik/queryset/mixins/projectable'
 require 'babik/queryset/mixins/sortable'
 require 'babik/queryset/mixins/sql_renderer'
+require 'babik/queryset/mixins/updatable'
 
 require 'babik/queryset/aggregation'
 require 'babik/queryset/limit'
@@ -26,12 +30,16 @@ module Babik
     # Base class for QuerySet, implements a container for database results.
     class Base
       include Enumerable
+      include Babik::QuerySet::Aggregatable
       include Babik::QuerySet::Countable
+      include Babik::QuerySet::Deletable
       include Babik::QuerySet::Distinguishable
+      include Babik::QuerySet::Filterable
       include Babik::QuerySet::Limitable
       include Babik::QuerySet::Lockable
       include Babik::QuerySet::Projectable
       include Babik::QuerySet::Sortable
+      include Babik::QuerySet::Updatable
 
       attr_reader :model, :_aggregation, :_count, :_distinct, :_limit, :_lock_type, :_order, :_projection,
                   :inclusion_filters, :exclusion_filters, :_select_related, :_update
@@ -57,47 +65,6 @@ module Babik
         @_update = nil
       end
 
-      # Aggregate a set of objects.
-      # @param agg_functions [Hash{symbol: Babik.agg}] hash with the different aggregations that will be computed.
-      # @return [Hash{symbol: float}] Result of computing each one of the aggregations.
-      def aggregate(agg_functions)
-        @_aggregation = Babik::QuerySet::Aggregation.new(@model, agg_functions)
-        self.class._execute_sql(sql.select).first.symbolize_keys
-      end
-
-      # Delete the selected records
-      def delete
-        @model.connection.execute(sql.delete)
-      end
-
-      # Exclude objects according to some criteria.
-      # @return [QuerySet] Reference to self.
-      def exclude(filters)
-        _filter(filters, @exclusion_filters)
-      end
-
-      # Select objects according to some criteria.
-      # @param filters [Array, Hash] if array, it is considered an disjunction (OR clause),
-      #        if a hash, it is considered a conjunction (AND clause).
-      # @return [QuerySet] Reference to self.
-      def filter(filters)
-        _filter(filters, @inclusion_filters)
-      end
-
-      # Select the objects according to some criteria.
-      def _filter(filters, applied_filters)
-        if filters.class == Array
-          disjunctions = filters.map do |filter|
-            Conjunction.new(@model, filter)
-          end
-          applied_filters << disjunctions
-        elsif filters.class == Hash
-          applied_filters << Conjunction.new(@model, filters)
-        end
-        self
-      end
-
-      # @!method all
       # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.
       # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
       def all
@@ -146,15 +113,12 @@ module Babik
         self
       end
 
-      def update(update_command)
-        @_update = update_command
-        @model.connection.execute(sql.update)
-      end
-
       def sql
         SQLRenderer.new(self)
       end
 
+      # Get the left joins grouped by alias in a hash.
+      # @return [Hash] Return a hash with the format :table_alias => SQL::Join
       def left_joins_by_alias
         left_joins_by_alias = {}
         @inclusion_filters.flatten.each do |conjunction|
