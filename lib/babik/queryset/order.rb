@@ -77,9 +77,16 @@ module Babik
         end
         left_joins_by_alias
       end
+
+      # Return sql of the fields to order.
+      # Does not include ORDER BY.
+      # @return [SQL] SQL code for fields to order.
+      def sql
+        @order_fields.map(&:sql).join(',')
+      end
     end
 
-      # Each one of the fields that appear in the order statement
+    # Each one of the fields that appear in the order statement
     class OrderField
       attr_reader :selection, :direction, :model
 
@@ -98,6 +105,15 @@ module Babik
         @model = model
         @selection = Selection.factory(@model, field_path, '_')
         @direction = direction_sym
+      end
+
+      # Return sql of the field to order.
+      # i.e. something like this:
+      #   <table_alias>.<field> ASC
+      #   <table_alias>.<field> DESC
+      # @return [SQL] SQL code for field to order.
+      def sql
+        "#{@selection.table_alias}.#{@selection.selected_field} #{@direction}"
       end
     end
   end

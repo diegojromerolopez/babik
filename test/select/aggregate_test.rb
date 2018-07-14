@@ -33,7 +33,7 @@ class AggregateTest < Minitest::Test
     avg_stars = stars.reduce(:+) / stars.length.to_f
     avg_starts_aggregation = @caesar
                              .objects(:posts)
-                             .aggregate(avg_stars: Babik.agg(:avg, 'stars'))
+                             .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'stars'))
     assert_equal avg_stars, avg_starts_aggregation[:avg_stars]
   end
 
@@ -43,7 +43,7 @@ class AggregateTest < Minitest::Test
     avg_starts_aggregation = User
                              .objects
                              .filter(id: @caesar.id)
-                             .aggregate(avg_stars: Babik.agg(:avg, 'posts::stars'))
+                             .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'posts::stars'))
     assert_equal avg_stars, avg_starts_aggregation[:avg_stars]
   end
 
@@ -52,23 +52,46 @@ class AggregateTest < Minitest::Test
     avg_stars = stars.reduce(:+) / stars.length.to_f
     avg_starts_aggregation = @caesar
                              .objects
-                             .aggregate(avg_stars: Babik.agg(:avg, 'posts::stars'))
+                             .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'posts::stars'))
     assert_equal avg_stars, avg_starts_aggregation[:avg_stars]
   end
 
   def test_max
     max_stars = @caesar.objects(:posts).map(&:stars).max
-    assert_equal max_stars, @caesar.objects(:posts).aggregate(max_stars: Babik.agg(:max, 'stars'))[:max_stars]
+    max_stars_agg = @caesar.objects(:posts)
+                           .aggregate(max_stars: Babik::QuerySet.agg(:max, 'stars'))[:max_stars]
+    assert_equal max_stars, max_stars_agg
   end
 
   def test_min
     min_stars = @caesar.objects(:posts).map(&:stars).min
-    assert_equal min_stars, @caesar.objects(:posts).aggregate(min_stars: Babik::Min.new('stars'))[:min_stars]
+    min_stars_agg = @caesar.objects(:posts)
+                           .aggregate(min_stars: Babik::QuerySet::Min.new('stars'))[:min_stars]
+    assert_equal min_stars, min_stars_agg
   end
 
   def test_sum
     sum_stars = @caesar.objects(:posts).map(&:stars).inject(:+)
-    assert_equal sum_stars, @caesar.objects(:posts).aggregate(sum_stars: Babik::Sum.new('stars'))[:sum_stars]
+    sum_stars_agg = @caesar.objects(:posts)
+                           .aggregate(sum_stars: Babik::QuerySet::Sum.new('stars'))[:sum_stars]
+    assert_equal sum_stars, sum_stars_agg
+  end
+
+  def test_sum_max_min
+    sum_stars = @caesar.objects(:posts).map(&:stars).inject(:+)
+    max_stars = @caesar.objects(:posts).map(&:stars).max
+    min_stars = @caesar.objects(:posts).map(&:stars).min
+
+
+    max_min_stars_agg = @caesar.objects(:posts)
+                               .aggregate(
+                                 sum_stars: Babik::QuerySet::Sum.new('stars'),
+                                 max_stars: Babik::QuerySet::Max.new('stars'),
+                                 min_stars: Babik::QuerySet::Min.new('stars')
+                               )
+    assert_equal sum_stars, max_min_stars_agg[:sum_stars]
+    assert_equal max_stars, max_min_stars_agg[:max_stars]
+    assert_equal min_stars, max_min_stars_agg[:min_stars]
   end
 
 
