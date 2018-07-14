@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'selection'
+require 'babik/queryset/lib/selection'
 
 class LocalSelection < Selection
 

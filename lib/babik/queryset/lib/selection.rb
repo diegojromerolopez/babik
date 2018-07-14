@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Represents a filter selection (that can be filtered in WHERE)
 class Selection
   RELATIONSHIP_SEPARATOR = '::'
   OPERATOR_SEPARATOR = '__'

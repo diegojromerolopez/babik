@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'erb'
+
 module Babik
   module QuerySet
     # SQL renderer
@@ -52,7 +54,7 @@ module Babik
                           "#{TEMPLATE_PATH}/default/#{template_path}"
                         end
         template_content = File.read(template_path)
-        ERB.new(template_content).result_with_hash(**replacements)
+        ::ERB.new(template_content).result_with_hash(**replacements)
       end
 
       def _dbms_adapter

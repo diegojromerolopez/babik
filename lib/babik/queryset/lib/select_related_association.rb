@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'join'
+require 'babik/queryset/lib/join'
 
 class SelectRelatedAssociation
   RELATIONSHIP_SEPARATOR = '::'

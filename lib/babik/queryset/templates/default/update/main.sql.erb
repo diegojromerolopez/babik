@@ -9,7 +9,7 @@
 UPDATE <%= model.table_name %>
 SET
   <% update_command.each do |field, value| %>
-    <%= Babik::Update.sql_field(model, field) %> = <%= Babik::Update.sql_value(value) %>
+    <%= Babik::QuerySet::Update.sql_field(model, field) %> = <%= Babik::QuerySet::Update.sql_value(value) %>
   <% end %>
 WHERE id IN (
   <%= queryset.sql.select %>

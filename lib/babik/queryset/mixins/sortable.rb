@@ -13,7 +13,7 @@ module Babik
         self
       end
 
-      #  Alias for order_by
+      # Alias for order_by
       # @see #order_by
       # @param order [Array, String, Hash] ordering that will be applied to the QuerySet.
       # @return [QuerySet] reference to this QuerySet.
@@ -21,6 +21,14 @@ module Babik
         order_by(*order)
       end
 
+      # Invert the order
+      # e.g.
+      #   first_name ASC, last_name ASC, created_at DESC => invert => first_name DESC, last_name DESC, created_at ASC
+      # @return [QuerySet] reference to this QuerySet.
+      def invert_order
+        @_order.invert!
+        self
+      end
     end
   end
 end

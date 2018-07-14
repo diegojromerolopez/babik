@@ -1,0 +1,41 @@
+<% where = queryset._where %>
+
+<% if where.inclusion_filters? || where.exclusion_filters?  %>
+
+  WHERE (
+    <% if where.inclusion_filters? %>
+      -- Inclusion filters
+      (
+        <% inclusion_filters = where.inclusion_filters %>
+        <% inclusion_filters.each_with_index do |condition, condition_index| %>
+          <% last_one = condition_index == inclusion_filters.length - 1 %>
+          (
+            <%= condition.sql %>
+          )
+          <% unless last_one %>AND<% end %>
+        <% end %>
+      )
+    <% end %>
+
+    <% if where.inclusion_filters? && where.exclusion_filters? %>
+    AND
+    <% end %>
+
+    <% if where.exclusion_filters? %>
+    -- Exclusion filters
+    ( NOT
+      (
+        <% exclusion_filters = where.exclusion_filters %>
+        <% exclusion_filters.each_with_index do |condition, condition_index| %>
+          <% last_one = condition_index == exclusion_filters.length - 1 %>
+          (
+            <%= condition.sql %>
+          )
+          <% unless last_one %>AND<% end %>
+        <% end %>
+      )
+    )
+    <% end %>
+  )
+
+<% end %>

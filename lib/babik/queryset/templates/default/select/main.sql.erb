@@ -1,12 +1,5 @@
 <% model = queryset.model %>
 
-<% inclusion_filters = queryset.inclusion_filters %>
-<% has_inclusion_filters = inclusion_filters.length.positive? %>
-
-<% exclusion_filters = queryset.exclusion_filters %>
-<% has_exclusion_filters = exclusion_filters.length.positive? %>
-
-
 SELECT
 
   <% if queryset.lock? %>
@@ -18,16 +11,16 @@ SELECT
   <% end %>
 
   <% if queryset.aggregation? %>
-    <%= render.('select/aggregation.sql.erb', {queryset: queryset}) %>
+    <%= render.('select/components/aggregation.sql.erb', {queryset: queryset}) %>
   <% else %>
     <% if queryset.projection? %>
       <%# Projection of the results %>
-      <%= render.('select/projection.sql.erb', {queryset: queryset}) %>
+      <%= render.('select/components/projection.sql.erb', {queryset: queryset}) %>
     <% else %>
       <%= model.table_name %>.*
       <% if queryset.select_related? %>
         ,
-        <%= render.('select/select_related.sql.erb', {queryset: queryset}) %>
+        <%= render.('select/components/select_related.sql.erb', {queryset: queryset}) %>
       <% end %>
     <% end %>
 
@@ -37,61 +30,11 @@ FROM <%= model.table_name %>
 
 <%= queryset.sql.left_joins %>
 
-<% if has_inclusion_filters || has_exclusion_filters  %>
-WHERE (
-  <% if has_inclusion_filters %>
-  (
-    <% inclusion_filters.each_with_index do |condition, condition_index| %>
-      <% last_inclusion_filter = condition_index == inclusion_filters.length - 1 %>
-      (
-        1=1
-        <% if condition.class == Array %>
-          AND ( 1=0
-            <% condition.each do |disjunction| %>
-              OR <%= disjunction.sql_where_condition %>
-            <% end %>
-          )
-        <% else %>
-          AND (<%= condition.sql_where_condition %>)
-        <% end %>
-      )
-      <% unless last_inclusion_filter %>
-      AND
-      <% end %>
-    <% end %>
-  )
-  <% end %>
+<%# Where conditions %>
+<%= render.('select/components/where.sql.erb', {queryset: queryset}) %>
 
-  <% if has_inclusion_filters && has_exclusion_filters %>
-    AND
-  <% end %>
-
-  <% if has_exclusion_filters %>
-  ( NOT (
-    <% exclusion_filters.each_with_index do |condition, condition_index| %>
-      <% last_exclusion_filter = condition_index == exclusion_filters.length - 1 %>
-      (
-        1=1
-        <% if condition.class == Array %>
-          AND ( 1=0
-          <% condition.each do |disjunction| %>
-            OR <%= disjunction.sql_where_condition %>
-          <% end %>
-          )
-        <% else %>
-          AND (<%= condition.sql_where_condition %>)
-        <% end %>
-      )
-      <% unless last_exclusion_filter %>
-      AND
-      <% end %>
-    <% end %>
-  ) )
-<% end %>
-)
-<% end %>
 <%# Order the results %>
-<%= render.('select/order_by.sql.erb', {queryset: queryset}) %>
+<%= render.('select/components/order_by.sql.erb', {queryset: queryset}) %>
 
 <%# Limit the results (only MySQL, MariaDB and PostgreSQL) %>
-<%= render.('select/limit.sql.erb', {queryset: queryset}) %>
+<%= render.('select/components/limit.sql.erb', {queryset: queryset}) %>

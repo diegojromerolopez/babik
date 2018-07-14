@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'babik/query/select_related_association'
+require 'babik/queryset/lib/selection'
 
 module Babik
   # QuerySet module
@@ -68,6 +68,19 @@ module Babik
         end
       end
 
+      # Return an direction inversion of this order
+      # e.g.
+      #   User, first_name, ASC => invert => User, first_name, DESC
+      # @return [Array<OrderField>] Inverted order.
+      def invert
+        @order_fields.map(&:invert)
+      end
+
+      # Invert actual order direction
+      def invert!
+        @order_fields = self.invert
+      end
+
       # Return the left joins this order include, grouped by alias
       # @return [Hash] Hash with the key equal to alias and the value equals to a Join.
       def left_joins_by_alias
@@ -94,7 +107,7 @@ module Babik
 
       # Construct the OrderField
       # @param model [ActiveRecord::Base] base model.
-      # @param field_path [String, Symbol] field path. If local, it will be one of the attributes,
+      # @param field_path [String, Symbol, Selection] field path. If local, it will be one of the attributes,
       #        otherwise will be an association path.
       # @param direction [String, Symbol] :ASC or :DESC (a string will be converted to symbol).
       def initialize(model, field_path, direction)
@@ -103,8 +116,20 @@ module Babik
           raise "Invalid order type #{direction} in #{field_path}: Expecting :ASC or :DESC"
         end
         @model = model
-        @selection = Selection.factory(@model, field_path, '_')
+        @selection = Selection.factory(@model, field_path, '_') if [String, Symbol].include?(field_path.class)
+        @selection = field_path if field_path.is_a?(Selection)
         @direction = direction_sym
+      end
+
+      # Return a new OrderField with the direction inverted
+      # @return [OrderField] Order field with inverted direction.
+      def invert
+        inverted_direction = if @direction.to_sym == :ASC
+                               :DESC
+                             else
+                               :ASC
+                             end
+        OrderField.new(@model, @selection, inverted_direction)
       end
 
       # Return sql of the field to order.

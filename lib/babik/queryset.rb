@@ -12,17 +12,18 @@ require 'babik/queryset/mixins/sortable'
 require 'babik/queryset/mixins/sql_renderer'
 require 'babik/queryset/mixins/updatable'
 
-require 'babik/queryset/aggregation'
-require 'babik/queryset/limit'
-require 'babik/queryset/order'
-require 'babik/queryset/projection'
-require 'babik/queryset/select_related'
+require 'babik/queryset/components/aggregation'
+require 'babik/queryset/components/limit'
+require 'babik/queryset/components/order'
+require 'babik/queryset/components/projection'
+require 'babik/queryset/components/select_related'
+require 'babik/queryset/components/where'
 
-require 'babik/query/conjunction'
-require 'babik/query/local_selection'
-require 'babik/query/foreign_selection'
-require 'babik/query/field'
-require 'babik/query/update'
+require 'babik/queryset/lib/condition'
+require 'babik/queryset/lib/local_selection'
+require 'babik/queryset/lib/foreign_selection'
+require 'babik/queryset/lib/field'
+require 'babik/queryset/lib/update'
 
 # Represents a new type of query result set
 module Babik
@@ -42,7 +43,7 @@ module Babik
       include Babik::QuerySet::Updatable
 
       attr_reader :model, :_aggregation, :_count, :_distinct, :_limit, :_lock_type, :_order, :_projection,
-                  :inclusion_filters, :exclusion_filters, :_select_related, :_update
+                  :_where, :_select_related, :_update
 
       alias aggregation? _aggregation
       alias count? _count
@@ -55,9 +56,8 @@ module Babik
         @_count = false
         @_distinct = false
         @_order = nil
-        @_lock = nil
-        @inclusion_filters = []
-        @exclusion_filters = []
+        @_lock_type = nil
+        @_where = Babik::QuerySet::Where.new(@model)
         @_aggregation = nil
         @_limit = nil
         @_projection = nil
@@ -74,25 +74,26 @@ module Babik
         @model.find_by_sql(sql_select)
       end
 
+      # Loop through the results with a block
+      # @param block [Proc] Proc that will be applied to each object.
+      def each(&block)
+        self.all.each(&block)
+      end
+
       # Return the first element of the QuerySet.
       # @return [ActiveRecord::Base] First element of the QuerySet.
       def first
         self.all.first
       end
 
-      def each(&block)
-        self.all.each(&block)
-      end
-
-      def get(filters)
-        result_ = self.filter(filters).all
-        result_count = result_.count
-        raise 'Does not exist' if result_count.zero?
-        raise 'Multiple objects returned' if result_count > 1
-        result_.first
+      # Return the last element of the QuerySet.
+      # @return [ActiveRecord::Base] Last element of the QuerySet.
+      def last
+        self.invert_order.all.first
       end
 
       # Return an empty ActiveRecord ResultSet
+      # @return [ResultSet] Empty result set.
       def none
         @model.find_by_sql("SELECT * FROM #{@model.table_name} WHERE 1 = 0")
       end
@@ -113,6 +114,8 @@ module Babik
         self
       end
 
+      # Get the SQL renderer for this QuerySet.
+      # @return [QuerySet] SQL Renderer for this QuerySet.
       def sql
         SQLRenderer.new(self)
       end
@@ -121,12 +124,8 @@ module Babik
       # @return [Hash] Return a hash with the format :table_alias => SQL::Join
       def left_joins_by_alias
         left_joins_by_alias = {}
-        @inclusion_filters.flatten.each do |conjunction|
-          left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
-        end
-        @exclusion_filters.flatten.each do |conjunction|
-          left_joins_by_alias.merge!(conjunction.left_joins_by_alias)
-        end
+        # Merge where
+        left_joins_by_alias.merge!(@_where.left_joins_by_alias)
         # Merge order
         left_joins_by_alias.merge!(@_order.left_joins_by_alias) if @_order
         # Merge aggregation
@@ -137,6 +136,9 @@ module Babik
         left_joins_by_alias
       end
 
+      # Execute SQL code
+      # @param [String] sql SQL code
+      # @return SQL result set.
       def self._execute_sql(sql)
         ActiveRecord::Base.connection.exec_query(sql)
       end
