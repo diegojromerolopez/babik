@@ -11,6 +11,7 @@ require 'babik/queryset/mixins/sql_renderer'
 require 'babik/queryset/aggregation'
 require 'babik/queryset/limit'
 require 'babik/queryset/order'
+require 'babik/queryset/projection'
 require 'babik/queryset/select_related'
 
 require 'babik/query/conjunction'
@@ -38,6 +39,7 @@ module Babik
       alias aggregation? _aggregation
       alias count? _count
       alias distinct? _distinct
+      alias projection? _projection
       alias select_related? _select_related
 
       def initialize(model_class)
@@ -50,16 +52,16 @@ module Babik
         @exclusion_filters = []
         @_aggregation = nil
         @_limit = nil
-        @_projection = false
+        @_projection = nil
         @_select_related = nil
         @_update = nil
       end
 
       # Aggregate a set of objects.
-      # @param aggregation_functions [Hash{symbol: Babik.agg}] hash with the different aggregations that will be computed.
+      # @param agg_functions [Hash{symbol: Babik.agg}] hash with the different aggregations that will be computed.
       # @return [Hash{symbol: float}] Result of computing each one of the aggregations.
-      def aggregate(aggregation_functions)
-        @_aggregation = Babik::QuerySet::Aggregation.new(@model, aggregation_functions)
+      def aggregate(agg_functions)
+        @_aggregation = Babik::QuerySet::Aggregation.new(@model, agg_functions)
         self.class._execute_sql(sql.select).first.symbolize_keys
       end
 

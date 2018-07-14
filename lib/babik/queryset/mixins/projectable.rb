@@ -11,7 +11,7 @@ module Babik
       #        Babik will take care of joins.
       # @return [QuerySet] Reference to this QuerySet.
       def project(*attributes)
-        @_projection = attributes
+        @_projection = Babik::QuerySet::Projection.new(@model, attributes)
         self
       end
 
