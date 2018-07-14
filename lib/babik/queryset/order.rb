@@ -3,6 +3,7 @@
 require 'babik/query/select_related_association'
 
 module Babik
+  # QuerySet module
   module QuerySet
     # Manages the order of the QuerySet
     class Order

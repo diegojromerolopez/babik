@@ -6,7 +6,6 @@
 <% exclusion_filters = queryset.exclusion_filters %>
 <% has_exclusion_filters = exclusion_filters.length.positive? %>
 
-<% aggregations = queryset.aggregations %>
 
 SELECT
 
@@ -18,10 +17,8 @@ SELECT
     DISTINCT
   <% end %>
 
-  <% if aggregations.length > 0 %>
-    <% aggregations.each do |aggregation| %>
-      <%= aggregation.sql_select %>
-    <% end %>
+  <% if queryset.aggregation? %>
+    <%= render.('select/aggregation.sql.erb', {queryset: queryset}) %>
   <% else %>
     <% if queryset.projection? %>
       <%# Projection of the results %>

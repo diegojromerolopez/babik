@@ -3,6 +3,7 @@
 require 'babik/query/select_related_association'
 
 module Babik
+  # QuerySet module
   module QuerySet
     # Delegate object that must deals with all the select_related particularities.
     class SelectRelated

@@ -8,11 +8,11 @@ require 'babik/queryset/mixins/projectable'
 require 'babik/queryset/mixins/sortable'
 require 'babik/queryset/mixins/sql_renderer'
 
+require 'babik/queryset/aggregation'
 require 'babik/queryset/limit'
 require 'babik/queryset/order'
 require 'babik/queryset/select_related'
 
-require 'babik/query/aggregation'
 require 'babik/query/conjunction'
 require 'babik/query/local_selection'
 require 'babik/query/foreign_selection'
@@ -32,9 +32,10 @@ module Babik
       include Babik::QuerySet::Projectable
       include Babik::QuerySet::Sortable
 
-      attr_reader :model, :_count, :_distinct, :_limit, :_lock_type, :_order, :_projection,
-                  :inclusion_filters, :exclusion_filters, :aggregations, :_select_related, :_update
+      attr_reader :model, :_aggregation, :_count, :_distinct, :_limit, :_lock_type, :_order, :_projection,
+                  :inclusion_filters, :exclusion_filters, :_select_related, :_update
 
+      alias aggregation? _aggregation
       alias count? _count
       alias distinct? _distinct
       alias select_related? _select_related
@@ -47,7 +48,7 @@ module Babik
         @_lock = nil
         @inclusion_filters = []
         @exclusion_filters = []
-        @aggregations = []
+        @_aggregation = nil
         @_limit = nil
         @_projection = false
         @_select_related = nil
@@ -55,12 +56,10 @@ module Babik
       end
 
       # Aggregate a set of objects.
-      # @param aggregations [Hash{symbol: Babik.agg}] hash with the different aggregations that will be computed.
+      # @param aggregation_functions [Hash{symbol: Babik.agg}] hash with the different aggregations that will be computed.
       # @return [Hash{symbol: float}] Result of computing each one of the aggregations.
-      def aggregate(aggregations)
-        aggregations.each do |aggregation_field_name, aggregation|
-          @aggregations << aggregation.prepare(@model, aggregation_field_name)
-        end
+      def aggregate(aggregation_functions)
+        @_aggregation = Babik::QuerySet::Aggregation.new(@model, aggregation_functions)
         self.class._execute_sql(sql.select).first.symbolize_keys
       end
 
@@ -165,9 +164,7 @@ module Babik
         # Merge order
         left_joins_by_alias.merge!(@_order.left_joins_by_alias) if @_order
         # Merge aggregation
-        @aggregations.each do |aggregation|
-          left_joins_by_alias.merge!(aggregation.left_joins_by_alias)
-        end
+        left_joins_by_alias.merge!(@_aggregation.left_joins_by_alias) if @_aggregation
         # Merge prefetchs
         left_joins_by_alias.merge!(@_select_related.left_joins_by_alias) if @_select_related
         # Return the left joins by alias
