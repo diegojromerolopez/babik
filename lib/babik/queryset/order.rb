@@ -82,7 +82,7 @@ module Babik
       # Does not include ORDER BY.
       # @return [SQL] SQL code for fields to order.
       def sql
-        @order_fields.map(&:sql).join(',')
+        @order_fields.map(&:sql).join(', ')
       end
     end
 
@@ -111,6 +111,9 @@ module Babik
       # i.e. something like this:
       #   <table_alias>.<field> ASC
       #   <table_alias>.<field> DESC
+      # e.g.
+      #   users_0.first_name ASC
+      #   posts_0.title DESC
       # @return [SQL] SQL code for field to order.
       def sql
         "#{@selection.table_alias}.#{@selection.selected_field} #{@direction}"
