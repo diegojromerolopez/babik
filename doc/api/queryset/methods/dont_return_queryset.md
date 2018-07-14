@@ -231,12 +231,12 @@ Post.filter(title__startswith: 'Hello')
 user = User.objects.get(id=222)
 user.objects(:posts)
     .filter(title__startswith: 'Hello')
-    .update(stars: Babik::Update::Increment.new('stars'))
+    .update(stars: Babik::QuerySet::Update::Increment.new('stars'))
 ```
 
 ```ruby
 # Set the title_length attribute of all posts
 # Note the SQL inserted as a string in Function object.
 Post.objects
-    .update(stars: Babik::Update::Function.new('title_length', 'LENGTH(title)'))
+    .update(stars: Babik::QuerySet::Update::Function.new('title_length', 'LENGTH(title)'))
 ```

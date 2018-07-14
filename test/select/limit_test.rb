@@ -74,6 +74,13 @@ class LimitTest < Minitest::Test
     assert_nil User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC)[1000]
   end
 
+  def test_brackets_invalid_value
+    exception = assert_raises RuntimeError do
+      assert_raises User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC)['INVALID VALUE']
+    end
+    assert_equal('Invalid limit passed to query: INVALID VALUE', exception.message)
+  end
+
   def test_fetch_index_out_of_range
     exception = assert_raises IndexError do
       assert_raises User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC).fetch(1000)

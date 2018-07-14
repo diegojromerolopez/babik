@@ -537,7 +537,7 @@ User.objects.filter('zone::name': 'Roman Empire', last_name__isnull: true).updat
 
 ```ruby
 Post.objects.filter(stars__gte: 1, stars__lte: 4)
-    .update(stars: Babik::Update::Increment.new('stars'))
+    .update(stars: Babik::QuerySet::Update::Increment.new('stars'))
 # UPDATE SET stars = stars + 1
 # FROM posts
 # WHERE id IN ( 

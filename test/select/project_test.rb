@@ -36,6 +36,8 @@ class ProjectTest < Minitest::Test
       { first_name: 'Juan II', email: 'juanii@example.com' },
       { first_name: 'Juana I', email: 'juanai@example.com' }
     ]
+
+    assert users_projection.projection?
     users_projection.each_with_index do |user_projection, user_projection_index|
       assert_equal local_projection_expectation[user_projection_index], user_projection.symbolize_keys
     end
@@ -51,6 +53,8 @@ class ProjectTest < Minitest::Test
       { first_name: 'Juan II', email: 'juanii@example.com', country: 'Castilla' },
       { first_name: 'Juana I', email: 'juanai@example.com', country: 'Castilla' }
     ]
+
+    assert users_projection.projection?
     users_projection.each_with_index do |user_projection, user_projection_index|
       assert_equal foreign_projection_expectation[user_projection_index], user_projection.symbolize_keys
     end

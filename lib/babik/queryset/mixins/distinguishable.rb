@@ -16,7 +16,7 @@ module Babik
       # Mark this QuerySet as not distinguishable
       # (i.e. DISTINCT keyword will NOT be applied to query).
       # @return [QuerySet] Reference to this QuerySet.
-      def indistinct
+      def undistinct
         @_distinct = false
         self
       end

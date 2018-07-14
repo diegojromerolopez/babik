@@ -17,7 +17,7 @@ module Babik
         if filter.class == Hash
           return Conjunction.new(model, filter)
         end
-        raise 'filters parameter must be an Array for OR-based AND-conditions or a hash for a lone AND-condition'
+        raise '`filter\' parameter must be an Array for OR-based AND-conditions or a hash for a lone AND-condition'
       end
 
       # AND-based condition, also known as conjunction

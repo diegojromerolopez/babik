@@ -151,8 +151,21 @@ class FilterTest < Minitest::Test
     exception = assert_raises RuntimeError do
       Tag.objects.filter('posts::bad_association::name': 'Dialogues').order_by(%i[name ASC])
     end
-    assert_equal('Bad selection path: posts::bad_association::name. '\
-                      'bad_association not found in model Post when filtering Tag objects', exception.message)
+    assert_equal(
+      'Bad selection path: posts::bad_association::name. bad_association not found in model Post when filtering Tag objects',
+      exception.message
+    )
+
+  end
+
+  def test_wrong_parameter_passed_to_filter
+    exception = assert_raises RuntimeError do
+      Tag.objects.filter('INVALID VALUE').order_by(%i[name ASC])
+    end
+    assert_equal(
+      '`filter\' parameter must be an Array for OR-based AND-conditions or a hash for a lone AND-condition',
+      exception.message
+    )
 
   end
 

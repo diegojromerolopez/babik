@@ -43,6 +43,28 @@ class OrderTest < Minitest::Test
     GeoZone.destroy_all
   end
 
+  def test_first
+    first_user = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name ASC]).first
+    assert_equal 'Alarico I', first_user.first_name
+  end
+
+  def test_last_asc
+    last_user = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name ASC]).last
+    assert_equal 'Turismundo', last_user.first_name
+  end
+
+  def test_last_desc
+    last_user = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name DESC]).last
+    assert_equal 'Alarico I', last_user.first_name
+  end
+
+  def test_first_last
+    first = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name ASC]).first
+    inverted_last = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name DESC]).last
+    assert_equal first.id, inverted_last.id
+    assert_equal first.first_name, inverted_last.first_name
+  end
+
   def test_basic_order
     users = User.objects.filter('zone::name': 'Hispania').order_by(%i[first_name ASC])
     _test_basic_order(users)

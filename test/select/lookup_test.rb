@@ -15,6 +15,9 @@ class LookupTest < Minitest::Test
 
     Post.create!(title: 'Old post 1', stars: 0, created_at: Time.now - 1.month)
     Post.create!(title: 'Old post 2', stars: 0, created_at: Time.now - 10.months)
+
+    Post.create!(title: 'Yesteryear post 1', created_at: Time.now - 1.year)
+    Post.create!(title: 'Yesteryear post 2', created_at: Time.now - 10.year)
   end
 
   def teardown
@@ -78,18 +81,19 @@ class LookupTest < Minitest::Test
   end
 
   def test_year
-    today_posts = Post.objects.filter(created_at__year: Date.today.year).order_by(created_at: :ASC)
-    #puts today_posts.select_sql
-   # assert_equal 7, today_posts.count
+    # year lookup not yet implemented
+    # this_year_posts = Post.objects.filter(created_at__year: Date.today.year).order_by(created_at: :ASC)
+    # puts this_year_posts.sql.select
+    # assert_equal 5, this_year_posts.count
   end
 
   def test_regex
     other_posts = Post.objects.filter(title__regex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
-    assert other_posts.sql.select.include?("(posts.title REGEXP '^This other[\\w\\d\\s]+$/')")
+    assert other_posts.sql.select.include?("posts.title REGEXP '^This other[\\w\\d\\s]+$/'")
   end
 
   def test_iregex
     other_posts = Post.objects.filter(title__iregex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
-    assert other_posts.sql.select.include?("(posts.title REGEXP '(?i)^This other[\\w\\d\\s]+$/')")
+    assert other_posts.sql.select.include?("posts.title REGEXP '(?i)^This other[\\w\\d\\s]+$/'")
   end
 end

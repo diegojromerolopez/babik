@@ -35,7 +35,7 @@ class UpdateTest < Minitest::Test
     @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
-      .update(stars: Babik::Update::Increment.new('stars'))
+      .update(stars: Babik::QuerySet::Update::Increment.new('stars'))
     assert_equal 5, Post.objects.get(title: 'Cantar del Mío Cid').stars
     assert_equal 3, Post.objects.get(title: 'Mocedades del Cid').stars
   end
@@ -44,7 +44,7 @@ class UpdateTest < Minitest::Test
     @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
-      .update(stars: Babik::Update::Decrement.new('stars'))
+      .update(stars: Babik::QuerySet::Update::Decrement.new('stars'))
     assert_equal 3, Post.objects.get(title: 'Cantar del Mío Cid').stars
     assert_equal 3, Post.objects.get(title: 'Mocedades del Cid').stars
   end
@@ -53,7 +53,7 @@ class UpdateTest < Minitest::Test
     @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
-      .update(stars: Babik::Update::Multiply.new('stars', 2))
+      .update(stars: Babik::QuerySet::Update::Multiply.new('stars', 2))
     assert_equal 8, Post.objects.get(title: 'Cantar del Mío Cid').stars
     assert_equal 3, Post.objects.get(title: 'Mocedades del Cid').stars
   end
@@ -62,7 +62,7 @@ class UpdateTest < Minitest::Test
     result = @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
-      .update(stars: Babik::Update::Divide.new('stars', 2))
+      .update(stars: Babik::QuerySet::Update::Divide.new('stars', 2))
     assert_equal 2, Post.objects.get(title: 'Cantar del Mío Cid').stars
     assert_equal 3, Post.objects.get(title: 'Mocedades del Cid').stars
   end
@@ -71,7 +71,7 @@ class UpdateTest < Minitest::Test
     @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
-      .update(stars: Babik::Update::Function.new('stars', 'LENGTH(title)'))
+      .update(stars: Babik::QuerySet::Update::Function.new('stars', 'LENGTH(title)'))
     assert_equal 'Cantar del Mío Cid'.length, Post.objects.get(title: 'Cantar del Mío Cid').stars
     assert_equal 3, Post.objects.get(title: 'Mocedades del Cid').stars
   end
