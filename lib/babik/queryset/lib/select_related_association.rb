@@ -10,7 +10,6 @@ class SelectRelatedAssociation
 
   delegate :left_joins_by_alias, to: :@association_joiner
   delegate :target_alias, to: :@association_joiner
-  alias table_alias target_alias
 
   def initialize(model, association_path)
     @model = model
