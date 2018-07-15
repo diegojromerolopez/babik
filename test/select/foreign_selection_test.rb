@@ -15,7 +15,6 @@ class ForeignSelectionTest < Minitest::Test
     assert_equal foreign_selection.sql_value, '\'Rome\''
     assert_equal foreign_selection.operator, 'equal'
     assert_equal foreign_selection.sql_operator, '='
-    assert_equal foreign_selection.left_joins[0].sql, 'LEFT JOIN geo_zones users__zone_0 ON users__zone_0.id = users.zone_id'
     assert_equal foreign_selection.sql_where_condition, 'users__zone_0.name = \'Rome\''
   end
 
@@ -35,8 +34,6 @@ class ForeignSelectionTest < Minitest::Test
     assert_equal foreign_selection.sql_value, '\'Rome\''
     assert_equal foreign_selection.operator, 'equal'
     assert_equal foreign_selection.sql_operator, '='
-    assert_equal foreign_selection.left_joins[0].sql, 'LEFT JOIN geo_zones users__zone_0 ON users__zone_0.id = users.zone_id'
-    assert_equal foreign_selection.left_joins[1].sql, 'LEFT JOIN geo_zones geo_zones__parent_zone_1 ON geo_zones__parent_zone_1.id = users__zone_0.parent_zone_id'
     assert_equal foreign_selection.sql_where_condition, 'geo_zones__parent_zone_1.name = \'Rome\''
   end
 
@@ -50,8 +47,6 @@ class ForeignSelectionTest < Minitest::Test
     assert_equal foreign_selection.operator, 'equal'
     assert_equal foreign_selection.sql_operator, '='
 
-    assert_equal foreign_selection.left_joins[0].sql, 'LEFT JOIN posts users__posts_0 ON users__posts_0.author_id = users.id'
-    assert_equal foreign_selection.left_joins[1].sql, 'LEFT JOIN post_tags posts__post_tags_1 ON posts__post_tags_1.post_id = users__posts_0.id'
     assert_equal foreign_selection.sql_where_condition, 'post_tags__tag_2.name = \'Funny\''
   end
 

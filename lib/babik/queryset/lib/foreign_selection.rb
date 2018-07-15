@@ -1,13 +1,18 @@
 # frozen_string_literal: true
 
 require 'babik/queryset/lib/selection'
+require 'babik/queryset/lib/association_joiner'
 
 class ForeignSelection < Selection
 
   attr_reader :model, :selection_path, :associations, :selected_field,
-              :left_joins, :left_joins_by_alias, :sql_where_condition,
+              :sql_where_condition,
               :value, :operator,
               :sql_operator, :sql_value
+
+  delegate :left_joins_by_alias, to: :@association_joiner
+  delegate :target_alias, to: :@association_joiner
+  alias table_alias target_alias
 
   def initialize(model, selection_path, value)
     super
@@ -16,6 +21,7 @@ class ForeignSelection < Selection
     @selected_field, @operator = selection_path.split(OPERATOR_SEPARATOR)
 
     _initialize_associations
+    _initialize_association_joins
     _init_sql
   end
 
@@ -62,29 +68,15 @@ class ForeignSelection < Selection
   def _init_sql
     _initialize_sql_operator
     _initialize_sql_value
-    _init_left_join
     _init_where
   end
 
-  def _init_left_join
-    @left_joins = []
-    @left_joins_by_alias = {}
-    last_table_alias = nil
-    @associations.each_with_index do |association, association_path_index|
-      last_table_alias ||= association.active_record.table_name
-      left_join = Babik::QuerySet::Join.new_from_association(association, association_path_index, last_table_alias)
-      @left_joins_by_alias[left_join.target_alias] = left_join
-      @left_joins << left_join
-      last_table_alias = left_join.target_alias
-    end
+  def _initialize_association_joins
+    @association_joiner = Babik::QuerySet::AssociationJoiner.new(@associations)
   end
 
   def _init_where
-    @sql_where_condition = "#{self.table_alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
-  end
-
-  def table_alias
-    @left_joins[-1].target_alias
+    @sql_where_condition = "#{@association_joiner.target_alias}.#{@selected_field} #{@sql_operator} #{@sql_value}"
   end
 
 end
