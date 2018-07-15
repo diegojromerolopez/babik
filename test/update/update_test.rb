@@ -59,7 +59,7 @@ class UpdateTest < Minitest::Test
   end
 
   def test_divide_field_with_local_conditions
-    result = @cid
+    @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
       .update(stars: Babik::QuerySet::Update::Divide.new('stars', 2))
