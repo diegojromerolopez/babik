@@ -20,10 +20,10 @@ require 'babik/queryset/components/select_related'
 require 'babik/queryset/components/where'
 
 require 'babik/queryset/lib/condition'
-require 'babik/queryset/lib/local_selection'
-require 'babik/queryset/lib/foreign_selection'
+require 'babik/queryset/lib/selection/local_selection'
+require 'babik/queryset/lib/selection/foreign_selection'
 require 'babik/queryset/lib/field'
-require 'babik/queryset/lib/update'
+require 'babik/queryset/lib/update/assignment'
 
 # Represents a new type of query result set
 module Babik

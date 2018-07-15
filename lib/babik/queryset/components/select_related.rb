@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/select_related_association'
+require 'babik/queryset/lib/selection/select_related_association'
 
 module Babik
   # QuerySet module

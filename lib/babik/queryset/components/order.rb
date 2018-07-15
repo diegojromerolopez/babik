@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/selection'
+require 'babik/queryset/lib/selection/selection'
 
 module Babik
   # QuerySet module

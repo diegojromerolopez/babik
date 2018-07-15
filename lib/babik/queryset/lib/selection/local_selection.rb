@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/selection'
+require 'babik/queryset/lib/selection/selection'
 
 class LocalSelection < Selection
 
@@ -14,7 +14,7 @@ class LocalSelection < Selection
   end
 
   def sql_where_condition
-    field = Babik::Field.new(model, @selected_field)
+    field = Babik::Table::Field.new(model, @selected_field)
     actual_field = field.real_field
     sql_value = @sql_value
     # Only if the real field is an association and the value is an ActiveRecord,

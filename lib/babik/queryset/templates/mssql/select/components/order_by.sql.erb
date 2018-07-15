@@ -1,0 +1,21 @@
+<% order = queryset._order %>
+
+
+<%# Order the results %>
+<% if order %>
+
+  ORDER BY
+  <%= order.sql %>
+
+<% else %>
+
+  <% limit = queryset._limit %>
+
+  <%# MSSQL server requires always an ORDER BY if a OFFSET - FETCH NEXT clause is present %>
+  <% if limit %>
+
+    ORDER BY <%= queryset.model.table_name %>.id ASC
+
+  <% end %>
+
+<% end %>

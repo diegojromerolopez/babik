@@ -1,0 +1,8 @@
+<% limit = queryset._limit %>
+
+<% if limit %>
+
+  OFFSET  <%= limit.offset ? limit.offset : 0 %> ROWS
+  FETCH NEXT <%= limit.size %> ROWS ONLY
+
+<% end %>

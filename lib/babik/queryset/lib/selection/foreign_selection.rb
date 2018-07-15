@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/selection'
-require 'babik/queryset/lib/association_joiner'
+require 'babik/queryset/lib/selection/selection'
+require 'babik/queryset/lib/join/association_joiner'
 
 class ForeignSelection < Selection
 
@@ -71,7 +71,7 @@ class ForeignSelection < Selection
   end
 
   def _initialize_association_joins
-    @association_joiner = Babik::QuerySet::AssociationJoiner.new(@associations)
+    @association_joiner = Babik::QuerySet::Join::AssociationJoiner.new(@associations)
   end
 
   def _init_where
