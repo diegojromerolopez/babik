@@ -21,7 +21,7 @@ module Babik
       end
 
       # Return the joins grouped by alias
-      # @return [Hash{alias: Babik::Join}] Hash where the value is the alias of the table and the value is a Babik::Join
+      # @return [Hash{alias: Babik::QuerySet::Join}] Hash where the value is the alias of the table and the value is a Babik::Join
       def left_joins_by_alias
         left_joins_by_alias = {}
         @functions.each do |function|
@@ -66,7 +66,7 @@ module Babik
       end
 
       # Return the joins grouped by alias
-      # @return [Hash{alias: Babik::Join}] Hash where the value is the alias of the table and the value is a Babik::Join
+      # @return [Hash{alias: Babik::QuerySet::Join}] Hash where the value is the alias of the table and the value is a Babik::Join
       def left_joins_by_alias
         @selection.left_joins_by_alias
       end

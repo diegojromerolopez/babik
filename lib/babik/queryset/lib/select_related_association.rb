@@ -42,16 +42,17 @@ class SelectRelatedAssociation
   def _init_left_join
     @left_joins = []
     @left_joins_by_alias = {}
-    last_owner_table_alias = nil
+    last_table_alias = nil
     @associations.each_with_index do |association, association_path_index|
-      left_join = Babik::Join.new("LEFT JOIN", association, association_path_index, last_owner_table_alias)
-      @left_joins_by_alias[left_join.alias] = left_join
+      last_table_alias ||= association.active_record.table_name
+      left_join = Babik::QuerySet::Join.new_from_association(association, association_path_index, last_table_alias)
+      @left_joins_by_alias[left_join.target_alias] = left_join
       @left_joins << left_join
-      last_owner_table_alias = left_join.alias
+      last_table_alias = left_join.target_alias
     end
   end
 
   def target_alias
-    @left_joins[-1].alias
+    @left_joins[-1].target_alias
   end
 end
