@@ -39,4 +39,22 @@ class DeleteTest < Minitest::Test
     User.destroy_all
   end
 
+  def delete_by_local_selection
+    User.objects.filter(first_name: 'Julius').delete
+    assert_nil User.objects.filter(first_name: 'Julius').first
+    assert_equal 1, User.objects.count
+  end
+
+  def test_delete_by_foreign_selection
+    Post.objects.filter('author::first_name': 'Julius', title: 'Commentarii de Bello Gallico 2').delete
+    assert_nil Post.objects.filter('author::first_name': 'Julius', title: 'Commentarii de Bello Gallico 2').first
+    assert_equal 6, @caesar.objects(:posts).count
+  end
+
+  def test_delete_by_instance_foreign_selection
+    @caesar.objects(:posts).filter(title: 'Commentarii de Bello Gallico 2').delete
+    assert_nil @caesar.objects(:posts).filter(title: 'Commentarii de Bello Gallico 2').first
+    assert_equal 6, @caesar.objects(:posts).count
+  end
+
 end
