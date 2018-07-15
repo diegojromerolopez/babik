@@ -23,10 +23,10 @@ class LocalSelection < Selection
     # If the value is a QuerySet, include the SQL code
     sql_value = "(#{@sql_value.select_sql})" if @sql_value.class == Babik::QuerySet::Base
     # Return the condition
-    "#{self.table_alias}.#{actual_field} #{@sql_operator} #{sql_value}"
+    "#{self.target_alias}.#{actual_field} #{@sql_operator} #{sql_value}"
   end
 
-  def table_alias
+  def target_alias
     @model.table_name
   end
 

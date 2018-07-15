@@ -54,8 +54,8 @@ module Babik
       #   posts_0.title AS post_title
       # @return [SQL] SQL code for field to appear in SELECT.
       def sql
-        return "#{@selection.table_alias}.#{@selection.selected_field} AS #{@alias}" if @alias
-        "#{@selection.table_alias}.#{@selection.selected_field}"
+        return "#{@selection.target_alias}.#{@selection.selected_field} AS #{@alias}" if @alias
+        "#{@selection.target_alias}.#{@selection.selected_field}"
       end
     end
   end

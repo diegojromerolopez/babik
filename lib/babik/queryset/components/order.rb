@@ -141,7 +141,7 @@ module Babik
       #   posts_0.title DESC
       # @return [SQL] SQL code for field to order.
       def sql
-        "#{@selection.table_alias}.#{@selection.selected_field} #{@direction}"
+        "#{@selection.target_alias}.#{@selection.selected_field} #{@direction}"
       end
     end
   end

@@ -62,7 +62,7 @@ module Babik
       # Return aggregatio function SQL
       # @return [String] Aggregation function SQL
       def sql
-        "#{self.class::SQL_OPERATION}(#{@selection.table_alias}.#{@selection.selected_field}) AS #{@field_name}"
+        "#{self.class::SQL_OPERATION}(#{@selection.target_alias}.#{@selection.selected_field}) AS #{@field_name}"
       end
 
       # Return the joins grouped by alias
