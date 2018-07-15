@@ -12,7 +12,6 @@ class ForeignSelection < Selection
 
   delegate :left_joins_by_alias, to: :@association_joiner
   delegate :target_alias, to: :@association_joiner
-  #alias table_alias target_alias
 
   def initialize(model, selection_path, value)
     super
