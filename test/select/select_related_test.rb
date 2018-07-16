@@ -40,6 +40,7 @@ class SelectRelatedTest < Minitest::Test
     users = User.objects.order_by('first_name')
     number_of_users = User.objects.count
     number_of_returned_users = 0
+
     User
       .objects
       .select_related(:zone)

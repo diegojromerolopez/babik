@@ -79,6 +79,19 @@ class FilterTest < Minitest::Test
     assert_equal asturian_kings.count, user_count
   end
 
+  def test_foreign_filter_by_active_record_object
+    kings = User.objects
+                .filter('zone::parent_zone': @asturias)
+                .order_by(%i[first_name ASC])
+    asturian_kings = ['Favila', 'Fruela I', 'Pelayo']
+    user_count = 0
+    kings.each_with_index do |king, king_i|
+      assert_equal asturian_kings[king_i], king.first_name
+      user_count += 1
+    end
+    assert_equal asturian_kings.count, user_count
+  end
+
   def test_foreign_or_filter
     kings = User.objects
                 .filter([{first_name: 'Pelayo'}, {'zone::name': 'Cantabria'}])
@@ -155,7 +168,6 @@ class FilterTest < Minitest::Test
       'Bad selection path: posts::bad_association::name. bad_association not found in model Post when filtering Tag objects',
       exception.message
     )
-
   end
 
   def test_wrong_parameter_passed_to_filter

@@ -128,4 +128,11 @@ class OrderTest < Minitest::Test
     assert_equal('Invalid type of order: 2222', exception.message)
   end
 
+  def test_wrong_field_path
+    exception = assert_raises RuntimeError do
+      User.objects.filter('zone::name': 'Hispania').order_by([1111, :ASC])
+    end
+    assert_equal('field_path of class Integer not valid. A Symbol/String/Babik::Selection::Base expected', exception.message)
+  end
+
 end

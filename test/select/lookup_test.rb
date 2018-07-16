@@ -81,10 +81,19 @@ class LookupTest < Minitest::Test
   end
 
   def test_year
-    # year lookup not yet implemented
-    # this_year_posts = Post.objects.filter(created_at__year: Date.today.year).order_by(created_at: :ASC)
-    # puts this_year_posts.sql.select
-    # assert_equal 5, this_year_posts.count
+    younger_than_1998_year_posts = Post.objects.filter(created_at__year__gt: 1998).order_by(created_at: :ASC)
+    assert_equal Post.objects.count, younger_than_1998_year_posts.count
+    assert_equal 0, Post.objects.filter(created_at__year: 1998).count
+  end
+
+  def test_month
+    this_month_posts = Post.objects.filter(created_at__month: Time.now.utc.month).order_by(created_at: :ASC)
+    assert_equal 7, this_month_posts.count
+  end
+
+  def test_day
+    this_day_posts = Post.objects.filter(created_at__day: Time.now.utc.day).order_by(created_at: :ASC)
+    assert_equal 9, this_day_posts.count
   end
 
   def test_regex

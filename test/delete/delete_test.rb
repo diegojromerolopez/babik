@@ -39,7 +39,7 @@ class DeleteTest < Minitest::Test
     User.destroy_all
   end
 
-  def delete_by_local_selection
+  def test_delete_by_local_selection
     User.objects.filter(first_name: 'Julius').delete
     assert_nil User.objects.filter(first_name: 'Julius').first
     assert_equal 1, User.objects.count

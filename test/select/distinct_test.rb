@@ -21,6 +21,12 @@ class DistinctTest < Minitest::Test
     assert User.objects.distinct.filter(first_name: 'Diego').distinct?
   end
 
+  def test_local_distinct_from_queryset
+    diegos = User.objects.filter(first_name: 'Diego').project(:first_name).distinct
+    assert diegos.distinct?
+    assert_equal 1, diegos.count
+  end
+
   def test_local_undistinct
     diegos = User.objects.filter(first_name: 'Diego').project(:first_name)
     refute diegos.distinct?

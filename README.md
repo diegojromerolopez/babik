@@ -2,11 +2,12 @@
 
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
-**This project is not ready to use in production!**
+**This project is in alpha phase. User at your own risk!**
+
 See [Roadmap](#roadmap) to check what is keeping it from being stable.
 
 Contact [me](mailto:diegojromerolopez@gmail.com) if you are interested in
-help developing it.
+helping me developing it.
 
 ## What's this?
 
@@ -16,7 +17,7 @@ of the foreign field conditions.
 
 ### Example: Blog platform in Rails
 
-Suppose you are developing a blog platform with the following [schema](#apendix-1:-example-schema).
+Suppose you are developing a blog platform with the following [schema](/test/db/schema.rb).
 Compare these two queries and check what is more easier to write:
 
 Returning all users with last name equals to 'Fabia' that are from Rome:
@@ -56,15 +57,22 @@ No rubygem version for the moment.
 
 ## Requirements
 
-Include all [inverse relationships](http://guides.rubyonrails.org/association_basics.html#bi-directional-associations).
+Include all [inverse relationships](http://guides.rubyonrails.org/association_basics.html#bi-directional-associations)
+in your models.
 
 **It is required to compute the object selection from instance**.
 
+## Configuration
+
+No configuration is needed, Babik automatically includes two methods for your models:
+- **objects** class method to make queries for a model.
+- **objects** instance method to make queries from an instance. 
+
 ## Database support
 
-PostgreSQL, MySQL, MariaDB and Sqlite are supported.
+PostgreSQL, MySQL, MariaDB, MSSQL and Sqlite are supported.
 
-Accepting contributors to port this library to MSSQL or Oracle.
+Accepting contributors to port this library to Oracle.
 
 ## Main differences with Django QuerySet system
 - Django does not make any distinct against relationships, local fields or lookups when selecting by
@@ -74,7 +82,7 @@ that allows the construction of complex queries. Babik allows passing an array t
 there is no need of this artifact.
 - Django [select_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#select-related)
 method cache the objects in the returned object.
-We return a pair of object and a hash with the associated objects.
+We return a pair of objects and a hash with the associated objects. [See doc here](/doc/api/queryset/methods/dont_return_queryset.md#select-related).
 
 
 ## Usage
@@ -336,7 +344,9 @@ See more [here](/doc/api/queryset/lookups.md).
 
 #### Selection by foreign model field
 
-The main feature is the filter by foreign keys. This can be done by only 
+The main feature of Babik is filtering by foreign keys. 
+
+**Your associations must have always an inverse (by making use of inverse_of)**. 
 
 **NOTE many-to-many relationships are only supported when based on has_many through**
 
@@ -550,16 +560,37 @@ Post.objects.filter(stars__gte: 1, stars__lte: 4)
 ## Documentation
 
 See the [documentation](doc/README.md) for more information
-about the [API](doc/README.md#API) and the
+about the [API](doc/README.md#queryset-api) and the
 internals of this library.
 
 ## Roadmap
+
+### Lookups
+
+Django QuerySets have several datetime
+lookups that Babik has not implemented:
+- [hour](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#hour)
+- [minute](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#minute)
+- [second](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#second)
+- [time](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#time)
+- [quarter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#quarter)
+- [week_day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week_day)
+- [week](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week)
+
+### Set operations
+
+- [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
+- [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
+- [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
 
 ### Optimized update & delete
 
 Both operation will have to be rewritten by DBMS. Standard SQL has no 
 DELETE or UPDATE with joins and the current alternative
-(a IN-based-subquery) does not scale.
+(a IN-based-subquery) does not scale for some DBMS.
+
+That is, MSSQL and PostgreSQL have an internal optimization engine that
+compute a JOIN internally. Sadly, MySQL is not one of them.
 
 ### Prefect
 
@@ -567,9 +598,6 @@ DELETE or UPDATE with joins and the current alternative
 is not implemented yet.
 
 ### Increase code quality
-
-Code quality is poor. Comment all with yard and increase code maintainability
-and improve its structure.
 
 This project must follow Rubocop directives and pass Reek checks.
 
@@ -586,88 +614,11 @@ Deploy gem in rubygems.
 [Annotations](https://docs.djangoproject.com/en/2.0/topics/db/aggregation/#aggregation)
 are not implemented yet.
 
-### Lookups
-
-Django QuerySets have several datetime
-lookups that Babik has not implemented:
-- [year](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#year)
-- [month](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#month)
-- [day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#day)
-- [hour](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#hour)
-- [minute](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#minute)
-- [second](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#second)
-- [time](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#time)
-- [quarter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#quarter)
-- [week_day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week_day)
-- [week](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week)
-
-### Set operations
-
-- [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
-- [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
-- [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
-
 ### Support other DBMS
 
-Oracle and MSSQL are not supported at the moment because of they lack LIMIT clause
+Oracle is not supported at the moment because of they lack LIMIT clause
 in SELECT queries.
 
 ## License
 
 [MIT](LICENSE)
-
-## Apendix 1: Example schema
-
-
-```ruby
-ActiveRecord::Schema.define do
-  self.verbose = false
-
-  create_table :geo_zones, :force => true do |t|
-    t.string :name
-    t.text :description
-    t.integer :parent_zone_id
-    t.timestamps
-  end
-
-  create_table :users, :force => true do |t|
-    t.integer :zone_id
-    t.string :first_name
-    t.string :last_name
-    t.text :biography
-    t.integer :age
-    t.string :email
-    t.timestamps
-  end
-
-  create_table :posts, :force => true do |t|
-    t.string :title
-    t.text :content
-    t.integer :stars
-    t.integer :author_id
-    t.integer :category_id
-    t.timestamps
-  end
-
-  create_table :post_tags, :force => true do |t|
-    t.integer :post_id
-    t.integer :tag_id
-    t.timestamps
-  end
-
-  create_table :tags, :force => true do |t|
-    t.string :name
-    t.timestamps
-  end
-
-  create_table :categories, :force => true do |t|
-    t.string :name
-    t.timestamps
-  end
-
-  add_index :users, :email, unique: true
-  add_index :categories, :name, unique: true
-  add_index :post_tags, [:post_id, :tag_id], unique: true
-  add_index :posts, [:title, :author_id], unique: true
-end
-```

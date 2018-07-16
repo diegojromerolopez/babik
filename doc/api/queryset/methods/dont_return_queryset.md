@@ -216,7 +216,42 @@ User.objects
     .project('first_name', 'email', %w[zone::name country])
 ```
 
-# Update
+## Select related
+
+When looping through a set of objects, it is usual to have to load the same
+foreign objects in each loop. Traditionally, the simplest way to do it is to
+make a query in each loop.
+
+Hovewer, the best way to do it, is by loading the required foreign objects
+and the begining and reading in the corresponding loop iteration.
+
+Babik differs from Django in the interface but the idea remains the same:
+
+```ruby
+# Load the first 5 users with their corresponding zone
+User.objects.limit(size: 5).select_related([:zone]).each do |user_with_zone|
+  user, foreign_objects = user_with_zone
+  puts "#{foreign_objects[:zone]} is the zone of user #{user.first_name}}"
+end
+```
+
+This feature **only works in association paths that follow belongs_to
+or has_one association**. Many to many associations are not implemented
+because they requires a special treatment.
+
+```ruby
+# Load the posts with 4 or more stars with their author and category
+Post.objects
+    .filter(stars__gte: 4)
+    .select_related([:author, :category]).each do |post_and_co|
+  post, foreign_objects = post_and_co
+  author = foreign_objects[:author]
+  category = foreign_objects[:category]
+  puts "#{author.first_name} wrote #{post.title} in the category #{category.name}"
+end
+```
+
+## Update
 
 Updates the objects according to the queryset filter/exclude condition.
 
@@ -231,12 +266,12 @@ Post.filter(title__startswith: 'Hello')
 user = User.objects.get(id=222)
 user.objects(:posts)
     .filter(title__startswith: 'Hello')
-    .update(stars: Babik::QuerySet::Update::Increment.new('stars'))
+    .update(stars: Babik::QuerySet::Update::Assignment::Increment.new('stars'))
 ```
 
 ```ruby
 # Set the title_length attribute of all posts
 # Note the SQL inserted as a string in Function object.
 Post.objects
-    .update(stars: Babik::QuerySet::Update::Function.new('title_length', 'LENGTH(title)'))
+    .update(stars: Babik::QuerySet::Update::Assignment::Function.new('title_length', 'LENGTH(title)'))
 ```
