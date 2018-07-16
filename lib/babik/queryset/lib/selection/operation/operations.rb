@@ -1,60 +1,19 @@
 # frozen_string_literal: true
 
+require 'babik/queryset/lib/selection/operation/base'
+
 module Babik
   module Selection
+    # SQL operation module
     module Operation
 
-      class Base
-        def initialize(field, sql_operation, value)
-          @field = field
-          @value = value
-          @sql_operation_template = sql_operation.dup
-          @sql_operation = sql_operation.dup
-          _init_sql_operation
-        end
-
-        def _init_sql_operation
-          @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value', Base.escape(@value))
-        end
-
-        def to_s
-          @sql_operation
-        end
-
-        def db_engine
-          Babik::Config::Database.config[:adapter]
-        end
-
-        def self.factory(field, operator, value)
-          final_field, final_operator, final_value = self.special_cases(field, operator, value)
-          final_operator_class_name = Babik::Selection::Operation::CORRESPONDENCE[final_operator.to_sym]
-          final_operator_class = Object.const_get("Babik::Selection::Operation::#{final_operator_class_name}")
-          final_operator_class.new(final_field, final_value)
-        end
-
-        def self.special_cases(field, operator, value)
-          return field, 'equal', value.id if operator == 'equal' && value.is_a?(ActiveRecord::Base)
-          return field, 'between', [value.beginning_of_day, value.end_of_day] if operator == 'date' && value.is_a?(::Date)
-          return field, 'in', value if operator == 'equal' && value.is_a?(Babik::QuerySet::Base)
-          [field, operator, value]
-        end
-
-        def self.escape(str)
-          ActiveRecord::Base.connection.quote(str)
-        end
-      end
-
-      class BinaryOperator < Base
-        def initialize(field, value)
-          super(field, "?field #{self.class::SQL_OPERATOR} ?value", value)
-        end
-      end
-
-      class Different < BinaryOperator
+      # When two values are not equal
+      class Different < BinaryOperation
         SQL_OPERATOR = '<>'
       end
 
-      class OperatorIfNotNull < Base
+      # Operations that in case a nil is passed will convert the equality comparison to IS NULL
+      class IfNotNullOperation < Base
         SQL_OPERATOR = '='
         def initialize(field, value)
           if value.nil?
@@ -65,18 +24,22 @@ module Babik
         end
       end
 
-      class Equal < OperatorIfNotNull
+      # Equal operation
+      class Equal < IfNotNullOperation
         SQL_OPERATOR = '='
       end
 
-      class Exact < OperatorIfNotNull
+      # Exact operation
+      class Exact < IfNotNullOperation
         SQL_OPERATOR = 'LIKE'
       end
 
+      # Exact case-insensitive operation
       class IExact < Exact
         SQL_OPERATOR = 'ILIKE'
       end
 
+      # IN operation
       class In < Base
         def initialize(field, value)
           if value.class == Array
@@ -99,6 +62,7 @@ module Babik
         end
       end
 
+      # IS NULL operation
       class IsNull < Base
         def initialize(field, value)
           sql_operation = value ? '?field IS NULL' : '?field IS NOT NULL'
@@ -106,22 +70,27 @@ module Babik
         end
       end
 
-      class LessThan < BinaryOperator
+      # Less than comparison
+      class LessThan < BinaryOperation
         SQL_OPERATOR = '<'
       end
 
-      class LessThanOrEqual < BinaryOperator
+      # Less than or equal comparison
+      class LessThanOrEqual < BinaryOperation
         SQL_OPERATOR = '<='
       end
 
-      class GreaterThan < BinaryOperator
+      # Greater than comparison
+      class GreaterThan < BinaryOperation
         SQL_OPERATOR = '>'
       end
 
-      class GreaterThanOrEqual < BinaryOperator
+      # Greater than or equal comparison
+      class GreaterThanOrEqual < BinaryOperation
         SQL_OPERATOR = '>='
       end
 
+      # Between comparison (check the value is between two different values)
       class Between < Base
         def initialize(field, value)
           super(field, '?field BETWEEN ?value1 AND ?value2', value)
@@ -143,7 +112,7 @@ module Babik
         end
       end
 
-      class StartsWith < BinaryOperator
+      class StartsWith < BinaryOperation
         SQL_OPERATOR = 'LIKE'
         def _init_sql_operation
           escaped_value = self.class.escape("#{@value}%")
@@ -155,7 +124,7 @@ module Babik
         SQL_OPERATOR = 'ILIKE'
       end
 
-      class EndsWith < BinaryOperator
+      class EndsWith < BinaryOperation
         SQL_OPERATOR = 'LIKE'
         def _init_sql_operation
           escaped_value = self.class.escape("%#{@value}")
@@ -167,7 +136,7 @@ module Babik
         SQL_OPERATOR = 'ILIKE'
       end
 
-      class Contains < BinaryOperator
+      class Contains < BinaryOperation
         SQL_OPERATOR = 'LIKE'
         def _init_sql_operation
           escaped_value = self.class.escape("%#{@value}%")
@@ -224,6 +193,43 @@ module Babik
         end
       end
 
+      class Year < DateOperation
+        def sql_function
+          dbms_adapter = db_engine
+          return 'EXTRACT(YEAR FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
+          return 'strftime(\'%Y\', ?field)' if dbms_adapter == 'sqlite3'
+          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
+        end
+      end
+
+      class Month < DateOperation
+        def initialize(field, operator, value)
+          value = '%02d' % value if db_engine == 'sqlite3'
+          super(field, operator, value)
+        end
+
+        def sql_function
+          dbms_adapter = db_engine
+          return 'EXTRACT(MONTH FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
+          return 'strftime(\'%m\', ?field)' if dbms_adapter == 'sqlite3'
+          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
+        end
+      end
+
+      class Day < DateOperation
+        def initialize(field, operator, value)
+          value = '%02d' % value if db_engine == 'sqlite3'
+          super(field, operator, value)
+        end
+
+        def sql_function
+          dbms_adapter = db_engine
+          return 'EXTRACT(DAY FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
+          return 'strftime(\'%d\', ?field)' if dbms_adapter == 'sqlite3'
+          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
+        end
+      end
+
       CORRESPONDENCE = {
         default: Equal,
         equal: Equal,
@@ -247,7 +253,10 @@ module Babik
         iendswith: IEndsWith,
         icontains: IContains,
         regex: Babik::Selection::Operation::Regex,
-        iregex: IRegex
+        iregex: IRegex,
+        month: Month,
+        day: Day,
+        year: Year
       }.freeze
 
     end

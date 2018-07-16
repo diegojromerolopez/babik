@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/selection/select_related_association'
+require 'babik/queryset/lib/selection/select_related_selection'
 
 module Babik
   # QuerySet module
@@ -11,12 +11,12 @@ module Babik
       attr_reader :model, :associations
 
       # Creates a new SelectRelated
-      def initialize(model, association_paths)
+      def initialize(model, selection_paths)
         @model = model
         @associations = []
-        association_paths = [association_paths] if association_paths.class != Array
-        association_paths.each do |association_path|
-          @associations << SelectRelatedAssociation.new(@model, association_path)
+        selection_paths = [selection_paths] if selection_paths.class != Array
+        selection_paths.each do |selection_path|
+          @associations << Babik::Selection::SelectRelatedSelection.new(@model, selection_path)
         end
       end
 
@@ -35,13 +35,13 @@ module Babik
       # of attributes of the associated objects.
       # @param result_set [ResultSet] Result with the query that loads all the required objects
       #        (main and related ones).
-      # @return [ActiveRecord::Base, Hash{association_path: ActiveRecord::Base}]
+      # @return [ActiveRecord::Base, Hash{selection_path: ActiveRecord::Base}]
       #         Return and object with its associated objects.
       def all_with_related(result_set)
         result_set.map do |record|
           object = instantiate_model_object(record)
           associated_objects = @associations.map do |association|
-            [association.association_path, instantiate_associated_object(record, association)]
+            [association.selection_path, instantiate_associated_object(record, association)]
           end
           [object, associated_objects.to_h.symbolize_keys]
         end

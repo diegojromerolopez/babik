@@ -62,8 +62,8 @@ module Babik
         # Check
         @order_fields = []
         order.each_with_index do |order_field_direction, _order_field_index|
-          order_field_path = order_field_direction[0].to_sym
-          order_direction = order_field_direction[1].to_sym
+          order_field_path = order_field_direction[0]
+          order_direction = order_field_direction[1]
           @order_fields << OrderField.new(@model, order_field_path, order_direction)
         end
       end

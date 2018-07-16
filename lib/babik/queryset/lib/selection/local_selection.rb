@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'babik/queryset/lib/selection/selection'
-require 'babik/queryset/lib/selection/operation'
+require 'babik/queryset/lib/selection/operation/operations'
 
 module Babik
   module Selection
     # Selection by a local field
     class LocalSelection < Babik::Selection::Base
 
-      attr_reader :model, :selection_path, :selected_field, :operator, :value
+      attr_reader :model, :selection_path, :selected_field, :operator, :secondary_operator, :value
 
       # Construct a local field selector
       # @param model [ActiveRecord::Base] model whose field will be used.
@@ -18,7 +18,7 @@ module Babik
       #        to select objects.
       def initialize(model, selection_path, value)
         super
-        @selected_field, @operator = @selection_path.to_s.split(OPERATOR_SEPARATOR)
+        @selected_field, @operator, @secondary_operator = @selection_path.to_s.split(OPERATOR_SEPARATOR)
         # By default, if no operator is given, 'equal' will be used
         @operator ||= 'equal'
       end
@@ -26,10 +26,14 @@ module Babik
       # Return the SQL where condition
       # @return [Babik::Selection::Operation::Base] Condition obtained from the selection path and value.
       def sql_where_condition
-        field = Babik::Table::Field.new(model, @selected_field)
-        actual_field = field.real_field
+        actual_field = Babik::Table::Field.new(model, @selected_field).real_field
         # Return the condition
-        Babik::Selection::Operation::Base.factory("#{self.target_alias}.#{actual_field}", @operator, @value)
+        operator = if @secondary_operator
+                     [@operator, @secondary_operator]
+                   else
+                     @operator
+                   end
+        Babik::Selection::Operation::Base.factory("#{self.target_alias}.#{actual_field}", operator, @value)
       end
 
       # Return the target table alias.
