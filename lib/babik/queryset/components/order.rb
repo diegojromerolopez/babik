@@ -116,8 +116,13 @@ module Babik
           raise "Invalid order type #{direction} in #{field_path}: Expecting :ASC or :DESC"
         end
         @model = model
-        @selection = Selection.factory(@model, field_path, '_') if [String, Symbol].include?(field_path.class)
-        @selection = field_path if field_path.is_a?(Selection)
+        if [String, Symbol].include?(field_path.class)
+          @selection = Babik::Selection::Base.factory(@model, field_path, '_')
+        elsif field_path.is_a?(Babik::Selection::Base)
+          @selection = field_path
+        else
+          raise "field_path of class #{field_path.class} not valid. A Symbol/String/Babik::Selection::Base expected"
+        end
         @direction = direction_sym
       end
 

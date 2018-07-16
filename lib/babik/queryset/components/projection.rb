@@ -42,7 +42,7 @@ module Babik
           actual_field = field
           @alias = nil
         end
-        @selection = Selection.factory(model, actual_field, '_')
+        @selection = Babik::Selection::Base.factory(model, actual_field, '_')
       end
 
       # Return sql of the field to project.

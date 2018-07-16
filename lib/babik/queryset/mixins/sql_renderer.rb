@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'erb'
+require 'babik/config/database'
 
 module Babik
   module QuerySet
@@ -82,10 +83,9 @@ module Babik
       end
 
       # Return the DBMS adapter.
-      # @todo Place in a class DBMS.
       # @return [String] DBMS adapter (sqlite3, postgre, mysql, mariadb, oracle or mssql).
       def _dbms_adapter
-        ActiveRecord::Base.connection_config[:adapter]
+        Babik::Config::Database.config[:adapter]
       end
 
     end

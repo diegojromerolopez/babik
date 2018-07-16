@@ -45,11 +45,11 @@ module Babik
       return self.class.objects.filter(id: self.id) unless selection_path
 
       selection_path = selection_path.to_s
-      is_a_selection_path = selection_path.include?(Selection::RELATIONSHIP_SEPARATOR)
+      is_a_selection_path = selection_path.include?(Babik::Selection::Base::RELATIONSHIP_SEPARATOR)
       return nil unless is_a_selection_path
 
       # If the selection path has more than one level deep, we have to build an instance-based query
-      selection_path_parts = selection_path.split(Selection::RELATIONSHIP_SEPARATOR)
+      selection_path_parts = selection_path.split(Babik::Selection::Base::RELATIONSHIP_SEPARATOR)
       model_i = self.class
 
       # The aim is to reverse the selection_path both
@@ -68,7 +68,7 @@ module Babik
       end
 
       # Construct a new selection path for our instance-based query
-      instance_selection_path = instance_selection_path_parts.join(Selection::RELATIONSHIP_SEPARATOR)
+      instance_selection_path = instance_selection_path_parts.join(Babik::Selection::Base::RELATIONSHIP_SEPARATOR)
       model_i.objects.filter("#{instance_selection_path}::id": self.id)
     end
 
@@ -98,7 +98,7 @@ module Babik
       rescue KeyError => _exception
         raise "Relationship #{association.name} of model #{self.class} has no inverse_of option."
       end
-      target.objects.filter("#{inverse_relationship}#{Selection::RELATIONSHIP_SEPARATOR}id": self.id)
+      target.objects.filter("#{inverse_relationship}#{Babik::Selection::Base::RELATIONSHIP_SEPARATOR}id": self.id)
     end
   end
 

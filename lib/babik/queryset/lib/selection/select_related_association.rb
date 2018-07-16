@@ -6,7 +6,7 @@ require 'babik/queryset/lib/selection/selection'
 
 
 class SelectRelatedAssociation
-  RELATIONSHIP_SEPARATOR = ::Selection::RELATIONSHIP_SEPARATOR
+  RELATIONSHIP_SEPARATOR = Babik::Selection::Base::RELATIONSHIP_SEPARATOR
   attr_reader :model, :association_path, :associations, :target_model, :id
 
   delegate :left_joins_by_alias, to: :@association_joiner

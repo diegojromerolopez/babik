@@ -32,7 +32,7 @@ module Babik
           @selections = []
           # filter is a Hash composed by :selection_path => value
           filter.each do |selection_path, value|
-            @selections << Selection.factory(@model, selection_path, value)
+            @selections << Babik::Selection::Base.factory(@model, selection_path, value)
           end
         end
 
