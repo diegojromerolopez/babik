@@ -137,7 +137,7 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(SECOND FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
+          return 'FLOOR(EXTRACT(SECOND FROM ?field))' if %w[mysql postgresql].include?(dbms_adapter)
           return 'strftime(\'%s\', ?field)' if dbms_adapter == 'sqlite3'
         end
       end
@@ -146,7 +146,7 @@ module Babik
       class Time < DateOperation
         def sql_function
           dbms_adapter = db_engine
-          return '?field::time' if dbms_adapter == 'postgresql'
+          return 'date_trunc(\'second\', ?field::time)' if dbms_adapter == 'postgresql'
           return 'DATE_FORMAT(colName,\'%H:%i:%s\')' if %w[mysql postgresql].include?(dbms_adapter)
           return 'strftime(\'%H:%M:%S\', ?field)' if dbms_adapter == 'sqlite3'
         end

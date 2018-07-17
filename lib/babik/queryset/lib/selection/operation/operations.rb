@@ -2,6 +2,7 @@
 
 require 'babik/queryset/lib/selection/operation/base'
 require 'babik/queryset/lib/selection/operation/date'
+require 'babik/queryset/lib/selection/operation/regex'
 
 module Babik
   module Selection
@@ -147,51 +148,6 @@ module Babik
 
       class IContains < Contains
         SQL_OPERATOR = 'ILIKE'
-      end
-
-      class Regex < Base
-        def initialize(field, value)
-          value = value.inspect[1..-1]
-          super(field, "?field #{operator} ?value", value)
-        end
-
-        def operator
-          dbms_adapter = db_engine
-          return 'REGEXP BINARY' if dbms_adapter == 'mysql'
-          return '~' if dbms_adapter == 'postgresql'
-          return 'REGEXP' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
-        end
-      end
-
-      class IRegex < Base
-        def initialize(field, value)
-          dbms_adapter = Babik::Config::Database.config[:adapter]
-          sql_operation = if dbms_adapter == 'sqlite3'
-                            "?field #{operator} ?value"
-                          else
-                            "LOWER(?field) #{operator} ?value"
-                          end
-          super(field, sql_operation, value)
-        end
-
-        def _init_sql_operation
-          if db_engine == 'sqlite3'
-            @value = "(?i)#{@value.inspect[1..-1]}"
-          else
-            @value = @value.inspect[1..-1]
-            @sql_operation_template = "LOWER(?field) #{SQL_OPERATOR} ?value"
-          end
-          @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value', "#{Base.escape(@value)}")
-        end
-
-        def operator
-          dbms_adapter = db_engine
-          return 'REGEXP' if dbms_adapter == 'mysql'
-          return '~*' if dbms_adapter == 'postgresql'
-          return 'REGEXP' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
-        end
       end
 
       CORRESPONDENCE = {

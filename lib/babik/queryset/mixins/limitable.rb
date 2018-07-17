@@ -46,7 +46,9 @@ module Babik
       # @api private
       # @return [ActiveRecord::Base, nil] ActiveRecord::Base if exists a record in that position, nil otherwise.
       def limit_integer(position)
-        limit(1, position).first
+        first = limit(1, position).first
+        unlimit
+        first
       end
 
       # Get a QuerySet with a slice of the original QuerySet
@@ -58,6 +60,14 @@ module Babik
         size = param.max.to_i - param.min.to_i
         limit(size, offset)
       end
+
+      # Destroy the current limit of this QuerySet
+      # @return [QuerySet] Reference to this QuerySet.
+      def unlimit
+        @_limit = nil
+        self
+      end
+
     end
   end
 end
