@@ -118,13 +118,11 @@ class LookupTest < Minitest::Test
 
   def test_week
     # Get a week with posts
-    weeks = Post.objects.map { |post| post.created_at.strftime('%W') }
+    weeks = Post.objects.map { |post| post.created_at.strftime('%V').to_i }
     grouped_weeks = weeks.group_by(&:itself)
     first_week = grouped_weeks.keys[0]
     first_week_int = first_week.to_i
     this_week_posts = Post.objects.filter(created_at__week: first_week_int)
-    #puts grouped_weeks[first_week]
-    #puts this_week_posts.sql.select
     assert_equal grouped_weeks[first_week].length, this_week_posts.count
   end
 
