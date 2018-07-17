@@ -86,21 +86,6 @@ module Babik
         end
       end
 
-      # Each one of the operations over date fields (date, year, month, day, etc.)
-      class DateOperation < Base
-        HAS_OPERATOR = true
-        def initialize(field, operator, value)
-          operator ||= 'equal'
-          @operator = operator
-          main_operation = Base.factory(sql_function, operator, value)
-          super(field, main_operation.sql_operation, value)
-        end
-
-        def sql_function
-          raise NotImplementedError
-        end
-      end
-
     end
   end
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'babik/queryset/lib/selection/operation/base'
+require 'babik/queryset/lib/selection/operation/date'
 
 module Babik
   module Selection
@@ -193,43 +194,6 @@ module Babik
         end
       end
 
-      class Year < DateOperation
-        def sql_function
-          dbms_adapter = db_engine
-          return 'EXTRACT(YEAR FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
-          return 'strftime(\'%Y\', ?field)' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
-        end
-      end
-
-      class Month < DateOperation
-        def initialize(field, operator, value)
-          value = '%02d' % value if db_engine == 'sqlite3'
-          super(field, operator, value)
-        end
-
-        def sql_function
-          dbms_adapter = db_engine
-          return 'EXTRACT(MONTH FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
-          return 'strftime(\'%m\', ?field)' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
-        end
-      end
-
-      class Day < DateOperation
-        def initialize(field, operator, value)
-          value = '%02d' % value if db_engine == 'sqlite3'
-          super(field, operator, value)
-        end
-
-        def sql_function
-          dbms_adapter = db_engine
-          return 'EXTRACT(DAY FROM ?field)' if %w[mysql postgresql].include?(dbms_adapter)
-          return 'strftime(\'%d\', ?field)' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
-        end
-      end
-
       CORRESPONDENCE = {
         default: Equal,
         equal: Equal,
@@ -254,9 +218,15 @@ module Babik
         icontains: IContains,
         regex: Babik::Selection::Operation::Regex,
         iregex: IRegex,
+        year: Year,
         month: Month,
         day: Day,
-        year: Year
+        week_day: WeekDay,
+        week: Week,
+        hour: Hour,
+        minute: Minute,
+        second: Second,
+        time: Babik::Selection::Operation::Time
       }.freeze
 
     end
