@@ -108,7 +108,7 @@ class LookupTest < Minitest::Test
 
   def test_second
     # Get a second with posts
-    seconds = Post.objects.map { |post| post.created_at.strftime('%s') }
+    seconds = Post.objects.map { |post| post.created_at.strftime('%S') }
     grouped_seconds = seconds.group_by(&:itself)
     second = grouped_seconds.keys[0]
     first_second = second.to_i
@@ -123,6 +123,8 @@ class LookupTest < Minitest::Test
     first_week = grouped_weeks.keys[0]
     first_week_int = first_week.to_i
     this_week_posts = Post.objects.filter(created_at__week: first_week_int)
+    #puts grouped_weeks[first_week]
+    #puts this_week_posts.sql.select
     assert_equal grouped_weeks[first_week].length, this_week_posts.count
   end
 
@@ -146,12 +148,31 @@ class LookupTest < Minitest::Test
   end
 
   def test_regex
-    other_posts = Post.objects.filter(title__regex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
-    assert other_posts.sql.select.include?("posts.title REGEXP '^This other[\\w\\d\\s]+$/'")
+    other_posts = Post.objects.filter(title__regex: /This a post of \d+ stars/).order_by(stars: :ASC)
+    if Babik::Config::Database.config[:adapter] == 'sqlite3'
+      assert other_posts.sql.select.include?("posts.title REGEXP 'This a post of \\d+ stars'")
+      return
+    end
+    assert_equal 3, other_posts.count
+    assert_equal 'This a post of 3 stars', other_posts[0].title
+    assert_equal 'This a post of 4 stars', other_posts[1].title
+    assert_equal 'This a post of 5 stars', other_posts[2].title
+    assert_equal 3, other_posts.count
   end
 
   def test_iregex
-    other_posts = Post.objects.filter(title__iregex: /^This other[\w\d\s]+$/).order_by(created_at: :ASC)
-    assert other_posts.sql.select.include?("posts.title REGEXP '(?i)^This other[\\w\\d\\s]+$/'")
+    other_posts = Post.objects.filter(title__regex: /This a post of \d+ stars/).order_by(stars: :ASC)
+    if Babik::Config::Database.config[:adapter] == 'sqlite3'
+      assert other_posts.sql.select.include?("posts.title REGEXP '(?i)This a post of \\d+ stars'")
+      return
+    end
+    assert_equal 3, other_posts.count
+    assert_equal 'This a post of 3 stars', other_posts[0].title
+    assert_equal 'This a post of 4 stars', other_posts[1].title
+    assert_equal 'This a post of 5 stars', other_posts[2].title
+    assert_equal 3, other_posts.count
+
+
   end
+
 end
