@@ -567,15 +567,8 @@ internals of this library.
 
 ### Lookups
 
-Django QuerySets have several datetime
-lookups that Babik has not implemented:
-- [hour](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#hour)
-- [minute](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#minute)
-- [second](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#second)
-- [time](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#time)
+Django QuerySets have only one lookup that Babik has not implemented yet: 
 - [quarter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#quarter)
-- [week_day](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week_day)
-- [week](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#week)
 
 ### Set operations
 

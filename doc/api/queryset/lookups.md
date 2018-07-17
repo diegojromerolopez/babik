@@ -171,16 +171,6 @@ User.objects.filter('created_at__between': [Time.zone.now - 3.days, Time.zone.no
 
 Alias for [between](#between).
 
-## date
-
-Select records by date part of a timestamp (datetime) field.
-
-```ruby
-Post.objects.filter('created_at__date': today)
-# SELECT * FROM posts WHERE BETWEEN '2018-06-26 00:00:00' AND '2018-06-26 23:59:59'
-
-```
-
 ## regex
 
 Math ActiveRecord objects by regex expression.
@@ -201,4 +191,94 @@ Post.objects.filter('first_name__iregex': /\d+ stars/)
 # SELECT * FROM posts WHERE title REGEXP '\\d+ stars'; -- MySQL
 # SELECT * FROM posts title ~* '\\d+ stars'; -- PostgreSQL
 # SELECT * FROM posts title REGEXP '(?i)\\d+ stars'; -- SQLite
+```
+
+## Date lookups
+
+### date
+
+Select records by date part of a timestamp (datetime) field.
+
+```ruby
+Post.objects.filter('created_at__date': today)
+# SELECT * FROM posts WHERE BETWEEN '2018-06-26 00:00:00' AND '2018-06-26 23:59:59'
+```
+
+### day
+
+Select records by day of month of the timestamp field.
+
+```ruby
+Post.objects.filter('created_at__day': 3)
+# SELECT * FROM posts WHERE EXTRACT(DAY FROM created_at) = 3
+```
+
+### month
+
+Select records by month of the timestamp field.
+
+```ruby
+Post.objects.filter('created_at__month': 3)
+# SELECT * FROM posts WHERE EXTRACT(MONTH FROM created_at) = 3
+```
+
+### year
+
+Select records by year of the timestamp field.
+
+```ruby
+Post.objects.filter('created_at__year': 12)
+# SELECT * FROM posts WHERE EXTRACT(MONTH FROM created_at) = 12
+```
+
+### time
+
+Select records by time part of a timestamp (datetime) field.
+
+```ruby
+Post.objects.filter('created_at__time': '00:30:05')
+# SELECT * FROM posts WHERE created_at::time = '00:30:05'
+```
+
+### hour
+
+Select records by the hour part of a timestamp (datetime) field.
+
+```ruby
+Post.objects.filter('created_at__hour': 3)
+# SELECT * FROM posts WHERE EXTRACT(HOUR FROM created_at) = 3
+```
+
+### minute
+
+Select records by the minute part of a timestamp (datetime) field.
+
+```ruby
+Post.objects.filter('created_at__minute': 30)
+# SELECT * FROM posts WHERE EXTRACT(MINUTE FROM created_at) = 30 
+```
+
+### second
+
+Select records by time part of a timestamp (datetime) field.
+
+```ruby
+Post.objects.filter('created_at__second': 5)
+# SELECT * FROM posts WHERE EXTRACT(SECOND FROM created_at) = 5 
+```
+
+### week
+
+Select records by week of year (from 1 to 53)
+
+```ruby
+Post.objects.filter('created_at__week': 3) # 3rd week of the year
+```
+
+### week_day
+
+Select records by day of week (from 0 to 6, sunday to monday)
+
+```ruby
+Post.objects.filter('created_at__week_day': 2) # Tuesday
 ```

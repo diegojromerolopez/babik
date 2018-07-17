@@ -203,7 +203,9 @@ By calling the method **project** of the QuerySet, an
 [ActiveRecord Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html)
 will be returned with the projected fields.
 
-Note they can be local and also foreign fields.
+**No typecasting is done on the returned array**. Data is returned as-is. 
+
+They can be local and also foreign fields.
 
 Examples:
 

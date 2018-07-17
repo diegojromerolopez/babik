@@ -67,8 +67,8 @@ class LookupTest < Minitest::Test
   end
 
   def test_between_dates
-    old_posts = Post.objects.filter(created_at__between: [Time.now - 2.months, Time.now]).order_by(created_at: :ASC)
-    old_posts_range = Post.objects.filter(created_at__range: [Time.now - 2.months, Time.now]).order_by(created_at: :ASC)
+    old_posts = Post.objects.filter(created_at__between: [Time.now - 2.months, Time.now - 1.day])
+    old_posts_range = Post.objects.filter(created_at__range: [Time.now - 2.months, Time.now - 1.day])
     assert_equal 1, old_posts.count
     assert_equal 1, old_posts_range.count
     assert_equal 'Old post 1', old_posts[0].title
@@ -76,24 +76,73 @@ class LookupTest < Minitest::Test
   end
 
   def test_date
-    today_posts = Post.objects.filter(created_at__date: Date.today).order_by(created_at: :ASC)
+    today_posts = Post.objects.filter(created_at__date: Date.today)
     assert_equal 5, today_posts.count
   end
 
   def test_year
-    younger_than_1998_year_posts = Post.objects.filter(created_at__year__gt: 1998).order_by(created_at: :ASC)
+    younger_than_1998_year_posts = Post.objects.filter(created_at__year__gt: 1998)
     assert_equal Post.objects.count, younger_than_1998_year_posts.count
     assert_equal 0, Post.objects.filter(created_at__year: 1998).count
   end
 
   def test_month
-    this_month_posts = Post.objects.filter(created_at__month: Time.now.utc.month).order_by(created_at: :ASC)
+    this_month_posts = Post.objects.filter(created_at__month: Time.now.utc.month)
     assert_equal 7, this_month_posts.count
   end
 
   def test_day
-    this_day_posts = Post.objects.filter(created_at__day: Time.now.utc.day).order_by(created_at: :ASC)
+    this_day_posts = Post.objects.filter(created_at__day: Time.now.utc.day)
     assert_equal 9, this_day_posts.count
+  end
+
+  def test_hour
+    this_hour_posts = Post.objects.filter(created_at__hour: Time.now.utc.hour)
+    assert_equal 9, this_hour_posts.count
+  end
+
+  def test_minute
+    this_minute_posts = Post.objects.filter(created_at__minute: Time.now.utc.strftime('%M'))
+    assert_equal 9, this_minute_posts.count
+  end
+
+  def test_second
+    # Get a second with posts
+    seconds = Post.objects.map { |post| post.created_at.strftime('%s') }
+    grouped_seconds = seconds.group_by(&:itself)
+    second = grouped_seconds.keys[0]
+    first_second = second.to_i
+    this_second_posts = Post.objects.filter(created_at__second: first_second)
+    assert_equal grouped_seconds[second].length, this_second_posts.count
+  end
+
+  def test_week
+    # Get a week with posts
+    weeks = Post.objects.map { |post| post.created_at.strftime('%W') }
+    grouped_weeks = weeks.group_by(&:itself)
+    first_week = grouped_weeks.keys[0]
+    first_week_int = first_week.to_i
+    this_week_posts = Post.objects.filter(created_at__week: first_week_int)
+    assert_equal grouped_weeks[first_week].length, this_week_posts.count
+  end
+
+  def test_weekday
+    # Get a week day (0-6, sunday to monday) with posts
+    week_days = Post.objects.map { |post| post.created_at.strftime('%w') }
+    grouped_week_days = week_days.group_by(&:itself)
+    first_week_day = grouped_week_days.keys[0]
+    first_week_day_int = first_week_day.to_i
+    this_week_day_posts = Post.objects.filter(created_at__week_day: first_week_day_int)
+    assert_equal grouped_week_days[first_week_day].length, this_week_day_posts.count
+  end
+
+  def test_time
+    # Get a time (HH:MM:SS) with posts
+    times = Post.objects.map { |post| post.created_at.strftime('%H:%M:%S') }
+    grouped_times = times.group_by(&:itself)
+    first_time = grouped_times.keys[0]
+    this_time_posts = Post.objects.filter(created_at__time: first_time)
+    assert_equal grouped_times[first_time].length, this_time_posts.count
   end
 
   def test_regex
