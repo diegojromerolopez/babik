@@ -18,6 +18,22 @@ User.objects.filter('first_name': 'Romulus').order_by(first_name: :ASC)[5..20]
 
 [There is also other way to use to return single ActiveRecord objects](/doc/api/queryset/dont_return_queryset.md#brackets).
 
+### Clone
+
+Return a deep copy of the caller QuerySet. 
+
+Remember that any other operation that returns a QuerySet is currently a mutator
+of the caller. The only way to stop the modifications in the caller class
+is to call **clone** before any other **mutator** method.
+
+```ruby
+seneca = User.objects.filter(last_name: 'Seneca')
+seneca_jr = seneca.clone.filter(first_name: 'Lucius Annaeus')
+
+puts seneca_jr == seneca
+# Will print false
+```
+
 ### Distinct
 
 Call **distinct** method when we are sure the result of your QuerySet

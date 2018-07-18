@@ -70,7 +70,9 @@ No configuration is needed, Babik automatically includes two methods for your mo
 
 ## Database support
 
-PostgreSQL, MySQL, MariaDB, MSSQL and Sqlite are supported.
+PostgreSQL, MySQL and Sqlite are supported.
+
+MariaDB and MSSQL should work as well.
 
 Accepting contributors to port this library to Oracle.
 
@@ -84,6 +86,37 @@ there is no need of this artifact.
 method cache the objects in the returned object.
 We return a pair of objects and a hash with the associated objects. [See doc here](/doc/api/queryset/methods/dont_return_queryset.md#select-related).
 
+## Known issues
+
+### Caller is modified in each call 
+
+**All operations that return a QuerySet modify the caller object**.
+
+These are currently destructive, that is, if you want to access your
+earlier value, you will not be able to.
+
+```ruby
+julius = User.objects.filter(first_name: 'Julius')
+julius_caesar = julius.filter(last_name: 'Caesar')
+
+puts julius_caesar == julius
+# Will print true
+```
+
+Use **clone** method to create a new QuerySet:
+
+```ruby
+julius = User.objects.filter(first_name: 'Julius')
+julius_caesar = julius.clone.filter(last_name: 'Caesar')
+
+puts julius_caesar == julius
+# Will print false
+```
+
+This behavior will change with the introduction of bang methods,
+that is, it will exist two versions for each method:
+- **method**: if the original QuerySet must be different, so a modified clone will be returned.
+- **method!**: if the original QuerySet can change.
 
 ## Usage
 
@@ -576,14 +609,6 @@ Django QuerySets have only one lookup that Babik has not implemented yet:
 - [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
 - [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
 
-### Optimized update & delete
-
-Both operation will have to be rewritten by DBMS. Standard SQL has no 
-DELETE or UPDATE with joins and the current alternative
-(a IN-based-subquery) does not scale for some DBMS.
-
-That is, MSSQL and PostgreSQL have an internal optimization engine that
-compute a JOIN internally. Sadly, MySQL is not one of them.
 
 ### Prefect
 

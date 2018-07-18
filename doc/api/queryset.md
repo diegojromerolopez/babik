@@ -46,6 +46,7 @@ end
 ## API
 
 - [Methods that return a QuerySet](/doc/api/queryset/methods/return_queryset.md). 
+  - [Clone](/doc/api/queryset/methods/return_queryset.md#clone): returns a new QuerySet clone from the caller.
   - [\[\] operator](/doc/api/queryset/methods/return_queryset.md#brackets): returns an slice of the QuerySet.
   - [Distinct](/doc/api/queryset/methods/return_queryset.md#distinct): make the query to return unique rows.
   - [Exclude](/doc/api/queryset/methods/return_queryset.md#exclude): add more excluding conditions to the query.
