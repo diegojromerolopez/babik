@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'babik/queryset/mixins/aggregatable'
+require 'babik/queryset/mixins/clonable'
 require 'babik/queryset/mixins/countable'
 require 'babik/queryset/mixins/deletable'
 require 'babik/queryset/mixins/distinguishable'
@@ -32,6 +33,7 @@ module Babik
     class Base
       include Enumerable
       include Babik::QuerySet::Aggregatable
+      include Babik::QuerySet::Clonable
       include Babik::QuerySet::Countable
       include Babik::QuerySet::Deletable
       include Babik::QuerySet::Distinguishable
@@ -117,7 +119,8 @@ module Babik
       # Get the SQL renderer for this QuerySet.
       # @return [QuerySet] SQL Renderer for this QuerySet.
       def sql
-        SQLRenderer.new(self)
+        renderer = SQLRenderer.new(self)
+        renderer
       end
 
       # Get the left joins grouped by alias in a hash.

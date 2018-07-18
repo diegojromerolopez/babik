@@ -34,7 +34,7 @@ module Babik
 
         # Return the database engine: sqlite3, mysql, postgres, mssql, etc.
         def db_engine
-          Babik::Config::Database.config[:adapter]
+          Babik::Database.config[:adapter]
         end
 
         # Operation factory
@@ -73,7 +73,7 @@ module Babik
 
         # Escape a string
         def self.escape(str)
-          ActiveRecord::Base.connection.quote(str)
+          Babik::Database.escape(str)
         end
       end
 

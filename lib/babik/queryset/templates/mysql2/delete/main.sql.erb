@@ -1,0 +1,15 @@
+<%#
+  SQL default delete.
+  Most DBMS engines optimize IN if there is a simple subquery inside pulling up the conditions as joins.
+%>
+
+<% model = queryset.model %>
+
+
+DELETE <%= model.table_name %>.*
+FROM <%= model.table_name %> <%= model.table_name %>
+
+<%= queryset.sql.left_joins %>
+
+<%# Where conditions %>
+<%= render.('select/components/where.sql.erb', {queryset: queryset}) %>

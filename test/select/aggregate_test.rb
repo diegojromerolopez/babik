@@ -34,7 +34,7 @@ class AggregateTest < Minitest::Test
     avg_starts_aggregation = @caesar
                              .objects(:posts)
                              .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'stars'))
-    assert_equal avg_stars, avg_starts_aggregation[:avg_stars]
+    assert_equal avg_stars.round(4), avg_starts_aggregation[:avg_stars].round(4)
   end
 
   def test_foreign_avg
@@ -44,7 +44,7 @@ class AggregateTest < Minitest::Test
                              .objects
                              .filter(id: @caesar.id)
                              .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'posts::stars'))
-    assert_equal avg_stars, avg_starts_aggregation[:avg_stars]
+    assert_equal avg_stars.round(4), avg_starts_aggregation[:avg_stars].round(4)
   end
 
   def test_simplified_foreign_avg
@@ -53,7 +53,7 @@ class AggregateTest < Minitest::Test
     avg_starts_aggregation = @caesar
                              .objects
                              .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'posts::stars'))
-    assert_equal avg_stars, avg_starts_aggregation[:avg_stars]
+    assert_equal avg_stars.round(4), avg_starts_aggregation[:avg_stars].round(4)
   end
 
   def test_max

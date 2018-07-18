@@ -68,10 +68,12 @@ class UpdateTest < Minitest::Test
   end
 
   def test_apply_function_to_field_with_local_conditions
+    function_name = 'LENGTH'
+    function_name = 'CHAR_LENGTH' if Babik::Database.config[:adapter] == 'mysql2'
     @cid
       .objects(:posts)
       .filter(title__startswith: 'Cantar')
-      .update(stars: Babik::QuerySet::Update::Assignment::Function.new('stars', 'LENGTH(title)'))
+      .update(stars: Babik::QuerySet::Update::Assignment::Function.new('stars', "#{function_name}(title)"))
     assert_equal 'Cantar del Mío Cid'.length, Post.objects.get(title: 'Cantar del Mío Cid').stars
     assert_equal 3, Post.objects.get(title: 'Mocedades del Cid').stars
   end

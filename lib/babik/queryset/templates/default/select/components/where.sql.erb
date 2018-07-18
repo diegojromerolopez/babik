@@ -4,7 +4,6 @@
 
   WHERE (
     <% if where.inclusion_filters? %>
-      -- Inclusion filters
       (
         <% inclusion_filters = where.inclusion_filters %>
         <% inclusion_filters.each_with_index do |condition, condition_index| %>
@@ -22,7 +21,6 @@
     <% end %>
 
     <% if where.exclusion_filters? %>
-    -- Exclusion filters
     ( NOT
       (
         <% exclusion_filters = where.exclusion_filters %>

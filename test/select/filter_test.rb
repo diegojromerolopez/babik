@@ -106,7 +106,7 @@ class FilterTest < Minitest::Test
   end
 
   def test_many_to_many_foreign_filter
-    tags = Tag.objects.distinct.filter('posts::title': 'I\'m not an ass').order_by(%i[name ASC])
+    tags = Tag.objects.distinct.filter('posts::title__contains': 'an ass').order_by(%i[name ASC])
     tag_names = ['asturias', 'battle', 'victory']
     tag_count = 0
     tags.each_with_index do |tag, tag_index|

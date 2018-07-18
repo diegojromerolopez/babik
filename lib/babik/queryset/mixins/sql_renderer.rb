@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'erb'
-require 'babik/config/database'
+require 'babik/database'
 
 module Babik
   module QuerySet
@@ -58,9 +58,9 @@ module Babik
       # @return [String] Rendered SQL with QuerySet replacements completed
       def _render(template_path)
         render = lambda do |partial_template_path, replacements|
-          _base_render(partial_template_path, **replacements)
+          _base_render(partial_template_path, **replacements).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
         end
-        _base_render(template_path, queryset: @queryset, render: render)
+        _base_render(template_path, queryset: @queryset, render: render).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
       end
 
       # Render a file
@@ -72,7 +72,7 @@ module Babik
       # @return [String] Rendered SQL with QuerySet replacements completed
       def _base_render(template_path, replacements)
         dbms_adapter = _dbms_adapter
-        dbms_adapter_template_path = "#{TEMPLATE_PATH}/#{dbms_adapter}#{template_path}"
+        dbms_adapter_template_path = "#{TEMPLATE_PATH}/#{dbms_adapter}/#{template_path}"
         template_path = if File.exist?(dbms_adapter_template_path)
                           dbms_adapter_template_path
                         else
@@ -85,7 +85,7 @@ module Babik
       # Return the DBMS adapter.
       # @return [String] DBMS adapter (sqlite3, postgre, mysql, mariadb, oracle or mssql).
       def _dbms_adapter
-        Babik::Config::Database.config[:adapter]
+        Babik::Database.config[:adapter]
       end
 
     end

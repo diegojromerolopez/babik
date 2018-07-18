@@ -29,6 +29,13 @@ module Babik
         @_order.invert!
         self
       end
+
+      # Inform if there is an order for this QuerySet
+      # @return [Boolean] True if this QuerySet is ordered, false otherwise.
+      def ordered?
+        return true if @_order
+        false
+      end
     end
   end
 end

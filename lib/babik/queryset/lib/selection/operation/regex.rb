@@ -12,43 +12,40 @@ module Babik
         def initialize(field, value)
           value = value.inspect[1..-2] if value.class == Regexp
           value = value[1..-2] if value.class == String && value[0] == '/' && value[-1] == '/'
+          value = _mysql2_convert_regex(value) if db_engine == 'mysql2'
           super(field, "?field #{operator} ?value", value)
         end
 
         def operator
           dbms_adapter = db_engine
-          return 'REGEXP BINARY' if dbms_adapter == 'mysql'
+          return 'REGEXP' if dbms_adapter == 'mysql2'
           return '~' if dbms_adapter == 'postgresql'
           return 'REGEXP' if dbms_adapter == 'sqlite3'
           raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
         end
+
+        def _mysql2_convert_regex(value)
+          replacements = { '\\d' => '[0-9]', '\\w' => '[a-zA-Z]' }
+          replacements.each do |pcre_pattern, mysql_pattern|
+            value = value.gsub(pcre_pattern, mysql_pattern)
+          end
+          value
+        end
       end
 
-      # Match by case-insensitive regex
-      class IRegex < Base
-        def initialize(field, value)
-          dbms_adapter = Babik::Config::Database.config[:adapter]
-          sql_operation = if dbms_adapter == 'sqlite3'
-                            "?field #{operator} ?value"
-                          else
-                            "LOWER(?field) #{operator} ?value"
-                          end
-          super(field, sql_operation, value)
-        end
+      class IRegex < Regex
 
-        def _init_sql_operation
-          if db_engine == 'sqlite3'
-            @value = "(?i)#{@value.inspect[1..-1]}"
-          else
-            @value = @value.inspect[1..-1]
-            @sql_operation_template = "LOWER(?field) #{SQL_OPERATOR} ?value"
-          end
-          @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value', "#{Base.escape(@value)}")
+        def initialize(field, value)
+          value = value.inspect[1..-2] if value.class == Regexp
+          value = value[1..-2] if value.class == String && value[0] == '/' && value[-1] == '/'
+          value = "(?i)#{value}" if db_engine == 'sqlite3'
+          super(field, value)
+          @sql_operation = @sql_operation.sub('?field', 'LOWER(?field)') if db_engine == 'mysql2'
         end
 
         def operator
           dbms_adapter = db_engine
-          return 'REGEXP' if dbms_adapter == 'mysql'
+          return 'REGEXP' if dbms_adapter == 'mysql2'
           return '~*' if dbms_adapter == 'postgresql'
           return 'REGEXP' if dbms_adapter == 'sqlite3'
           raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"

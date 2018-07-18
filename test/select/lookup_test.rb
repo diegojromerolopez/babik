@@ -117,7 +117,7 @@ class LookupTest < Minitest::Test
   end
 
   def test_week
-    # Get a week with posts
+    # Get a isoweek with posts
     weeks = Post.objects.map { |post| post.created_at.strftime('%V').to_i }
     grouped_weeks = weeks.group_by(&:itself)
     first_week = grouped_weeks.keys[0]
@@ -147,7 +147,7 @@ class LookupTest < Minitest::Test
 
   def test_regex
     other_posts = Post.objects.filter(title__regex: /This a post of \d+ stars/).order_by(stars: :ASC)
-    if Babik::Config::Database.config[:adapter] == 'sqlite3'
+    if Babik::Database.config[:adapter] == 'sqlite3'
       assert other_posts.sql.select.include?("posts.title REGEXP 'This a post of \\d+ stars'")
       return
     end
@@ -159,8 +159,8 @@ class LookupTest < Minitest::Test
   end
 
   def test_iregex
-    other_posts = Post.objects.filter(title__regex: /This a post of \d+ stars/).order_by(stars: :ASC)
-    if Babik::Config::Database.config[:adapter] == 'sqlite3'
+    other_posts = Post.objects.filter(title__iregex: /This a post of \d+ stars/).order_by(stars: :ASC)
+    if Babik::Database.config[:adapter] == 'sqlite3'
       assert other_posts.sql.select.include?("posts.title REGEXP '(?i)This a post of \\d+ stars'")
       return
     end
@@ -169,8 +169,6 @@ class LookupTest < Minitest::Test
     assert_equal 'This a post of 4 stars', other_posts[1].title
     assert_equal 'This a post of 5 stars', other_posts[2].title
     assert_equal 3, other_posts.count
-
-
   end
 
 end

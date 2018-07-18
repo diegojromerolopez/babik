@@ -17,26 +17,28 @@ require 'fileutils'
 FileUtils.mkpath 'log' unless File.directory? 'log'
 ActiveRecord::Base.logger = Logger.new('log/test-queries.log')
 
+DEFAULT_DB_ADAPTER = 'sqlite3'
+#DEFAULT_DB_ADAPTER = 'mysql2'
+
 # Make a connection
-adapter = ENV.fetch('DB', 'sqlite3')
+adapter = ENV.fetch('DB', DEFAULT_DB_ADAPTER)
 case adapter
 when 'mysql2', 'postgresql'
   config = {
-      # Host 127.0.0.1 required for default postgres installation on Ubuntu.
-      host: '127.0.0.1',
-      database: 'babik_test',
-      encoding: 'utf8',
-      min_messages: 'WARNING',
-      adapter: adapter,
-      username: ENV['DB_USERNAME'] || 'postgres',
-      password: ENV['DB_PASSWORD'] || 'postgres'
+    host: '127.0.0.1',
+    database: 'babik_test',
+    encoding: 'utf8',
+    min_messages: 'WARNING',
+    adapter: adapter,
+    username: ENV['DB_USERNAME'] || 'postgres',
+    password: ENV['DB_PASSWORD'] || 'postgres'
   }
-  ActiveRecord::Tasks::DatabaseTasks.create config.stringify_keys
-  ActiveRecord::Base.establish_connection config
+  ActiveRecord::Tasks::DatabaseTasks.create(config.stringify_keys)
+  ActiveRecord::Base.establish_connection(config)
 when 'sqlite3'
   ActiveRecord::Base.establish_connection adapter: adapter, database: ':memory:'
 else
-  fail "Unknown DB adapter #{adapter}. Valid adapters are: mysql2, postgresql, sqlite3."
+  raise "Unknown DB adapter #{adapter}. Valid adapters are: mysql2, postgresql, sqlite3."
 end
 
 # Load babik library

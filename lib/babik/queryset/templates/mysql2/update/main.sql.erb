@@ -1,0 +1,19 @@
+<%#
+  SQL default update.
+  Most DBMS engines optimize IN if there is a simple subquery inside pulling up the conditions as joins
+%>
+
+<% model = queryset.model %>
+<% update_command = queryset._update %>
+
+UPDATE <%= model.table_name %> AS <%= model.table_name %>
+
+<%= queryset.sql.left_joins %>
+
+SET
+  <% update_command.each do |field, value| %>
+    <%= model.table_name %>.<%= Babik::QuerySet::Update::Assignment.sql_field(model, field) %> = <%= Babik::QuerySet::Update::Assignment.sql_value(value) %>
+  <% end %>
+
+<%# Where conditions %>
+<%= render.('select/components/where.sql.erb', {queryset: queryset}) %>

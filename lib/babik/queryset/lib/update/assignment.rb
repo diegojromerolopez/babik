@@ -38,8 +38,7 @@ module Babik
         # @param str [String] original string value.
         # @return [String] escaped string value.
         def self._escape(str)
-          conn = ActiveRecord::Base.connection
-          conn.quote(str)
+          Babik::Database.escape(str)
         end
 
         # Represents a function operator that can be used in an UPDATE
