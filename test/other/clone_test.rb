@@ -4,7 +4,7 @@ require 'minitest/autorun'
 require_relative '../test_helper'
 
 # Class for Tests of dup method
-class Dup < Minitest::Test
+class CloneTest < Minitest::Test
 
   def setup
     @castille = GeoZone.create!(name: 'Castilla')
@@ -24,11 +24,17 @@ class Dup < Minitest::Test
     Post.destroy_all
   end
 
-  def test_dup
+  def test_clone
     first_qs = User.objects.filter(first_name: 'whatever').exclude(last_name: 'whatever')
     copy = first_qs.clone
+
+    copy.filter(created_at__lt: Time.now - 1.month)
     first_qs.order_by(id: :DESC)
-    refute_equal first_qs._where, copy._where
+
+    assert_equal first_qs._where.model, copy._where.model
+    refute_equal first_qs._where.inclusion_filters, copy._where.inclusion_filters
+    refute_equal first_qs._where.exclusion_filters, copy._where.exclusion_filters
+
     assert first_qs.ordered?
     refute copy.ordered?
   end

@@ -9,6 +9,7 @@ group :development, :test do
   gem 'pg'
   gem 'reek'
   gem 'rubocop'
+  gem 'ruby_deep_clone'
   gem 'simplecov'
   gem 'sqlite3'
 end
