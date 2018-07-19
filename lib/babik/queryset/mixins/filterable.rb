@@ -6,7 +6,7 @@ module Babik
     module Filterable
       # Exclude objects according to some criteria.
       # @return [QuerySet] Reference to self.
-      def exclude(filter)
+      def exclude!(filter)
         _filter(filter, 'exclusion')
         self
       end
@@ -15,7 +15,7 @@ module Babik
       # @param filter [Array, Hash] if array, it is considered an disjunction (OR clause),
       #        if a hash, it is considered a conjunction (AND clause).
       # @return [QuerySet] Reference to self.
-      def filter(filter)
+      def filter!(filter)
         _filter(filter, 'inclusion')
         self
       end
@@ -34,6 +34,8 @@ module Babik
         raise 'Multiple objects returned' if result_count > 1
         result_.first
       end
+
+      private
 
       # Select the objects according to some criteria.
       # @param filter [Array, Hash] if array, it is considered an disjunction (OR clause),

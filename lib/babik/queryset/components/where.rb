@@ -7,7 +7,7 @@ module Babik
     # Where conditions
     class Where
 
-      attr_reader :inclusion_filters, :exclusion_filters
+      attr_reader :model, :inclusion_filters, :exclusion_filters
 
       def initialize(model)
         @model = model

@@ -12,7 +12,7 @@ module Babik
       # @return [QuerySet, ActiveRecord::Base] QuerySet if a slice was passe as parameter,
       #         otherwise an ActiveRecord model.
       def [](param)
-        self.send("limit_#{param.class.to_s.downcase}", param)
+        self.clone.send("limit_#{param.class.to_s.downcase}!", param)
       rescue NoMethodError
         raise "Invalid limit passed to query: #{param}"
       end
@@ -34,8 +34,15 @@ module Babik
       # @param size [Integer] Number of elements to be selected.
       # @param offset [Integer] Position where the selection will start. By default is 0. No negative number is allowed.
       # @return [QuerySet] Reference to this QuerySet.
-      def limit(size, offset = 0)
+      def limit!(size, offset = 0)
         @_limit = Babik::QuerySet::Limit.new(size, offset)
+        self
+      end
+
+      # Destroy the current limit of this QuerySet
+      # @return [QuerySet] Reference to this QuerySet.
+      def unlimit!
+        @_limit = nil
         self
       end
 
@@ -45,26 +52,19 @@ module Babik
       # @param position [Integer] Position of the element to be returned.
       # @api private
       # @return [ActiveRecord::Base, nil] ActiveRecord::Base if exists a record in that position, nil otherwise.
-      def limit_integer(position)
-        first = limit(1, position).first
-        unlimit
-        first
+      def limit_integer!(position)
+        @_limit = Babik::QuerySet::Limit.new(1, position)
+        self.first
       end
 
       # Get a QuerySet with a slice of the original QuerySet
       # @param param [Range] first_element..last_element will be selected.
       # @api private
       # @return [QuerySet] QuerySet with a slice of the caller QuerySet.
-      def limit_range(param)
+      def limit_range!(param)
         offset = param.min
         size = param.max.to_i - param.min.to_i
-        limit(size, offset)
-      end
-
-      # Destroy the current limit of this QuerySet
-      # @return [QuerySet] Reference to this QuerySet.
-      def unlimit
-        @_limit = nil
+        @_limit = Babik::QuerySet::Limit.new(size, offset)
         self
       end
 

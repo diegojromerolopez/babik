@@ -8,5 +8,7 @@
 DELETE
 FROM <%= model.table_name %>
 WHERE id IN (
-  <%= queryset.sql.select %>
+    SELECT id FROM (
+        <%= queryset.sql.select %>
+    ) AS subquery
 )

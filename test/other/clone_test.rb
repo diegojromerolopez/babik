@@ -3,39 +3,120 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
-# Class for Tests of dup method
+# Class for Tests of clone method
 class CloneTest < Minitest::Test
 
-  def setup
-    @castille = GeoZone.create!(name: 'Castilla')
-    @leon = GeoZone.create!(name: 'León')
-    @burgos = GeoZone.create!(name: 'Burgos', parent_zone: @castille)
-    @cid = User.create!(first_name: 'Rodrigo', last_name: 'Díaz de Vivar', zone: @burgos)
-    @jimena = User.create!(first_name: 'Jimena', last_name: 'Díaz', zone: @burgos)
-    @alfonso_vi = User.create!(first_name: 'Alfonso VI', last_name: 'de León', zone: @leon)
+  def test_filter
+    filter = { first_name: 'whatever1' }
+    exclusion = { last_name: 'whatever1' }
 
-    Post.create!(author: @cid, title: 'Cantar del Mío Cid', stars: 4)
-    Post.create!(author: @cid, title: 'Mocedades del Cid', stars: 3)
+    original = User.objects.filter(filter).exclude(exclusion)
+    copy = original.clone
+
+    refute_equal original.object_id, copy.object_id
+
+    assert_equal original._where.model, copy._where.model
+
+    refute_equal original._where.inclusion_filters.object_id, copy._where.inclusion_filters.object_id
+    refute_equal original._where.inclusion_filters[0].object_id, copy._where.inclusion_filters[0].object_id
+
+    refute_equal original._where.exclusion_filters.object_id, copy._where.exclusion_filters.object_id
+    refute_equal original._where.exclusion_filters[0].object_id, copy._where.exclusion_filters[0].object_id
   end
 
-  def teardown
-    GeoZone.destroy_all
-    User.destroy_all
-    Post.destroy_all
+  def test_or_filter
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    exclusion = [{ last_name: 'whatever1' }, { last_name: 'whatever2' }]
+
+    original = User.objects.filter(filter).exclude(exclusion)
+    copy = original.clone
+
+    refute_equal original.object_id, copy.object_id
+
+    assert_equal original._where.model, copy._where.model
+
+    refute_equal original._where.inclusion_filters.object_id, copy._where.inclusion_filters.object_id
+    refute_equal original._where.inclusion_filters[0].object_id, copy._where.inclusion_filters[0].object_id
+
+    refute_equal original._where.exclusion_filters.object_id, copy._where.exclusion_filters.object_id
+    refute_equal original._where.exclusion_filters[0].object_id, copy._where.exclusion_filters[0].object_id
   end
 
-  def test_clone
-    first_qs = User.objects.filter(first_name: 'whatever').exclude(last_name: 'whatever')
-    copy = first_qs.clone
+  def test_distinct
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    exclusion = [{ last_name: 'whatever1' }, { last_name: 'whatever2' }]
 
-    copy.filter(created_at__lt: Time.now - 1.month)
-    first_qs.order_by(id: :DESC)
+    original = User.objects.filter(filter).exclude(exclusion)
+    copy = original.distinct
+    copy_undistinct = original.undistinct
 
-    assert_equal first_qs._where.model, copy._where.model
-    refute_equal first_qs._where.inclusion_filters, copy._where.inclusion_filters
-    refute_equal first_qs._where.exclusion_filters, copy._where.exclusion_filters
-
-    assert first_qs.ordered?
-    refute copy.ordered?
+    refute_equal original.object_id, copy.object_id
+    refute_equal original.object_id, copy_undistinct.object_id
+    refute original.distinct?
+    assert copy.distinct?
+    refute copy_undistinct.distinct?
   end
+
+  def test_limit
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    original = User.objects.filter(filter)
+    copy1 = original.limit(2, 10)
+    copy2 = original[2..10]
+    refute_equal original.object_id, copy1.object_id
+    refute_equal original.object_id, copy2.object_id
+    refute_equal copy1.object_id, copy2.object_id
+  end
+
+  def test_lockable
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    original = User.objects.filter(filter)
+    copy1 = original.lock
+    copy2 = original.for_update
+    refute_equal original.object_id, copy1.object_id
+    refute_equal original.object_id, copy2.object_id
+    refute_equal copy1.object_id, copy2.object_id
+  end
+
+  def test_projectable
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    original = User.objects.filter(filter)
+    copy1 = original.project(:id, :first_name)
+    copy2 = original.project(:id, :first_name, :last_name)
+    copy3 = copy2.unproject
+    refute_equal original.object_id, copy1.object_id
+    refute_equal original.object_id, copy2.object_id
+    refute_equal original.object_id, copy3.object_id
+    refute_equal copy1.object_id, copy2.object_id
+    refute_equal copy1.object_id, copy3.object_id
+    refute_equal copy2.object_id, copy3.object_id
+  end
+
+  def test_sortable
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    original = User.objects.filter(filter)
+    copy1 = original.order_by(first_name: :ASC)
+    copy2 = original.order(id: :ASC)
+    copy3 = copy2.order(%i[last_name DESC])
+    refute_equal original.object_id, copy1.object_id
+    refute_equal original.object_id, copy2.object_id
+    refute_equal original.object_id, copy3.object_id
+    refute_equal copy1.object_id, copy2.object_id
+    refute_equal copy1.object_id, copy3.object_id
+    refute_equal copy2.object_id, copy3.object_id
+  end
+
+  def test_updatable
+    filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
+    original = User.objects.filter(filter)
+    copy1 = original.update(first_name: 'Julius')
+    copy2 = original.update(last_name: 'Marcus')
+    copy3 = copy2.update(last_name: 'Tiberius')
+    refute_equal original.object_id, copy1.object_id
+    refute_equal original.object_id, copy2.object_id
+    refute_equal original.object_id, copy3.object_id
+    refute_equal copy1.object_id, copy2.object_id
+    refute_equal copy1.object_id, copy3.object_id
+    refute_equal copy2.object_id, copy3.object_id
+  end
+
 end

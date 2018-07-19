@@ -7,7 +7,7 @@ module Babik
 
       # Lock the table for writes
       # This must be inside a transaction
-      def for_update
+      def for_update!
         @_lock_type = 'FOR UPDATE'
         self
       end
@@ -15,8 +15,8 @@ module Babik
       # Lock the table for writes
       # This must be inside a transaction
       # @see #for_update Alias of for_update method
-      def lock
-        self.for_update
+      def lock!
+        self.for_update!
       end
 
       # Check if there is a lock

@@ -10,14 +10,14 @@ module Babik
       #        Each one of these can be a local field, or a foreign entity field.
       #        Babik will take care of joins.
       # @return [QuerySet] Reference to this QuerySet.
-      def project(*attributes)
+      def project!(*attributes)
         @_projection = Babik::QuerySet::Projection.new(@model, attributes)
         self
       end
 
       # Removes the projection.
       # @return [QuerySet] Reference to this QuerySet.
-      def unproject
+      def unproject!
         @_projection = nil
         self
       end

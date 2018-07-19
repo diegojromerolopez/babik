@@ -111,7 +111,7 @@ module Babik
       #        of belongs_to and has_one related objects.
       #        A passed symbol will be considered as an array of one symbol.
       #        That is, select_related(:group) is equal to select_related([:group])
-      def select_related(association_paths)
+      def select_related!(association_paths)
         @_select_related = Babik::QuerySet::SelectRelated.new(@model, association_paths)
         self
       end

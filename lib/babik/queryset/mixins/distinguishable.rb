@@ -5,10 +5,11 @@ module Babik
     # Distinguishable functionality for QuerySet
     module Distinguishable
 
-      # Mark this QuerySet as distinguishable
-      # (i.e. DISTINCT keyword will be applied to query).
+      # Mark this QuerySet as distinguishable.
+      # Modify this object
+      # (i.e. DISTINCT keyword will be applied to the final SQL query).
       # @return [QuerySet] Reference to this QuerySet.
-      def distinct
+      def distinct!
         @_distinct = true
         self
       end
@@ -16,7 +17,7 @@ module Babik
       # Mark this QuerySet as not distinguishable
       # (i.e. DISTINCT keyword will NOT be applied to query).
       # @return [QuerySet] Reference to this QuerySet.
-      def undistinct
+      def undistinct!
         @_distinct = false
         self
       end
