@@ -105,18 +105,25 @@ class CloneTest < Minitest::Test
     refute_equal copy2.object_id, copy3.object_id
   end
 
-  def test_updatable
+  def test_deletable
+    filter = [{ first_name: 'Julius' }, { first_name: 'Marcus' }]
+    names = %w[Julius Marcus Tiberius Pontius Crassus]
+    names.each do |name|
+      User.create(first_name: name)
+    end
+    users = User.objects.filter(filter)
+    users.delete
+
+    assert_equal 0, users.count
+    assert_equal 3, User.objects.count
+
+    User.destroy_all
+  end
+
+  def test_clone
     filter = [{ first_name: 'whatever1' }, { first_name: 'whatever2' }]
     original = User.objects.filter(filter)
-    copy1 = original.update(first_name: 'Julius')
-    copy2 = original.update(last_name: 'Marcus')
-    copy3 = copy2.update(last_name: 'Tiberius')
-    refute_equal original.object_id, copy1.object_id
-    refute_equal original.object_id, copy2.object_id
-    refute_equal original.object_id, copy3.object_id
-    refute_equal copy1.object_id, copy2.object_id
-    refute_equal copy1.object_id, copy3.object_id
-    refute_equal copy2.object_id, copy3.object_id
+    original.clone.clone
   end
 
 end

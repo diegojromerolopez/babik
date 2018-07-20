@@ -9,12 +9,12 @@ module Babik
       # @param param [Range, Integer]
       #        If it is a range, first_element..last_element will be selected.
       #        If it is an integer, the element in that position will be returned. No negative number is allowed.
+      # @raise RuntimeError 'Invalid limit passed to query: <VALUE>' If param is not a Range or Integer.
       # @return [QuerySet, ActiveRecord::Base] QuerySet if a slice was passe as parameter,
       #         otherwise an ActiveRecord model.
       def [](param)
+        raise "Invalid limit passed to query: #{param}" unless [Range, Integer].include?(param.class)
         self.clone.send("limit_#{param.class.to_s.downcase}!", param)
-      rescue NoMethodError
-        raise "Invalid limit passed to query: #{param}"
       end
 
       # Return an element at an index, otherwise:

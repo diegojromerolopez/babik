@@ -26,11 +26,12 @@ module Babik
       end
 
       # Render the UPDATE statement
+      # @param update_command [Hash{field: value}] Runs the update query.
       # @return [String] SQL UPDATE statement for this QuerySet.
-      def update
-        @queryset.project(['id'])
-        sql = _render('update/main.sql.erb')
-        @queryset.unproject
+      def update(update_command)
+        @queryset.project!(['id'])
+        sql = _render('update/main.sql.erb', {update_command: update_command})
+        @queryset.unproject!
         sql
       end
 
@@ -55,12 +56,16 @@ module Babik
       # Render a file in a path
       # @api private
       # @param template_path [String] Relative (to {SQLRenderer::TEMPLATE_PATH}) path of the template file.
+      # @param extra_replacements [Hash] Hash with the replacements. By default is an empty hash.
       # @return [String] Rendered SQL with QuerySet replacements completed
-      def _render(template_path)
+      def _render(template_path, extra_replacements = {})
         render = lambda do |partial_template_path, replacements|
           _base_render(partial_template_path, **replacements).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
         end
-        _base_render(template_path, queryset: @queryset, render: render).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
+        replacements = extra_replacements.clone()
+        replacements[:queryset] = @queryset
+        replacements[:render] = render
+        _base_render(template_path, **replacements).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
       end
 
       # Render a file

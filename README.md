@@ -72,7 +72,7 @@ No configuration is needed, Babik automatically includes two methods for your mo
 
 PostgreSQL, MySQL and Sqlite are supported.
 
-MariaDB and MSSQL should work as well.
+MariaDB and MSSQL should work as well (happy to solve any reported issues).
 
 Accepting contributors to port this library to Oracle.
 
@@ -88,41 +88,26 @@ We return a pair of objects and a hash with the associated objects. [See doc her
 
 ## Known issues
 
-### Caller is modified in each call 
+### Clone in each non-modifying method call
 
-**All operations that return a QuerySet modify the caller object**.
-
-These are currently destructive, that is, if you want to access your
-earlier value, you will not be able to.
+This library uses [ruby_deep_clone](https://github.com/gmodarelli/ruby-deepclone/) to create a new QuerySet each time
+a non-modifying method is called:
 
 ```ruby
 julius = User.objects.filter(first_name: 'Julius')
 julius_caesar = julius.filter(last_name: 'Caesar')
 
 puts julius_caesar == julius
-# Will print true
-```
-
-Use **clone** method to create a new QuerySet:
-
-```ruby
-julius = User.objects.filter(first_name: 'Julius')
-julius_caesar = julius.clone.filter(last_name: 'Caesar')
-
-puts julius_caesar == julius
 # Will print false
 ```
 
-This behavior will change with the introduction of bang methods,
-that is, it will exist two versions for each method:
-- **method**: if the original QuerySet must be different, so a modified clone will be returned.
-- **method!**: if the original QuerySet can change.
+This library is somewhat unstable or not as stable as I would like.
 
 ## Usage
 
 For a complete reference and full examples of methods, see [documentation](/doc/README.md).
 
-See [schema](/README.md#apendix-1:-example-schema) for information about this example's schema.
+See [schema](/test/db/schema.rb) for information about this example's schema.
 
 ### objects method
 
