@@ -4,13 +4,11 @@ require 'active_record'
 require 'minitest/unit'
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'simplecov'
+require 'simplecov-console'
 
-# Configure Rails Environment
-ENV['RAILS_ENV'] = ENV['RACK_ENV'] = 'test'
-if ENV['COVERAGE'] && !%w[rbx jruby].include?(RUBY_ENGINE)
-  require 'simplecov'
-  SimpleCov.command_name 'RSpec'
-end
+SimpleCov.formatter = SimpleCov.formatter = SimpleCov::Formatter::Console
+SimpleCov.start
 
 # Setup the log
 require 'fileutils'
@@ -19,6 +17,7 @@ ActiveRecord::Base.logger = Logger.new('log/test-queries.log')
 
 DEFAULT_DB_ADAPTER = 'sqlite3'
 #DEFAULT_DB_ADAPTER = 'mysql2'
+#DEFAULT_DB_ADAPTER = 'postgresql'
 
 # Make a connection
 adapter = ENV.fetch('DB', DEFAULT_DB_ADAPTER)

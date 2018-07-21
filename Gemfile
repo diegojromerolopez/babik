@@ -11,5 +11,6 @@ group :development, :test do
   gem 'reek'
   gem 'rubocop'
   gem 'simplecov'
+  gem 'simplecov-console'
   gem 'sqlite3'
 end
