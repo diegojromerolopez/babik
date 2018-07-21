@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/selection/selection'
+require 'babik/queryset/lib/selection/path/path'
 
 module Babik
   # QuerySet module
@@ -42,7 +42,7 @@ module Babik
           actual_field = field
           @alias = nil
         end
-        @selection = Babik::Selection::Base.factory(model, actual_field, '_')
+        @selection = Babik::Selection::Path::Factory.build(model, actual_field)
       end
 
       # Return sql of the field to project.

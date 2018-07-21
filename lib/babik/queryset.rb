@@ -21,6 +21,7 @@ require 'babik/queryset/components/select_related'
 require 'babik/queryset/components/where'
 
 require 'babik/queryset/lib/condition'
+require 'babik/queryset/lib/selection/config'
 require 'babik/queryset/lib/selection/local_selection'
 require 'babik/queryset/lib/selection/foreign_selection'
 require 'babik/queryset/lib/field'

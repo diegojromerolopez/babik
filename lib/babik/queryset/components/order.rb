@@ -117,8 +117,8 @@ module Babik
         end
         @model = model
         if [String, Symbol].include?(field_path.class)
-          @selection = Babik::Selection::Base.factory(@model, field_path, '_')
-        elsif field_path.is_a?(Babik::Selection::Base)
+          @selection = Babik::Selection::Path::Factory.build(@model, field_path)
+        elsif [Babik::Selection::Path::LocalPath, Babik::Selection::Path::ForeignPath].include?(field_path.class)
           @selection = field_path
         else
           raise "field_path of class #{field_path.class} not valid. A Symbol/String/Babik::Selection::Base expected"

@@ -1,43 +1,32 @@
 # frozen_string_literal: true
 
-require 'babik/queryset/lib/selection/selection'
-require 'babik/queryset/lib/selection/operation/operations'
-require 'babik/queryset/lib/join/association_joiner'
-require 'babik/queryset/lib/association/foreign_association_chain'
+require 'babik/queryset/lib/selection/path/foreign_path'
 
 module Babik
   module Selection
     # Foreign selection
-    class ForeignSelection < Babik::Selection::Base
-      RELATIONSHIP_SEPARATOR = '::'
-      OPERATOR_SEPARATOR = '__'
+    class ForeignSelection < Babik::Selection::Path::ForeignPath
 
       attr_reader :model, :selection_path, :selected_field,
                   :sql_where_condition,
                   :value, :operator
 
-      delegate :left_joins_by_alias, to: :@association_joiner
-      delegate :target_alias, to: :@association_joiner
-      delegate :associations, to: :@association_chain
-
+      # Create a foreign selection, that is, a filter that is based on a foreign field condition.
+      # @param model [ActiveRecord::Base] Model
+      # @param selection_path [String, Symbol] selection path used only to raise errors. e.g.:
+      #        posts::category__in
+      #        author::posts::tags
+      #        creation_at__date__gte
+      # @param value [String, Integer, ActiveRecord::Base] value that will be used in the filter
       def initialize(model, selection_path, value)
-        super
-        @selection_path = selection_path.dup
-        @association_path = selection_path.to_s.split(RELATIONSHIP_SEPARATOR)
-        selection_path = @association_path.pop
-        @selected_field, @operator = selection_path.split(OPERATOR_SEPARATOR)
-        @operator ||= 'equal'
+        super(model, selection_path)
         # If the value is an ActiveRecord model, get its id
+        @value = value
         @value = @value.id if @value.is_a?(ActiveRecord::Base)
-        _initialize_associations
         _init_sql_where_condition
       end
 
-      def _initialize_associations
-        @association_chain = Babik::Association::ForeignAssociationChain.new(@model, @association_path, @selection_path)
-        @association_joiner = Babik::QuerySet::Join::AssociationJoiner.new(@association_chain.associations)
-      end
-
+      # Initialize the SQL condition that will be used on the SQL SELECT
       def _init_sql_where_condition
         last_association_model = @association_chain.target_model
         actual_field = Babik::Table::Field.new(last_association_model, @selected_field).real_field
@@ -46,8 +35,5 @@ module Babik
         )
       end
     end
-
-
-
   end
 end

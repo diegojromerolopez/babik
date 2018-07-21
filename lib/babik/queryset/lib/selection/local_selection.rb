@@ -2,11 +2,12 @@
 
 require 'babik/queryset/lib/selection/selection'
 require 'babik/queryset/lib/selection/operation/operations'
+require 'babik/queryset/lib/selection/path/local_path'
 
 module Babik
   module Selection
     # Selection by a local field
-    class LocalSelection < Babik::Selection::Base
+    class LocalSelection < Babik::Selection::Path::LocalPath
 
       attr_reader :model, :selection_path, :selected_field, :operator, :secondary_operator, :value
 
@@ -17,10 +18,8 @@ module Babik
       # @param value [String,Integer,Float,ActiveRecord::Base,Babik::QuerySet::Base] anything that can be used
       #        to select objects.
       def initialize(model, selection_path, value)
-        super
-        @selected_field, @operator, @secondary_operator = @selection_path.to_s.split(OPERATOR_SEPARATOR)
-        # By default, if no operator is given, 'equal' will be used
-        @operator ||= 'equal'
+        super(model, selection_path)
+        @value = value
       end
 
       # Return the SQL where condition
@@ -34,14 +33,6 @@ module Babik
                      @operator
                    end
         Babik::Selection::Operation::Base.factory("#{self.target_alias}.#{actual_field}", operator, @value)
-      end
-
-      # Return the target table alias.
-      # That is alias of the model table.
-      # For the moment, actually, return the name of this model's table.
-      # @return [String] alias of the model table.
-      def target_alias
-        @model.table_name
       end
 
     end

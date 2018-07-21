@@ -54,7 +54,7 @@ module Babik
       #        If nil, it will take the value <table_alias>__<agg_function>.
       def prepare(model, field_name = nil)
         @model = model
-        @selection = Babik::Selection::Base.factory(model, @aggregation_path, '_')
+        @selection = Babik::Selection::Path::Factory.build(model, @aggregation_path)
         @field_name = field_name || "#{self.table_alias}__#{SQL_OPERATION.downcase}"
         self
       end

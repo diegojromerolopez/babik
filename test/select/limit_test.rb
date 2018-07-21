@@ -67,7 +67,9 @@ class LimitTest < Minitest::Test
 
   def test_limit_brackets_index
     first_user = User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC)[0]
-    assert_equal 'User 1', first_user.first_name
+    expected_first_user = User.where(last_name: 'LimitTest user').order('created_at ASC').first
+    assert_equal expected_first_user.id, first_user.id
+    assert_equal expected_first_user.first_name, first_user.first_name
   end
 
   def test_brackets_index_out_of_range

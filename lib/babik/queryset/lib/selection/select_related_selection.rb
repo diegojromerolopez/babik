@@ -3,15 +3,17 @@
 require 'babik/queryset/lib/join/association_joiner'
 require 'babik/queryset/lib/join/join'
 require 'babik/queryset/lib/selection/selection'
+require 'babik/queryset/lib/selection/config'
 require 'babik/queryset/lib/association/select_related_association_chain'
+require 'babik/queryset/lib/selection/path/foreign_path'
 
 module Babik
   module Selection
 
     # Abstraction of a selection used in select_related operation
     class SelectRelatedSelection
-      RELATIONSHIP_SEPARATOR = Babik::Selection::Base::RELATIONSHIP_SEPARATOR
-      attr_reader :model, :selection_path, :association_path, :associations, :target_model, :id
+      RELATIONSHIP_SEPARATOR = Babik::Selection::Config::RELATIONSHIP_SEPARATOR
+      attr_reader :model, :selection_path, :association_path, :target_model, :id
 
       delegate :left_joins_by_alias, to: :@association_joiner
       delegate :target_alias, to: :@association_joiner
