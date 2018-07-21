@@ -97,9 +97,6 @@ module Babik
       # ISO Week of year (1-52/53) from date operation
       #
       class Week < DateOperation
-        def initialize(field, operator, value)
-          super(field, operator, value)
-        end
 
         def sql_function
           dbms_adapter = db_engine
@@ -112,48 +109,36 @@ module Babik
 
       # Hour date operation
       class Hour < DateOperation
-        def initialize(field, operator, value)
-          value = format('%02d', value) if db_engine == 'sqlite3'
-          super(field, operator, value)
-        end
 
         def sql_function
           dbms_adapter = db_engine
           return 'EXTRACT(HOUR FROM ?field)' if dbms_adapter == 'postgresql'
           return 'HOUR(?field)' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%H\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'CAST(strftime(\'%H\', ?field) AS INTEGER)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
       # Minute date operation
       class Minute < DateOperation
-        def initialize(field, operator, value)
-          value = format('%02d', value) if db_engine == 'sqlite3'
-          super(field, operator, value)
-        end
 
         def sql_function
           dbms_adapter = db_engine
           return 'EXTRACT(MINUTE FROM ?field)' if dbms_adapter == 'postgresql'
           return 'MINUTE(?field)' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%M\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'CAST(strftime(\'%M\', ?field) AS INTEGER)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
       # Second date operation
       class Second < DateOperation
-        def initialize(field, operator, value)
-          value = format('%02d', value) if db_engine == 'sqlite3'
-          super(field, operator, value)
-        end
 
         def sql_function
           dbms_adapter = db_engine
           return 'FLOOR(EXTRACT(SECOND FROM ?field))' if dbms_adapter == 'postgresql'
           return 'SECOND(?field)' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%S\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'CAST(strftime(\'%S\', ?field) AS INTEGER)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
