@@ -4,11 +4,6 @@ require 'active_record'
 require 'minitest/unit'
 require 'minitest/autorun'
 require 'minitest/pride'
-require 'simplecov'
-require 'simplecov-console'
-
-SimpleCov.formatter = SimpleCov.formatter = SimpleCov::Formatter::Console
-SimpleCov.start
 
 # Setup the log
 require 'fileutils'
