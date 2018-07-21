@@ -59,6 +59,8 @@ No rubygem version for the moment.
 
 ## Requirements
 
+Ruby Version >= 2.5
+
 Include all [inverse relationships](http://guides.rubyonrails.org/association_basics.html#bi-directional-associations)
 in your models.
 
