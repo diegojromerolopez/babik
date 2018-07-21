@@ -23,7 +23,11 @@ module Babik
 
         # Replace the SQL operation template and store the result in sql_operation attribute
         def _init_sql_operation
-          @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value', Base.escape(@value))
+          @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value', '?')
+          # Use Rails SQL escaping and avoid possible SQL-injection issues
+          # and also several DB-related issues (like MySQL escaping quotes by \' instead of '')
+          # Only if it has not been already replaced
+          @sql_operation = ActiveRecord::Base.sanitize_sql([@sql_operation, @value]) if @sql_operation.include?('?')
         end
 
         # Convert the operation to string

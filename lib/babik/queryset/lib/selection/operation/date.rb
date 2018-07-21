@@ -25,8 +25,12 @@ module Babik
           assert_dbms
           operator ||= 'equal'
           @operator = operator
-          main_operation = Base.factory(sql_function, operator, value)
-          super(field, main_operation.sql_operation, value)
+          # We have to guard the replacement token ?field
+          code_for_sql_function = sql_function
+          code_for_sql_function = code_for_sql_function.sub('?field', '#field')
+          main_operation = Base.factory(code_for_sql_function, operator, value)
+          main_operation_sql_code = main_operation.sql_operation.sub('#field', '?field')
+          super(field, main_operation_sql_code, value)
         end
 
         def sql_function
