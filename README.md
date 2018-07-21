@@ -1,5 +1,7 @@
 # Babik
 
+[![Build Status](https://travis-ci.com/diegojromerolopez/babik.svg?branch=master)](https://travis-ci.com/diegojromerolopez/babik)
+
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
 **This project is in alpha phase. User at your own risk!**
