@@ -116,8 +116,8 @@ class LookupTest < Minitest::Test
     assert_equal grouped_seconds[second].length, this_second_posts.count
   end
 
+  # Check ISO week
   def test_week
-    # Get a isoweek with posts
     weeks = Post.objects.map { |post| post.created_at.strftime('%V').to_i }
     grouped_weeks = weeks.group_by(&:itself)
     first_week = grouped_weeks.keys[0]
@@ -126,6 +126,7 @@ class LookupTest < Minitest::Test
     assert_equal grouped_weeks[first_week].length, this_week_posts.count
   end
 
+  # Check 0-6 (sunday to monday) week day
   def test_weekday
     # Get a week day (0-6, sunday to monday) with posts
     week_days = Post.objects.map { |post| post.created_at.strftime('%w') }

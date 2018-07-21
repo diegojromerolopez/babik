@@ -64,7 +64,6 @@ module Babik
         @_limit = nil
         @_projection = nil
         @_select_related = nil
-        #@_update = nil
       end
 
       # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.

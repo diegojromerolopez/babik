@@ -98,7 +98,6 @@ module Babik
       #
       class Week < DateOperation
         def initialize(field, operator, value)
-          value = format('%02d', value) if db_engine == 'sqlite3'
           super(field, operator, value)
         end
 
