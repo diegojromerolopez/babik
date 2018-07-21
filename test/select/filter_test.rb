@@ -38,6 +38,7 @@ class FilterTest < Minitest::Test
     User.destroy_all
     GeoZone.destroy_all
     Post.destroy_all
+    BadPost.destroy_all
     Tag.destroy_all
     Category.destroy_all
   end
@@ -178,7 +179,6 @@ class FilterTest < Minitest::Test
       '`filter\' parameter must be an Array for OR-based AND-conditions or a hash for a lone AND-condition',
       exception.message
     )
-
   end
 
 end

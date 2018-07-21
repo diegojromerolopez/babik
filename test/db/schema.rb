@@ -55,11 +55,22 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
+  # Post class only used to show what happens if a model
+  # has no inverse_of in one of its associations
+  create_table :bad_posts, force: true do |t|
+    t.string :title
+    t.text :content
+    t.integer :stars
+    t.integer :category_id
+    t.timestamps
+  end
+
   # Tag class that will make use of a has_and_belongs_to_many relationship
   # Used only for test the detection of has_and_belongs_to_many and the raise
   # of an exception happens
   create_table :bad_tags, force: true do |t|
     t.string :name
+    t.integer :bad_post_id
     t.timestamps
   end
 

@@ -55,6 +55,7 @@ require 'models/category'
 require 'models/post'
 require 'models/post_tag'
 require 'models/bad_tag'
+require 'models/bad_post'
 
 
 
