@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.com/diegojromerolopez/babik.svg?branch=master)](https://travis-ci.com/diegojromerolopez/babik)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/8a64e9a43c77d31a0df1/maintainability)](https://codeclimate.com/github/diegojromerolopez/babik/maintainability)
+
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8a64e9a43c77d31a0df1/test_coverage)](https://codeclimate.com/github/diegojromerolopez/babik/test_coverage)
+
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
 **This project is in alpha phase. User at your own risk!**
