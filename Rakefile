@@ -4,7 +4,7 @@ require 'rake/testtask'
 desc 'Run tests'
 Rake::TestTask.new(:test) do |t|
   t.libs.push 'test'
-  t.pattern = 'test/**/*_test.rb'
+  t.test_files = FileList['test/enable_coverage.rb', 'test/**/*_test.rb']
   t.warning = ENV['warning']
   t.verbose = ENV['verbose']
 end
