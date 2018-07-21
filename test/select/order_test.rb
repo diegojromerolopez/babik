@@ -92,6 +92,7 @@ class OrderTest < Minitest::Test
     users.each_with_index do |user, user_index|
       assert_equal goth_king_names[user_index], user.first_name
     end
+    assert users.ordered?
   end
 
   def test_deep_order
@@ -112,6 +113,13 @@ class OrderTest < Minitest::Test
     users.each_with_index do |user, user_index|
       assert_equal king_names[user_index], user.first_name
     end
+    assert users.ordered?
+  end
+
+  def test_disorder
+    users = User.objects.order_by(%i[zone::name ASC], %i[first_name ASC])
+    users.disorder!
+    refute users.ordered?
   end
 
   def test_wrong_order

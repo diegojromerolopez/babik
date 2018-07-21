@@ -51,7 +51,6 @@ module Babik
       alias aggregation? _aggregation
       alias count? _count
       alias distinct? _distinct
-      alias projection? _projection
       alias select_related? _select_related
 
       def initialize(model_class)

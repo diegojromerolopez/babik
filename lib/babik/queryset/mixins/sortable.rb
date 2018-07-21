@@ -13,6 +13,13 @@ module Babik
         self
       end
 
+      # Remove the order on this QuerySet according to an order
+      # @return [QuerySet] reference to this QuerySet.
+      def disorder!
+        @_order = nil
+        self
+      end
+
       # Alias for order_by
       # @see #order_by
       # @param order [Array, String, Hash] ordering that will be applied to the QuerySet.

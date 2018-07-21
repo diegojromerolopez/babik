@@ -43,6 +43,13 @@ class ProjectTest < Minitest::Test
     end
   end
 
+  def test_no_projection
+    users_projection = User.objects
+                           .filter('zone::name': 'Castilla')
+                           .order_by('first_name')
+    refute users_projection.projection?
+  end
+
   def test_foreign_field_project
     users_projection = User.objects
                            .filter('zone::name': 'Castilla')
