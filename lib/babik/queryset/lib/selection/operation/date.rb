@@ -25,10 +25,14 @@ module Babik
           assert_dbms
           operator ||= 'equal'
           @operator = operator
-          # We have to guard the replacement token ?field
+          # In the left-hand of the main operator lies the sql_function
+          # that will extract the desired part of the datetime
+          # This function represents the field as #field, not as ?field
+          # to avoid having replacement issues
           code_for_sql_function = sql_function
-          code_for_sql_function = code_for_sql_function.sub('?field', '#field')
           main_operation = Base.factory(code_for_sql_function, operator, value)
+          # Replacement mechanism only understand ?field and not #field,
+          # so replace #field for ?field and let it work
           main_operation_sql_code = main_operation.sql_operation.sub('#field', '?field')
           super(field, main_operation_sql_code, value)
         end
@@ -42,9 +46,9 @@ module Babik
       class Year < DateOperation
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(YEAR FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'YEAR(?field)' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%Y\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(YEAR FROM #field)' if dbms_adapter == 'postgresql'
+          return 'YEAR(#field)' if dbms_adapter == 'mysql2'
+          return 'strftime(\'%Y\', #field)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -58,9 +62,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(MONTH FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'MONTH(?field)' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%m\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(MONTH FROM #field)' if dbms_adapter == 'postgresql'
+          return 'MONTH(#field)' if dbms_adapter == 'mysql2'
+          return 'strftime(\'%m\', #field)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -74,9 +78,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(DAY FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'DAYOFMONTH(?field)' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%d\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(DAY FROM #field)' if dbms_adapter == 'postgresql'
+          return 'DAYOFMONTH(#field)' if dbms_adapter == 'mysql2'
+          return 'strftime(\'%d\', #field)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -91,9 +95,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(DOW FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'DAYOFWEEK(?field) -  1' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%w\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(DOW FROM #field)' if dbms_adapter == 'postgresql'
+          return 'DAYOFWEEK(#field) -  1' if dbms_adapter == 'mysql2'
+          return 'strftime(\'%w\', #field)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -104,9 +108,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(WEEK FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'WEEK(?field, 3)' if dbms_adapter == 'mysql2'
-          return '(strftime(\'%j\', date(?field, \'-3 days\', \'weekday 4\')) - 1) / 7 + 1' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(WEEK FROM #field)' if dbms_adapter == 'postgresql'
+          return 'WEEK(#field, 3)' if dbms_adapter == 'mysql2'
+          return '(strftime(\'%j\', date(#field, \'-3 days\', \'weekday 4\')) - 1) / 7 + 1' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -116,9 +120,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(HOUR FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'HOUR(?field)' if dbms_adapter == 'mysql2'
-          return 'CAST(strftime(\'%H\', ?field) AS INTEGER)' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(HOUR FROM #field)' if dbms_adapter == 'postgresql'
+          return 'HOUR(#field)' if dbms_adapter == 'mysql2'
+          return 'CAST(strftime(\'%H\', #field) AS INTEGER)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -128,9 +132,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'EXTRACT(MINUTE FROM ?field)' if dbms_adapter == 'postgresql'
-          return 'MINUTE(?field)' if dbms_adapter == 'mysql2'
-          return 'CAST(strftime(\'%M\', ?field) AS INTEGER)' if dbms_adapter == 'sqlite3'
+          return 'EXTRACT(MINUTE FROM #field)' if dbms_adapter == 'postgresql'
+          return 'MINUTE(#field)' if dbms_adapter == 'mysql2'
+          return 'CAST(strftime(\'%M\', #field) AS INTEGER)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -140,9 +144,9 @@ module Babik
 
         def sql_function
           dbms_adapter = db_engine
-          return 'FLOOR(EXTRACT(SECOND FROM ?field))' if dbms_adapter == 'postgresql'
-          return 'SECOND(?field)' if dbms_adapter == 'mysql2'
-          return 'CAST(strftime(\'%S\', ?field) AS INTEGER)' if dbms_adapter == 'sqlite3'
+          return 'FLOOR(EXTRACT(SECOND FROM #field))' if dbms_adapter == 'postgresql'
+          return 'SECOND(#field)' if dbms_adapter == 'mysql2'
+          return 'CAST(strftime(\'%S\', #field) AS INTEGER)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
@@ -151,9 +155,9 @@ module Babik
       class Time < DateOperation
         def sql_function
           dbms_adapter = db_engine
-          return 'date_trunc(\'second\', ?field::time)' if dbms_adapter == 'postgresql'
-          return 'DATE_FORMAT(?field, \'%H:%i:%s\')' if dbms_adapter == 'mysql2'
-          return 'strftime(\'%H:%M:%S\', ?field)' if dbms_adapter == 'sqlite3'
+          return 'date_trunc(\'second\', #field::time)' if dbms_adapter == 'postgresql'
+          return 'DATE_FORMAT(#field, \'%H:%i:%s\')' if dbms_adapter == 'mysql2'
+          return 'strftime(\'%H:%M:%S\', #field)' if dbms_adapter == 'sqlite3'
           raise "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
