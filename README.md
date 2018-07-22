@@ -64,9 +64,10 @@ No rubygem version for the moment.
 Ruby Version >= 2.5
 
 Include all [inverse relationships](http://guides.rubyonrails.org/association_basics.html#bi-directional-associations)
-in your models.
+in your models. **It is required to compute the object selection from instance**.
 
-**It is required to compute the object selection from instance**.
+All your many-to-many relationships must have a through attribute.
+Per Rubocop guidelines, [using has_and_belongs_to_many is discouraged](https://github.com/rubocop-hq/rails-style-guide#has-many-through).
 
 ## Configuration
 
@@ -370,11 +371,12 @@ See more [here](/doc/api/queryset/lookups.md).
 
 The main feature of Babik is filtering by foreign keys. 
 
-**Your associations must have always an inverse (by making use of inverse_of)**. 
+Remember:
 
-**NOTE many-to-many relationships are only supported when based on has_many through**
+- **Your associations must have always an inverse (by making use of inverse_of)**. 
 
-**NO has_and_belongs_to_many support**. [Reason](https://github.com/rubocop-hq/rails-style-guide#has-many-through). 
+- **Many-to-many** relationships are only supported when based on **has_many through**.
+[Reason](https://github.com/rubocop-hq/rails-style-guide#has-many-through). 
 
 ##### Belongs to relationships
 
