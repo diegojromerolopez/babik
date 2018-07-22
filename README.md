@@ -150,6 +150,8 @@ julius.objects('posts::tags').filter(name__in: ['war', 'battle', 'victory'])
 
 #### Selection
 
+[See the main docs](/doc/api/queryset/methods/return_queryset.md#filter).
+
 Basic selection is made by passing a hash to filter function:
 
 ```ruby
@@ -225,6 +227,8 @@ julius.objects('zone')
 
 
 ##### Lookups
+
+[See the main docs](/doc/api/queryset/methods/return_queryset.md#field-lookups).
 
 There are other operators than equal to, these are implemented by using lookups:
 
@@ -416,6 +420,8 @@ with tagged as 'history').
 
 #### Projections
 
+[See the main docs](/doc/api/queryset/methods/dont_return_queryset.md#project).
+
 Return
 an [ActiveRecord Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html)
 with only the fields you are interested
@@ -441,6 +447,8 @@ p User.objects.filter('zone::name': 'Castilla').order_by('first_name').project('
 
 #### Select related
 
+[See the main docs](/doc/api/queryset/methods/dont_return_queryset.md#select-related).
+
 **select_related** method allows fetching an object and its related ones at once.
 
 ```ruby
@@ -452,7 +460,7 @@ User.filter(first_name: 'Julius').select_related(:zone)
 
 ##### Order
 
-###### Basic usage
+[See the main docs](/doc/api/queryset/methods/return_queryset.md#order-by).
 
 Ordering by one field (ASC)
 
@@ -510,6 +518,8 @@ User.objects
 
 #### Delete
 
+[See the main docs](/doc/api/queryset/methods/dont_return_queryset.md#delete).
+
 There is no standard DELETE from foreign field SQL statement, so for now
 the default implementation makes use of DELETE WHERE id IN SELECT subqueries.
 
@@ -545,6 +555,8 @@ User.objects.filter('zone::name': 'Roman Empire').delete
 ```
 
 ## Update
+
+[See the main docs](/doc/api/queryset/methods/dont_return_queryset.md#update).
 
 Similar to what happens in when running SQL-delete statements, there is no
 standard UPDATE from foreign field SQL statement, so for now

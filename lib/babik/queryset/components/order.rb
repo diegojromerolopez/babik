@@ -13,6 +13,13 @@ module Babik
       # Construct the order manager
       # @param model [ActiveRecord::Base] base model.
       # @param ordering [Array, String, Hash] ordering that will be applied to the QuerySet.
+      #        Each item of the array represents an order:
+      #        - field1: field1 ASC
+      #        - -field1: field1 DESC
+      #        - [field1, :ASC]: field1 ASC
+      #        - [field1, :DESC]: field1 DESC
+      #        - {field1, :ASC}: field1 ASC
+      #        - {field1, :DESC}: field1 DESC
       # @raise [RuntimeError] Invalid type of order
       def initialize(model, *ordering)
         @model = model
@@ -34,7 +41,8 @@ module Babik
       # @api private
       # @return [Array] Conversion of order as string to array.
       def _order_from_string(order)
-        [order, :ASC]
+        return [order, :ASC] if order[0] != '-'
+        [order[1..-1], :DESC]
       end
 
       # Get order from symbol

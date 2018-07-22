@@ -52,6 +52,7 @@ end
   - [Exclude](/doc/api/queryset/methods/return_queryset.md#exclude): add more excluding conditions to the query.
   - [Filter](/doc/api/queryset/methods/return_queryset.md#filter): add more including conditions to the query.
   - [Limit](/doc/api/queryset/methods/return_queryset.md#limit): returns an slice of the QuerySet.
+  - [Order by](/doc/api/queryset/methods/return_queryset.md#order-by): returns an ordered QuerySet.
   - [Reverse](/doc/api/queryset/methods/return_queryset.md#reverse): returns an order-inverted QuerySet.
 - [Methods that don't return a QuerySet](/doc/api/queryset/methods/dont_return_queryset.md). 
   - [aggregate](/doc/api/queryset/methods/dont_return_queryset.md#aggregate): returns a hash with the result of one valid aggregation (AVG, MIN, MAX, SUM).

@@ -214,6 +214,42 @@ User.objects.filter('zone::name': 'Rome').limit(5, 6)
 
 No negative offset is allowed.
 
+## Order by
+
+Returns a QuerySet ordered by some fields.
+
+```ruby
+# Order the users by their zone name (ASC) and later by their first_name (ASC)
+User.objects.order_by(['zone::name', :ASC], ['first_name', :ASC])
+
+# Obviously, you can filter and later apply the order 
+User.objects
+    .filter(firs_name__in: ['Marcus', 'Aulus'])
+    .order_by(['zone::name', :ASC], ['first_name', :ASC])
+
+```
+
+**order_by** accepts a list of parameters where each parameter
+can be one of the following values:
+
+- field1: ORDER BY field1 ASC
+- -field1: ORDER BY field1 DESC (Django-like field sorting)
+- [field1, :ASC]: ORDER BY field1 ASC
+- [field1, :DESC]: ORDER BY field1 DESC
+- {field1, :ASC}: ORDER BY field1 ASC
+- {field1, :DESC}: ORDER BY field1 DESC
+
+
+```ruby
+# Order the users by their first_name (ASC) and later by their created_at field (DESC)
+# All of these alternatives are equivalent:
+User.objects.order_by(['first_name', :ASC], ['created_at', :DESC])
+User.objects.order_by([{first_name: :ASC}, {created_at: :DESC}])
+User.objects.order_by(['first_name', '-created_at'])
+# The last example can also be written using %w literals
+User.objects.order_by(%w[first_name, -created_at])
+```
+
 ## Reverse
 
 Return a QuerySet with the inverted order than the caller QuerySet.

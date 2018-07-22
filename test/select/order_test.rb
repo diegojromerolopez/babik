@@ -134,6 +134,13 @@ class OrderTest < Minitest::Test
     refute users.ordered?
   end
 
+  def test_order_with_prefixed_direction
+    users = User.objects.order_by('-zone::name', '-first_name')
+    first_user = users.first
+    assert_equal 'Hispania', first_user.zone.name
+    assert_equal 'Turismundo', first_user.first_name
+  end
+
   def test_wrong_order
     exception = assert_raises RuntimeError do
       User.objects.filter('zone::name': 'Hispania').order_by([:first_name, 'XXXX'])
