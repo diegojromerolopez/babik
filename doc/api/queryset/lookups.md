@@ -210,7 +210,7 @@ Select records by day of month of the timestamp field.
 
 ```ruby
 Post.objects.filter('created_at__day': 3)
-# SELECT * FROM posts WHERE EXTRACT(DAY FROM created_at) = 3
+# SELECT * FROM posts WHERE EXTRACT(DAY FROM created_at) = 3 -- PostgreSQL
 ```
 
 ### month
@@ -219,8 +219,19 @@ Select records by month of the timestamp field.
 
 ```ruby
 Post.objects.filter('created_at__month': 3)
-# SELECT * FROM posts WHERE EXTRACT(MONTH FROM created_at) = 3
+# SELECT * FROM posts WHERE EXTRACT(MONTH FROM created_at) = 3 -- PostgreSQL
 ```
+
+### quarter
+
+Select records by quarter of the year.
+
+```ruby
+Post.objects.filter('created_at_quarter': 3)
+# Get all posts that where created in the 3rd quarter
+# SELECT * FROM posts WHERE EXTRACT(QUARTER FROM created_at) = 3 -- PostgreSQL
+```
+
 
 ### year
 
@@ -228,7 +239,7 @@ Select records by year of the timestamp field.
 
 ```ruby
 Post.objects.filter('created_at__year': 12)
-# SELECT * FROM posts WHERE EXTRACT(MONTH FROM created_at) = 12
+# SELECT * FROM posts WHERE EXTRACT(MONTH FROM created_at) = 12 -- PostgreSQL
 ```
 
 ### time
@@ -237,7 +248,7 @@ Select records by time part of a timestamp (datetime) field.
 
 ```ruby
 Post.objects.filter('created_at__time': '00:30:05')
-# SELECT * FROM posts WHERE created_at::time = '00:30:05'
+# SELECT * FROM posts WHERE created_at::time = '00:30:05' -- PostgreSQL
 ```
 
 ### hour
@@ -246,7 +257,7 @@ Select records by the hour part of a timestamp (datetime) field.
 
 ```ruby
 Post.objects.filter('created_at__hour': 3)
-# SELECT * FROM posts WHERE EXTRACT(HOUR FROM created_at) = 3
+# SELECT * FROM posts WHERE EXTRACT(HOUR FROM created_at) = 3 -- PostgreSQL
 ```
 
 ### minute
@@ -255,7 +266,7 @@ Select records by the minute part of a timestamp (datetime) field.
 
 ```ruby
 Post.objects.filter('created_at__minute': 30)
-# SELECT * FROM posts WHERE EXTRACT(MINUTE FROM created_at) = 30 
+# SELECT * FROM posts WHERE EXTRACT(MINUTE FROM created_at) = 30 -- PostgreSQL
 ```
 
 ### second
@@ -264,7 +275,7 @@ Select records by time part of a timestamp (datetime) field.
 
 ```ruby
 Post.objects.filter('created_at__second': 5)
-# SELECT * FROM posts WHERE EXTRACT(SECOND FROM created_at) = 5 
+# SELECT * FROM posts WHERE EXTRACT(SECOND FROM created_at) = 5 -- PostgreSQL
 ```
 
 ### week

@@ -175,6 +175,7 @@ module Babik
         regex: Babik::Selection::Operation::Regex,
         iregex: IRegex,
         year: Year,
+        quarter: Quarter,
         month: Month,
         day: Day,
         week_day: WeekDay,

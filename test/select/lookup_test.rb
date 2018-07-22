@@ -98,6 +98,16 @@ class LookupTest < Minitest::Test
     assert_equal 0, Post.objects.filter(created_at__year: 1998).count
   end
 
+  def test_quarter
+    # Get a quarter with posts
+    quarters = Post.objects.map { |post| (post.created_at.strftime('%m').to_i + 2) / 3 }
+    grouped_quarters = quarters.group_by(&:itself)
+    quarter = grouped_quarters.keys[0]
+    first_quarter = quarter.to_i
+    this_quarter_posts = Post.objects.filter(created_at__quarter: first_quarter)
+    assert_equal grouped_quarters[quarter].length, this_quarter_posts.count
+  end
+
   def test_month
     this_month_posts = Post.objects.filter(created_at__month: Time.now.utc.month)
     assert_equal 7, this_month_posts.count

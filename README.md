@@ -589,11 +589,6 @@ internals of this library.
 
 ## Roadmap
 
-### Lookups
-
-Django QuerySets have only one lookup that Babik has not implemented yet: 
-- [quarter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#quarter)
-
 ### Set operations
 
 Not currently implemented, will be in next days.
