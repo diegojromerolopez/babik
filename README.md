@@ -628,7 +628,6 @@ internals of this library.
 
 - [latest](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#latest)
 - [earliest](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#earliest)
-- [exists](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#exists)
 
 #### Will not be implemented
 

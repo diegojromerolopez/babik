@@ -125,6 +125,16 @@ aulus_user = User.objects.get(first_name: 'Aulus')
 aulus_user.objects('posts::tags').filter(name: 'war').delete
 ```
 
+## Exists
+
+Check if there is any record that matches the QuerySet conditions.
+
+```ruby
+puts 'There is at least one user called Aulus' if User.objects.get(first_name: 'Aulus').exists?
+```
+
+Also, there is a method **exist?** alias of this **exists?**.
+
 ## Fetch
 
 Returns the element with the index parameter.

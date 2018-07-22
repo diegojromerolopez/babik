@@ -54,6 +54,7 @@ module Babik
       alias select_related? _select_related
       alias reverse! invert_order!
       alias select_for_update! for_update!
+      alias exist? exists?
 
       def initialize(model_class)
         @model = model_class

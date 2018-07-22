@@ -17,16 +17,25 @@ module Babik
         self.clone.send("limit_#{param.class.to_s.downcase}!", param)
       end
 
+      # Inform if at least one record is matched by this QuerySet
+      # @return [Boolean] True if at least one record matches the conditions of the QuerySet, false otherwise.
+      def exists?
+        element = self.fetch(0, false)
+        return true if element
+        false
+      end
+
       # Return an element at an index, otherwise:
       # - Return a default value if it has been passed as second argument.
       # - Raise an IndexError exception
       # @param index [Integer] Position of the element want to return. No negative number is allowed.
       # @param default_value [Object] Anything that will be returned if no record is found at the index position.
+      #        By default it takes a nil value (in that case, it will raise the IndexError exception).
       # @raise [IndexError] When there is no default value
       def fetch(index, default_value = nil)
         element = self.[](index)
         return element if element
-        return default_value if default_value
+        return default_value unless default_value.nil?
         raise IndexError, "Index #{index} outside of QuerySet bounds"
       end
 

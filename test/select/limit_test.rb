@@ -72,6 +72,14 @@ class LimitTest < Minitest::Test
     assert_equal expected_first_user.first_name, first_user.first_name
   end
 
+  def test_exists
+    assert User.objects.filter(last_name: 'LimitTest user').exists?
+    assert User.objects.filter(last_name: 'LimitTest user').exist?
+
+    refute User.objects.filter(last_name: 'This user does not exist').exists?
+    refute User.objects.filter(last_name: 'This user does not exist').exist?
+  end
+
   def test_brackets_index_out_of_range
     assert_nil User.objects.filter(last_name: 'LimitTest user').order_by(created_at: :ASC)[1000]
   end

@@ -58,6 +58,7 @@ end
   - [All](/doc/api/queryset/methods/dont_return_queryset.md#all): returns the query result corresponding to your query.
   - [\[\] operator](/doc/api/queryset/methods/dont_return_queryset.md#brackets): returns an ActiveRecord object or nil.
   - [Delete](/doc/api/queryset/methods/dont_return_queryset.md#delete): returns nothing.
+  - [Exists](/doc/api/queryset/methods/dont_return_queryset.md#exists): returns true if there is at least a record matching QuerySet conditions.
   - [Count](/doc/api/queryset/methods/dont_return_queryset.md#count): returns a positive or zero integer.
   - [Fetch](/doc/api/queryset/methods/dont_return_queryset.md#fetch): returns an ActiveRecord object or default value.
   - [First](/doc/api/queryset/methods/dont_return_queryset.md#first): returns an ActiveRecord object or nil.
