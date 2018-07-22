@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'babik/queryset/mixins/aggregatable'
+require 'babik/queryset/mixins/bounded'
 require 'babik/queryset/mixins/clonable'
 require 'babik/queryset/mixins/countable'
 require 'babik/queryset/mixins/deletable'
@@ -34,6 +35,7 @@ module Babik
     class Base
       include Enumerable
       include Babik::QuerySet::Aggregatable
+      include Babik::QuerySet::Bounded
       include Babik::QuerySet::Clonable
       include Babik::QuerySet::Countable
       include Babik::QuerySet::Deletable
@@ -82,18 +84,6 @@ module Babik
       # @param block [Proc] Proc that will be applied to each object.
       def each(&block)
         self.all.each(&block)
-      end
-
-      # Return the first element of the QuerySet.
-      # @return [ActiveRecord::Base] First element of the QuerySet.
-      def first
-        self.all.first
-      end
-
-      # Return the last element of the QuerySet.
-      # @return [ActiveRecord::Base] Last element of the QuerySet.
-      def last
-        self.invert_order.all.first
       end
 
       # Return an empty ActiveRecord ResultSet

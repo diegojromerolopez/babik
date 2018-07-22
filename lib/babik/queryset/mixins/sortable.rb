@@ -7,6 +7,7 @@ module Babik
 
       # Sort QuerySet according to an order
       # @param order [Array, String, Hash] ordering that will be applied to the QuerySet.
+      #        See {Babik::QuerySet::Order#order_by}.
       # @return [QuerySet] reference to this QuerySet.
       def order_by!(*order)
         @_order = Babik::QuerySet::Order.new(@model, *order)

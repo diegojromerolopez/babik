@@ -636,11 +636,6 @@ internals of this library.
 
 ### Methods that don't return a QuerySet
 
-#### Will be implemented
-
-- [latest](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#latest)
-- [earliest](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#earliest)
-
 #### Will not be implemented
 
 The aim of this library is to help make complex queries, not re-implementing the

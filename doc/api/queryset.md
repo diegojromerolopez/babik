@@ -52,18 +52,20 @@ end
   - [Exclude](/doc/api/queryset/methods/return_queryset.md#exclude): add more excluding conditions to the query.
   - [Filter](/doc/api/queryset/methods/return_queryset.md#filter): add more including conditions to the query.
   - [Limit](/doc/api/queryset/methods/return_queryset.md#limit): returns an slice of the QuerySet.
-  - [Order by](/doc/api/queryset/methods/return_queryset.md#order-by): returns an ordered QuerySet.
+  - [Order by](/doc/api/queryset/methods/return_queryset.md#order-by): returns a sorted QuerySet.
   - [Reverse](/doc/api/queryset/methods/return_queryset.md#reverse): returns an order-inverted QuerySet.
 - [Methods that don't return a QuerySet](/doc/api/queryset/methods/dont_return_queryset.md). 
   - [aggregate](/doc/api/queryset/methods/dont_return_queryset.md#aggregate): returns a hash with the result of one valid aggregation (AVG, MIN, MAX, SUM).
   - [All](/doc/api/queryset/methods/dont_return_queryset.md#all): returns the query result corresponding to your query.
   - [\[\] operator](/doc/api/queryset/methods/dont_return_queryset.md#brackets): returns an ActiveRecord object or nil.
   - [Delete](/doc/api/queryset/methods/dont_return_queryset.md#delete): returns nothing.
+  - [Earliest](/doc/api/queryset/methods/dont_return_queryset.md#earliest): returns the first record according to the passed sort.
   - [Exists](/doc/api/queryset/methods/dont_return_queryset.md#exists): returns true if there is at least a record matching QuerySet conditions.
   - [Count](/doc/api/queryset/methods/dont_return_queryset.md#count): returns a positive or zero integer.
   - [Fetch](/doc/api/queryset/methods/dont_return_queryset.md#fetch): returns an ActiveRecord object or default value.
   - [First](/doc/api/queryset/methods/dont_return_queryset.md#first): returns an ActiveRecord object or nil.
   - [Get](/doc/api/queryset/methods/dont_return_queryset.md#get): returns an ActiveRecord object.
+  - [Latest](/doc/api/queryset/methods/dont_return_queryset.md#latest): returns the last record according to the passed sort.
   - [None](/doc/api/queryset/methods/dont_return_queryset.md#none): returns an empty query result.
   - [Project](/doc/api/queryset/methods/dont_return_queryset.md#project): returns a [Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html).
   - [Select related](/doc/api/queryset/methods/dont_return_queryset.md#select-related): returns a pair of ActiveRecord::Base object, Hash with the related objects.

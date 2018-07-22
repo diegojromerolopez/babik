@@ -125,6 +125,48 @@ aulus_user = User.objects.get(first_name: 'Aulus')
 aulus_user.objects('posts::tags').filter(name: 'war').delete
 ```
 
+
+## Earliest
+
+Return the first element according to the specified sort.
+It is the reverse method of [latest](#latest).
+
+**earliest** method accepts the same order parameters than [order_by](/doc/api/queryset/methods/return_queryset.md#order-by).
+
+```ruby
+User.objects.filter(last_name: 'García').earliest('first_name')
+# SELECT users.* FROM users
+# WHERE last_name = 'García'
+# ORDER BY first_name ASC
+# LIMIT 1
+```
+
+Also accepting descendant order, of course:
+
+```ruby
+User.objects.filter(last_name: 'Luna').earliest('-first_name')
+# SELECT users.* FROM users
+# WHERE last_name = 'Luna'
+# ORDER BY first_name DESC
+# LIMIT 1
+```
+
+And it is possible to order the QuerySet by a foreign condition:
+
+```ruby
+
+User.objects
+    .filter([{first_name: 'Iacobus'}])
+    .order_by('zone::name', 'last_name')
+# SELECT users.*
+# FROM users
+# INNER JOIN geo_zones ON users.geo_zone_id = geo_zones_id 
+# WHERE first_name = 'Iacobus'
+# ORDER BY geozones.name ASC, last_name ASC
+# LIMIT 1 
+```
+
+
 ## Exists
 
 Check if there is any record that matches the QuerySet conditions.
@@ -194,6 +236,31 @@ User.objects.get(last_name: 'Lothbrok')
 
 # Will return a User ActiveRecord
 User.objects.get(last_name: 'Ring')
+```
+
+## Latest
+
+Return the last element according to the specified sort.
+It is the reverse method of [earliest](#earliest).
+
+**latest** method accepts the same order parameters than [order_by](/doc/api/queryset/methods/return_queryset.md#order-by).
+
+```ruby
+User.objects.filter(last_name: 'García').latest('first_name')
+# SELECT users.* FROM users
+# WHERE last_name = 'García'
+# ORDER BY first_name DESC
+# LIMIT 1
+```
+
+Also accepting descendant order, of course:
+
+```ruby
+User.objects.filter(last_name: 'Luna').latest('-first_name')
+# SELECT users.* FROM users
+# WHERE last_name = 'Luna'
+# ORDER BY first_name ASC
+# LIMIT 1
 ```
 
 ## None

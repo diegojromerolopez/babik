@@ -109,13 +109,13 @@ You can combine filter and exclude to create complex queries.
 ```ruby
 # SELECT users.* FROM users
 # INNER JOIN geo_zones ON users.geo_zone_id = geo_zones_id 
-# WHERE last_name <> 'Paulus' AND NOT(geo_zones.name IN ('Rome', 'Utica'))
+# WHERE last_name = 'Iacobus' AND NOT(geo_zones.name IN ('Rome', 'Utica'))
 User.objects.filter([{first_name: 'Iacobus'}]).exclude('zone::name__in': ['Rome', 'Utica'])
 ```
 
 ```ruby
 # SELECT users.* FROM users
-# WHERE last_name <> 'Paulus' AND NOT(users.email LIKE '%example.com')
+# WHERE last_name = 'Iacobus' AND NOT(users.email LIKE '%example.com')
 User.objects.filter({first_name: 'Iacobus'}).exclude({'email__endswith': 'example.com'})
 ```
 
