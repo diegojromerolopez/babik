@@ -6,7 +6,7 @@
 
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
-**This project is in alpha phase.**
+**This project is in alpha phase. Use it with caution.**
 
 See [Roadmap](#roadmap) to check what is keeping it from being stable.
 

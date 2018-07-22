@@ -94,7 +94,7 @@ module Babik
     # independently of the database adapter (SUM, MAX, MIN, etc.)
     module StandardSqlOperation
       def sql_operation
-        SQL_OPERATION
+        self.class::SQL_OPERATION
       end
     end
 
