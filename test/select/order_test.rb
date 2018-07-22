@@ -97,6 +97,7 @@ class OrderTest < Minitest::Test
 
   def test_deep_order
     users = User.objects.order_by(%i[zone::name ASC], %i[first_name ASC])
+    reversed_users = users.reverse
     king_names = [
       'Childeric I',
       'Clovis I',
@@ -114,6 +115,17 @@ class OrderTest < Minitest::Test
       assert_equal king_names[user_index], user.first_name
     end
     assert users.ordered?
+
+    reversed_king_names = king_names.reverse
+    reversed_users.each_with_index do |reversed_order_user, user_index|
+      assert_equal reversed_king_names[user_index], reversed_order_user.first_name
+    end
+    assert reversed_users.ordered?
+
+    king_names.each_with_index do |king_name, king_index|
+      assert_equal king_name, users[king_index].first_name
+      assert_equal king_name, reversed_users[king_names.length - king_index - 1].first_name
+    end
   end
 
   def test_disorder

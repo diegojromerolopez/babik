@@ -52,6 +52,8 @@ module Babik
       alias count? _count
       alias distinct? _distinct
       alias select_related? _select_related
+      alias reverse! invert_order!
+      alias select_for_update! for_update!
 
       def initialize(model_class)
         @model = model_class

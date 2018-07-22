@@ -365,8 +365,6 @@ Posts.objects.filter(score__lte: 4)
 
 See more [here](/doc/api/queryset/lookups.md).
 
-
-
 #### Selection by foreign model field
 
 The main feature of Babik is filtering by foreign keys. 
@@ -496,6 +494,20 @@ User.objects
 # ORDER BY parent_zones_0.name ASC, users.created_at DESC 
 ```
 
+Inverting the order
+
+```ruby
+
+User.objects
+    .filter('zone::name': 'Roman Empire')
+    .order_by(%i[zone::name, ASC], %i[created_at, DESC]).reverse
+# SELECT users.*
+# FOR users
+# LEFT JOIN geo_zones users_zone_0 ON users.zone_id = parent_zones_0.id
+# WHERE  users_zone_0 = 'Roman Empire'
+# ORDER BY parent_zones_0.name DES, users.created_at ASC 
+```
+
 #### Delete
 
 There is no standard DELETE from foreign field SQL statement, so for now
@@ -589,16 +601,75 @@ See the [documentation](doc/README.md) for more information
 about the [API](doc/README.md#queryset-api) and the
 internals of this library.
 
-## Roadmap
 
-### Set operations
 
-Not currently implemented, will be in next days.
+## Unimplemented API
 
+### Methods that return a QuerySet
+
+#### Will be implemented
+
+- [values](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values)
+- [values_list](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values_list)
+- [dates](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#dates)
+- [prefetch_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch_related)
+- [extra](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#extra)
+- [defer](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#defer)
+- [only](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#only)
+- [using](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#using)
+- [raw](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#raw)
 - [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
 - [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
 - [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
 
+### Methods that don't return a QuerySet
+
+#### Will be implemented
+
+- [latest](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#latest)
+- [earliest](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#earliest)
+- [exists](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#exists)
+
+#### Will not be implemented
+
+The aim of this library is to help make complex queries, not re-implementing the
+well-defined and working API of Rails. All of this methods have equivalents in Rails,
+but if you are interested, I'm accepting pull-requests. 
+
+- [create](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#create)
+- [get_or_create](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#get_or_create)
+- [update_or_create](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#update_or_create)
+- [bulk_create](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#bulk_create)
+- [in_bulk](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#in_bulk)
+- [iterator](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#iterator)
+- [as_manager](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#as_manager)
+
+
+### Aggregation functions
+
+#### Will be implemented
+
+- [Count](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#id8)
+- [StdDev](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#stddev)
+- [Variance](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#variance)
+
+#### Will be not implemented
+
+- [expression](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#expression):
+there are no [Query Expressions](https://docs.djangoproject.com/en/2.0/ref/models/expressions/)
+in Babik, will be possible with the custom aggregations.
+- [output_field](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#output_field): already possible passing a hash where the key is the output field. 
+- [filter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#id6): there are no Q objects in Babik.
+- [**extra](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#id7): no way to include
+extra keyword arguments in the aggregates for now. 
+
+
+## Roadmap
+
+### Implement remaining methods
+
+As you have seen in the earlier section, there are many methods
+that are not implemented yet. This is my aim at short-term.
 
 ### Prefect
 

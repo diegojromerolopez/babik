@@ -213,3 +213,18 @@ User.objects.filter('zone::name': 'Rome').limit(5, 6)
 ```
 
 No negative offset is allowed.
+
+## Reverse
+
+Return a QuerySet with the inverted order than the caller QuerySet.
+
+```ruby
+users = User.objects.order_by(%i[first_name ASC], %i[created_at ASC])
+# SELECT users.* FROM users ORDER BY first_name ASC, created_at ASC
+
+users.reverse
+# SELECT users.* FROM users ORDER BY first_name DESC, created_at DESC
+```
+
+This method is an alias of QuerySet method **invert_order**,
+so both can be called interchangeably.
