@@ -647,12 +647,6 @@ but if you are interested, I'm accepting pull-requests.
 
 ### Aggregation functions
 
-#### Will be implemented
-
-- [Count](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#id8)
-- [StdDev](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#stddev)
-- [Variance](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#variance)
-
 #### Will be not implemented
 
 - [expression](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#expression):

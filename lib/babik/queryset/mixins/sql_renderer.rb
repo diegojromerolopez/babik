@@ -60,12 +60,12 @@ module Babik
       # @return [String] Rendered SQL with QuerySet replacements completed
       def _render(template_path, extra_replacements = {})
         render = lambda do |partial_template_path, replacements|
-          _base_render(partial_template_path, **replacements).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
+          _base_render(partial_template_path, **replacements)
         end
-        replacements = extra_replacements.clone()
+        replacements = extra_replacements.clone
         replacements[:queryset] = @queryset
         replacements[:render] = render
-        _base_render(template_path, **replacements).gsub(/\n+/, "\n").gsub(/[ ]+/, ' ')
+        _base_render(template_path, **replacements)
       end
 
       # Render a file
@@ -84,7 +84,7 @@ module Babik
                           "#{TEMPLATE_PATH}/default/#{template_path}"
                         end
         template_content = File.read(template_path)
-        ::ERB.new(template_content).result_with_hash(**replacements)
+        ::ERB.new(template_content).result_with_hash(**replacements).gsub(/[ ]+/, ' ').gsub(/[\n ]{2,}/, "\n")
       end
 
       # Return the DBMS adapter.

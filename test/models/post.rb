@@ -12,4 +12,13 @@ class Post < ActiveRecord::Base
     end
   end
 
+  def add_tag_by_name(tag_name)
+    begin
+      new_tag = Tag.create!(name: tag_name)
+    rescue ActiveRecord::RecordNotUnique
+      new_tag = Tag.find_by(name: tag_name)
+    end
+    add_tag(new_tag)
+  end
+
 end

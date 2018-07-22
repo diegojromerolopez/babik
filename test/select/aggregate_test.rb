@@ -10,20 +10,22 @@ class AggregateTest < Minitest::Test
     @caesar = User.create!(first_name: 'Julius', last_name: 'Caesar', email: 'backstabbed@example.com')
     (1..7).each do |book_i|
       post = Post.create!(title: "Commentarii de Bello Gallico #{book_i}", author: @caesar, stars: [book_i, 5].min)
-      post.add_tag(Tag.first_or_create!(name: 'war'))
-      post.add_tag(Tag.first_or_create!(name: 'gallic'))
-      post.add_tag(Tag.first_or_create!(name: 'tribes'))
-      post.add_tag(Tag.first_or_create!(name: 'victory'))
-      post.add_tag(Tag.first_or_create!(name: 'campaign'))
+      post.add_tag_by_name('war')
+      post.add_tag_by_name('gallic')
+      post.add_tag_by_name('tribes')
+      post.add_tag_by_name('victory')
+      post.add_tag_by_name('campaign')
+      post.add_tag_by_name('biography')
     end
 
     @aulus = User.create!(first_name: 'Aulus', last_name: 'Hirtius', email: 'aulushirtius@example.com')
     last_post = Post.create!(title: 'Commentarii de Bello Gallico 8', author: @aulus)
-    last_post.add_tag(Tag.first_or_create!(name: 'war'))
-    last_post.add_tag(Tag.first_or_create!(name: 'last_book'))
+    last_post.add_tag_by_name('war')
+    last_post.add_tag_by_name('last_book')
   end
 
   def teardown
+    Tag.destroy_all
     Post.destroy_all
     User.destroy_all
   end
@@ -54,6 +56,41 @@ class AggregateTest < Minitest::Test
                              .objects
                              .aggregate(avg_stars: Babik::QuerySet.agg(:avg, 'posts::stars'))
     assert_equal avg_stars.round(4), avg_starts_aggregation[:avg_stars].round(4)
+  end
+
+  def test_local_distinct_count
+    # Julius Caesar has all types of value of stars
+    # As he has posts with all stars, it should be 5
+    count_aggregation = @caesar
+                        .objects
+                        .project(:stars)
+                        .aggregate(
+                          caesar_count_distinct_stars:
+                            Babik::QuerySet.agg(:count_distinct, 'posts::stars')
+                        )
+    assert_equal 5, count_aggregation[:caesar_count_distinct_stars]
+  end
+
+  def test_foreign_distinct_count
+    # Julius Caesar has 6 tags in his posts, it should be 6
+    count_aggregation = @caesar
+                        .objects
+                        .aggregate(
+                          caesar_count_distinct_tags:
+                            Babik::QuerySet.agg(:count_distinct, 'posts::tags::id')
+                        )
+    assert_equal 6, count_aggregation[:caesar_count_distinct_tags]
+  end
+
+  def test_foreign_count
+    # Julius Caesar has 6 tags in his posts, it should be 6
+    count_aggregation = @caesar
+                        .objects
+                        .aggregate(
+                          caesar_count_tags:
+                            Babik::QuerySet.agg(:count, 'posts::tags::id')
+                        )
+    assert_equal @caesar.objects(:posts).count * 6, count_aggregation[:caesar_count_tags]
   end
 
   def test_max
@@ -94,5 +131,21 @@ class AggregateTest < Minitest::Test
     assert_equal min_stars, max_min_stars_agg[:min_stars]
   end
 
+  def test_std_dev
+    if %w[postgres, mysql2].include?(Babik::Database.config[:adapter])
+      std_dev_var_agg = @caesar.objects(:posts)
+                               .aggregate(
+                                 std_dev_stars: Babik::QuerySet::StdDev.new('stars'),
+                                 std_dev_sample_stars: Babik::QuerySet::StdDevSample.new('stars'),
+                                 var_stars: Babik::QuerySet::Var.new('stars'),
+                                 var_sample_stars: Babik::QuerySet::VarSample.new('stars'),
+                               )
+
+      assert_in_delta 1.4982983545287878, std_dev_var_agg[:std_dev_stars]
+      assert_in_delta 1.618347187425374, std_dev_var_agg[:std_dev_sample_stars]
+      assert_in_delta 2.2448979591836733, std_dev_var_agg[:var_stars]
+      assert_in_delta 2.244897959183673, std_dev_var_agg[:var_sample_stars]
+    end
+  end
 
 end

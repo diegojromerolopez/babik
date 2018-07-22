@@ -79,4 +79,5 @@ ActiveRecord::Schema.define do
   add_index :categories, :name, unique: true
   add_index :post_tags, [:post_id, :tag_id], unique: true
   add_index :posts, [:title, :author_id], unique: true
+  add_index :tags, :name, unique: true
 end
