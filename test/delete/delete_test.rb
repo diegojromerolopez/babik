@@ -42,7 +42,7 @@ class DeleteTest < Minitest::Test
   def test_delete_by_local_selection
     User.objects.filter(first_name: 'Julius').delete
     assert_nil User.objects.filter(first_name: 'Julius').first
-    assert_equal 1, User.objects.count
+    assert_equal User.all.count, User.objects.count
   end
 
   def test_delete_by_foreign_selection

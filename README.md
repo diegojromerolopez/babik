@@ -76,7 +76,7 @@ No configuration is needed, Babik automatically includes two methods for your mo
 
 ## Database support
 
-PostgreSQL, MySQL and Sqlite are supported.
+PostgreSQL, MySQL and Sqlite are fully supported.
 
 MariaDB and MSSQL should work as well (happy to solve any reported issues).
 
@@ -595,6 +595,8 @@ Django QuerySets have only one lookup that Babik has not implemented yet:
 - [quarter](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#quarter)
 
 ### Set operations
+
+Not currently implemented, will be in next days.
 
 - [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
 - [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
