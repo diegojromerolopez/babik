@@ -115,7 +115,7 @@ class CloneTest < Minitest::Test
     users.delete
 
     assert_equal 0, users.count
-    assert_equal 3, User.objects.count
+    assert_equal User.all.count, User.objects.count
 
     User.destroy_all
   end
