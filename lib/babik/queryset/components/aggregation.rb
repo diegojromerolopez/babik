@@ -143,7 +143,7 @@ module Babik
       # @return [String] SQL code for the aggregation
       def sql_operation
         db_adapter = self.class.db_adapter
-        return SQL_OPERATION if %w[postgresql mysql2].include?(db_adapter)
+        return self.class::SQL_OPERATION if %w[postgresql mysql2].include?(db_adapter)
         raise "#{db_adapter} has no support for #{self.class} aggregation"
       end
     end

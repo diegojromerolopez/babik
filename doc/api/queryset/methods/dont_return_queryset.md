@@ -276,11 +276,13 @@ See [all](#all).
 Many times there is no need to get the full object. In that case we
 can make use of the projections.
 
+### Basic usage
+
 By calling the method **project** of the QuerySet, an
 [ActiveRecord Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html)
 will be returned with the projected fields.
 
-**No typecasting is done on the returned array**. Data is returned as-is. 
+**No values are type-casted**. All fields will be returned as-is (e.g.: datetimes as strings). 
 
 They can be local and also foreign fields.
 
@@ -289,11 +291,60 @@ Examples:
 ```ruby
 # Return a projection of the first name, email and country of
 # all the users with the last name 'García'
-User.objects
+p User.objects
     .filter('last_name': 'García')
     .order_by('first_name')
     .project('first_name', 'email', %w[zone::name country])
+# [{first_name: 'Alarico', email: 'alarico@example.com', country: 'Spain'}]
 ```
+
+Note in the example how the zone name is returned as the field country.
+An alias of a column is defined by passing an Array of two items
+the first one will be the column and the second one the new name
+that we want to use when returning the projection for this column
+(the column alias).
+
+
+### Transformations
+
+Some times we want to transform a projected field, tunning the parameters
+allows us to apply a lambda to each returned value of the column.
+
+Just change the column name parameter to an array and add a Proc
+as an item of this Array. e.g.:
+
+```ruby
+# Return a projection of the first name, last name in uppercase and email
+# for all the users with email in the domain example.com
+upcase = ->(s) { s.upcase } 
+p User.objects
+    .filter('email__endswith': '@example.com')
+    .order_by('first_name')
+    .project('first_name', ['last_name', upcase], ['email', 'main_email'])
+# [{first_name: 'Alarico', main_email: 'alarico@example.com', last_name: 'GARCÍA'}]
+```
+
+Note it is possible to combine alias and transformation
+(note the order of the items in the parameter Array is not important), e.g.
+
+```ruby
+# Return a projection of the first name, last name and email
+# for all the users with email in the domain example.com
+# both first name and last name will have their diacritics removed
+require 'i18n'
+remove_diacritics = ->(string) { I18n.transliterate(string) }
+clean_surname = ->(s) { remove_diacritics.call(s).upcase }
+p User.objects
+    .filter('email__endswith': '@example.com')
+    .order_by('first_name')
+    .project(
+      ['first_name', 'name', remove_diacritics],
+      ['last_name', clean_surname, 'surname'],
+      'email'
+    )
+# [{name: 'Alarico', email: 'alarico@example.com', surname: 'GARCIA'}]
+```
+
 
 ## Select related
 

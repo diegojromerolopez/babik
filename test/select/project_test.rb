@@ -67,4 +67,41 @@ class ProjectTest < Minitest::Test
     end
   end
 
+  def test_explicit_transform
+    datetime_format = '%Y-%m-%d %H:%M:%S'
+    datetime_transformer = ->(datetime) { datetime.strftime(datetime_format) }
+    users = User.objects.filter('zone::name': 'Castilla').order_by('first_name')
+    users_projection = users.project(
+      ['first_name', ->(s) { s.upcase }], 'email',
+      ['created_at', 'creation_date', ->(d) { datetime_transformer.call(Time.parse(d.to_s + 'UTC')) }]
+    )
+    users_projection.each_with_index do |user_projection, user_index|
+      assert_equal users[user_index].first_name.upcase, user_projection[:first_name]
+      assert_equal users[user_index].email, user_projection[:email]
+      assert_equal users[user_index].created_at.strftime(datetime_format), user_projection[:creation_date]
+      assert_equal users[user_index].created_at.strftime(datetime_format).class, user_projection[:creation_date].class
+    end
+  end
+
+  def test_wrong_transform_params
+    exception = assert_raises RuntimeError do
+      datetime_format = '%Y-%m-%d %H:%M:%S'
+      datetime_transformer = ->(datetime) { datetime.strftime(datetime_format) }
+      users = User.objects.filter('zone::name': 'Castilla').order_by('first_name')
+      users.project(
+        ['first_name', 2], 'email',
+        ['created_at', 'creation_date', ->(d) { datetime_transformer.call(Time.parse(d.to_s + 'UTC')) }]
+      )
+    end
+    assert_equal('Babik::QuerySet::ProjectedField.new only accepts String/Symbol or Proc. Passed a Integer.', exception.message)
+  end
+
+  def test_wrong_params
+    exception = assert_raises RuntimeError do
+      users = User.objects.filter('zone::name': 'Castilla').order_by('first_name')
+      users.project('first_name', 'email', 2222)
+    end
+    assert_equal('No other parameter type is permitted in Babik::QuerySet::ProjectedField.new than Array, String and Symbol.', exception.message)
+  end
+
 end

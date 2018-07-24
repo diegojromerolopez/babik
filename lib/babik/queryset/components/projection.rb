@@ -2,6 +2,13 @@
 
 require 'babik/queryset/lib/selection/path/path'
 
+# Identity transform
+#IDENTITY_TRANSFORM = ->(value) { value }
+
+# Datetime transform
+#DATETIME_TRANSFORM = ->(db_datetime_string) { Time.parse("#{db_datetime_string} UTC") }
+
+
 module Babik
   # QuerySet module
   module QuerySet
@@ -11,11 +18,30 @@ module Babik
 
       # Constructs a projection
       # @param model [ActiveRecord::Base] model the projection is based on.
-      # @param *fields [Array] array of fields that will be projected.
+      # @param fields [Array] array of fields that will be projected.
       def initialize(model, fields)
         @fields = []
+        @fields_hash = {}
         fields.each do |field|
-          @fields << ProjectedField.new(model, field)
+          new_field = ProjectedField.new(model, field)
+          @fields << new_field
+          @fields_hash[new_field.alias.to_sym] = new_field
+        end
+      end
+
+      def apply_transforms(result_set)
+        result_set.map do |record|
+          record.symbolize_keys!
+          transformed_record = {}
+          record.each do |field, value|
+            transform = @fields_hash[field].transform
+            if transform
+              transformed_record[field] = transform.call(value)
+            else
+              transformed_record[field] = value
+            end
+          end
+          transformed_record
         end
       end
 
@@ -29,20 +55,45 @@ module Babik
 
     # Each one of the fields that will be returned by SELECT clause
     class ProjectedField
+      attr_reader :model, :alias, :transform, :selection
 
       # Construct a projected field from a model and its field.
       # @param model [ActiveRecord::Base] model whose field will be returned in the SELECT query.
-      # @param field [Array, String] if Array, a pair or field, alias of the field.
-      #                              Otherwise, a field of the local table or foreign tables.
+      # @param field [Array, String]
+      #   if Array, it must be [field_name, alias, transform] where
+      #   - field_name is the name of the field (the column name). It is mandatory and must be the first
+      #   item of the array.
+      #   - alias if present, it will be used to name the field instead of its name.
+      #   - transform, if present, a lambda function with the transformation each value of that column it must suffer.
+      # e.g.:
+      #   [:created_at, :birth_date]
+      #   [:stars, ->(stars) { [stars, 5].min } ]
+      #   Otherwise, a field of the local table or foreign tables.
+      #
       def initialize(model, field)
+        @model = model
         if field.class == Array
-          actual_field = field[0]
-          @alias = field[1]
+          @name = field[0]
+          @alias = @name
+          [1, 2].each do |field_index|
+            next unless field[field_index]
+            field_i = field[field_index]
+            if [Symbol, String].include?(field_i.class)
+              @alias = field_i
+            elsif field_i.class == Proc
+              @transform = field_i
+            else
+              raise "#{self.class}.new only accepts String/Symbol or Proc. Passed a #{field_i.class}."
+            end
+          end
+        elsif [String, Symbol].include?(field.class)
+          @name = field
+          @alias = field
+          @transform = nil
         else
-          actual_field = field
-          @alias = nil
+          raise "No other parameter type is permitted in #{self.class}.new than Array, String and Symbol."
         end
-        @selection = Babik::Selection::Path::Factory.build(model, actual_field)
+        @selection = Babik::Selection::Path::Factory.build(model, @name)
       end
 
       # Return sql of the field to project.

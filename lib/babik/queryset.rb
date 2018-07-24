@@ -75,7 +75,7 @@ module Babik
       # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
       def all
         sql_select = sql.select
-        return self.class._execute_sql(sql_select) if @_projection
+        return @_projection.apply_transforms(self.class._execute_sql(sql_select)) if @_projection
         return @_select_related.all_with_related(self.class._execute_sql(sql_select)) if @_select_related
         @model.find_by_sql(sql_select)
       end

@@ -83,6 +83,10 @@ MariaDB and MSSQL should work as well (happy to solve any reported issues).
 
 Accepting contributors to port this library to Oracle.
 
+## Documentation
+
+See the [QuerySet API documentation](/doc/api/queryset.md).
+
 ## Main differences with Django QuerySet system
 - Django does not make any distinct against relationships, local fields or lookups when selecting by
 calling **filter**, **exclude** or **get**. Babik uses **::** for foreign fields.
@@ -621,18 +625,26 @@ internals of this library.
 
 #### Will be implemented
 
-- [values](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values)
-- [values_list](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values_list)
-- [dates](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#dates)
 - [prefetch_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch_related)
 - [extra](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#extra)
 - [defer](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#defer)
 - [only](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#only)
 - [using](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#using)
-- [raw](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#raw)
+
+##### Set operations
+
 - [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
 - [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
 - [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
+
+#### Will not be implemented
+
+- [dates](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#dates): [project](/doc/api/queryset/methods/dont_return_queryset.md#project) allow transformer functions that can be used to get dates in the desired format.
+- [datetimes](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#datetimes): [project](/doc/api/queryset/methods/dont_return_queryset.md#project) allow transformer functions that can be used to get datetimes in the desired format.
+- [values](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values): can be computed using [project](/doc/api/queryset/methods/dont_return_queryset.md#project).
+- [values_list](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values_list):  can be computed using [project](/doc/api/queryset/methods/dont_return_queryset.md#project).
+- [raw](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#raw): use ActiveRecord [find_by_sql](https://apidock.com/rails/ActiveRecord/Querying/find_by_sql). Babik is not
+for doing raw queries, is for having an additional query system to the ActiveRecord one.
 
 ### Methods that don't return a QuerySet
 
