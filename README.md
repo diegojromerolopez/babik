@@ -626,10 +626,6 @@ internals of this library.
 #### Will be implemented
 
 - [prefetch_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch_related)
-- [extra](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#extra)
-- [defer](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#defer)
-- [only](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#only)
-- [using](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#using)
 
 ##### Set operations
 
@@ -641,10 +637,23 @@ internals of this library.
 
 - [dates](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#dates): [project](/doc/api/queryset/methods/dont_return_queryset.md#project) allow transformer functions that can be used to get dates in the desired format.
 - [datetimes](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#datetimes): [project](/doc/api/queryset/methods/dont_return_queryset.md#project) allow transformer functions that can be used to get datetimes in the desired format.
+- [extra](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#extra): better use the ActiveRecord API or for raw SQL use [find_by_sql](https://apidock.com/rails/ActiveRecord/Querying/find_by_sql).
 - [values](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values): can be computed using [project](/doc/api/queryset/methods/dont_return_queryset.md#project).
 - [values_list](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#values_list):  can be computed using [project](/doc/api/queryset/methods/dont_return_queryset.md#project).
 - [raw](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#raw): use ActiveRecord [find_by_sql](https://apidock.com/rails/ActiveRecord/Querying/find_by_sql). Babik is not
 for doing raw queries, is for having an additional query system to the ActiveRecord one.
+- [using](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#using): to change the database a model
+is better to use something like [this](https://stackoverflow.com/questions/180349/how-can-i-dynamically-change-the-active-record-database-for-all-models-in-ruby-o).
+
+#### Under consideration
+
+I am not sure it is a good idea to allow deferred loading or fields. I think is a poor solution for tables with too many
+fields. Should I have to take the trouble to implement this two methods?:
+
+- [defer](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#defer)
+- [only](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#only)
+
+
 
 ### Methods that don't return a QuerySet
 
