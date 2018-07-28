@@ -21,7 +21,7 @@ of the foreign field conditions.
 
 ### Example: Blog platform in Rails
 
-Suppose you are developing a blog platform with the following [schema](/test/db/schema.rb).
+Suppose you are developing a blog platform with the following [schema](/test/config/db/schema.rb).
 Compare these two queries and check what is more easier to write:
 
 Returning all users with last name equals to 'Fabia' that are from Rome:
@@ -118,7 +118,7 @@ This library is somewhat unstable or not as stable as I would like.
 
 For a complete reference and full examples of methods, see [documentation](/doc/README.md).
 
-See [schema](/test/db/schema.rb) for information about this example's schema.
+See [schema](/test/config/db/schema.rb) for information about this example's schema.
 
 ### objects method
 

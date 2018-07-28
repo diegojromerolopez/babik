@@ -26,8 +26,10 @@ SELECT
 
   <% end %>
 
-FROM <%= model.table_name %>
+<%# From %>
+<%= render.('select/components/from.sql.erb', {queryset: queryset}) %>
 
+<%# Left joins %>
 <%= queryset.sql.left_joins %>
 
 <%# Where conditions %>

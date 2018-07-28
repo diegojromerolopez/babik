@@ -6,12 +6,15 @@ require 'babik/queryset/mixins/clonable'
 require 'babik/queryset/mixins/countable'
 require 'babik/queryset/mixins/deletable'
 require 'babik/queryset/mixins/distinguishable'
+require 'babik/queryset/mixins/enumerable'
 require 'babik/queryset/mixins/filterable'
 require 'babik/queryset/mixins/limitable'
 require 'babik/queryset/mixins/lockable'
 require 'babik/queryset/mixins/projectable'
+require 'babik/queryset/mixins/related_selector'
+#require 'babik/queryset/mixins/set_operations'
+require 'babik/queryset/mixins/sql_renderizable'
 require 'babik/queryset/mixins/sortable'
-require 'babik/queryset/mixins/sql_renderer'
 require 'babik/queryset/mixins/updatable'
 
 require 'babik/queryset/components/aggregation'
@@ -19,6 +22,7 @@ require 'babik/queryset/components/limit'
 require 'babik/queryset/components/order'
 require 'babik/queryset/components/projection'
 require 'babik/queryset/components/select_related'
+require 'babik/queryset/components/sql_renderer'
 require 'babik/queryset/components/where'
 
 require 'babik/queryset/lib/condition'
@@ -39,16 +43,19 @@ module Babik
       include Babik::QuerySet::Clonable
       include Babik::QuerySet::Countable
       include Babik::QuerySet::Deletable
+      include Babik::QuerySet::Enumerable
       include Babik::QuerySet::Distinguishable
       include Babik::QuerySet::Filterable
       include Babik::QuerySet::Limitable
       include Babik::QuerySet::Lockable
       include Babik::QuerySet::Projectable
+      include Babik::QuerySet::RelatedSelector
+      #include Babik::QuerySet::SetOperations
       include Babik::QuerySet::Sortable
       include Babik::QuerySet::Updatable
 
       attr_reader :model, :_aggregation, :_count, :_distinct, :_limit, :_lock_type, :_order, :_projection,
-                  :_where, :_select_related, :_update
+                  :_where, :_select_related
 
       alias aggregation? _aggregation
       alias count? _count
@@ -69,50 +76,6 @@ module Babik
         @_limit = nil
         @_projection = nil
         @_select_related = nil
-      end
-
-      # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.
-      # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
-      def all
-        sql_select = sql.select
-        return @_projection.apply_transforms(self.class._execute_sql(sql_select)) if @_projection
-        return @_select_related.all_with_related(self.class._execute_sql(sql_select)) if @_select_related
-        @model.find_by_sql(sql_select)
-      end
-
-      # Loop through the results with a block
-      # @param block [Proc] Proc that will be applied to each object.
-      def each(&block)
-        self.all.each(&block)
-      end
-
-      # Return an empty ActiveRecord ResultSet
-      # @return [ResultSet] Empty result set.
-      def none
-        @model.find_by_sql("SELECT * FROM #{@model.table_name} WHERE 1 = 0")
-      end
-
-      # Load the related objects of each model object specified by the association_paths
-      #
-      # e.g.
-      # - User.objects.filter(first_name: 'Julius').select_related(:group)
-      # - User.objects.filter(first_name: 'Cassius').select_related([:group, :zone])
-      # - Post.objects.select_related(:author)
-      #
-      # @param association_paths [Array<Symbol>, Symbol] Array of association paths
-      #        of belongs_to and has_one related objects.
-      #        A passed symbol will be considered as an array of one symbol.
-      #        That is, select_related(:group) is equal to select_related([:group])
-      def select_related!(association_paths)
-        @_select_related = Babik::QuerySet::SelectRelated.new(@model, association_paths)
-        self
-      end
-
-      # Get the SQL renderer for this QuerySet.
-      # @return [QuerySet] SQL Renderer for this QuerySet.
-      def sql
-        renderer = SQLRenderer.new(self)
-        renderer
       end
 
       # Get the left joins grouped by alias in a hash.

@@ -1,0 +1,17 @@
+
+<% if queryset.class == Babik::QuerySet::Base %>
+
+  FROM <%= queryset.model.table_name %>
+
+<% elsif [Babik::QuerySet::Operator::Union].include?(queryset.class) %>
+
+  FROM
+  (
+    (#{queryset.left_operand.sql.select}) #{queryset.operation} (#{queryset.right_operand.sql.select})
+  ) AS <%= queryset.model.table_name %>
+
+<% else %>
+
+  Operation NOT recognized
+
+<% end %>

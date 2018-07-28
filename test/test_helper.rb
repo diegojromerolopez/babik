@@ -39,17 +39,17 @@ end
 require 'babik'
 
 # Create tables
-load "#{__dir__}/db/schema.rb"
+load "#{__dir__}/config/db/schema.rb"
 
 # Load models
-require 'models/geozone'
-require 'models/user'
-require 'models/tag'
-require 'models/category'
-require 'models/post'
-require 'models/post_tag'
-require 'models/bad_tag'
-require 'models/bad_post'
+require 'config/models/geozone'
+require 'config/models/user'
+require 'config/models/tag'
+require 'config/models/category'
+require 'config/models/post'
+require 'config/models/post_tag'
+require 'config/models/bad_tag'
+require 'config/models/bad_post'
 
 
 
