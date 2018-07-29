@@ -39,7 +39,7 @@ class UnionTest < Minitest::Test
     User.destroy_all
   end
 
-  def test_union
+  def _test_union
     claudia = User.objects.filter(last_name: 'Claudia')
     verturia = User.objects.filter(last_name: 'Veturia')
     both_families = claudia.union(verturia).order_by(last_name: :DESC)

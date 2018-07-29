@@ -6,7 +6,7 @@ require 'babik/queryset/mixins/clonable'
 require 'babik/queryset/mixins/countable'
 require 'babik/queryset/mixins/deletable'
 require 'babik/queryset/mixins/distinguishable'
-require 'babik/queryset/mixins/enumerable'
+require 'babik/queryset/mixins/none'
 require 'babik/queryset/mixins/filterable'
 require 'babik/queryset/mixins/limitable'
 require 'babik/queryset/mixins/lockable'
@@ -37,13 +37,13 @@ module Babik
     module Combinator
 
       class Operation
-        include Enumerable
+        include NoneQuerySet
         include Babik::QuerySet::Aggregatable
         include Babik::QuerySet::Bounded
         include Babik::QuerySet::Clonable
         include Babik::QuerySet::Countable
         include Babik::QuerySet::Deletable
-        include Babik::QuerySet::Enumerable
+        include Babik::QuerySet::NoneQuerySet
         include Babik::QuerySet::Distinguishable
         include Babik::QuerySet::Filterable
         include Babik::QuerySet::Limitable

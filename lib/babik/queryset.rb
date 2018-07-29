@@ -6,13 +6,13 @@ require 'babik/queryset/mixins/clonable'
 require 'babik/queryset/mixins/countable'
 require 'babik/queryset/mixins/deletable'
 require 'babik/queryset/mixins/distinguishable'
-require 'babik/queryset/mixins/enumerable'
+require 'babik/queryset/mixins/none'
 require 'babik/queryset/mixins/filterable'
 require 'babik/queryset/mixins/limitable'
 require 'babik/queryset/mixins/lockable'
 require 'babik/queryset/mixins/projectable'
 require 'babik/queryset/mixins/related_selector'
-#require 'babik/queryset/mixins/set_operations'
+require 'babik/queryset/mixins/set_operations'
 require 'babik/queryset/mixins/sql_renderizable'
 require 'babik/queryset/mixins/sortable'
 require 'babik/queryset/mixins/updatable'
@@ -43,14 +43,15 @@ module Babik
       include Babik::QuerySet::Clonable
       include Babik::QuerySet::Countable
       include Babik::QuerySet::Deletable
-      include Babik::QuerySet::Enumerable
+      include Babik::QuerySet::NoneQuerySet
       include Babik::QuerySet::Distinguishable
       include Babik::QuerySet::Filterable
       include Babik::QuerySet::Limitable
       include Babik::QuerySet::Lockable
       include Babik::QuerySet::Projectable
+      include Babik::QuerySet::SQLRenderizable
       include Babik::QuerySet::RelatedSelector
-      #include Babik::QuerySet::SetOperations
+      include Babik::QuerySet::SetOperations
       include Babik::QuerySet::Sortable
       include Babik::QuerySet::Updatable
 
@@ -76,6 +77,21 @@ module Babik
         @_limit = nil
         @_projection = nil
         @_select_related = nil
+      end
+
+      # Return a ResultSet with the ActiveRecord objects that match the condition given by the filters.
+      # @return [ResultSet] ActiveRecord objects that match the condition given by the filters.
+      def all
+        sql_select = self.sql.select
+        return @_projection.apply_transforms(self.class._execute_sql(sql_select)) if @_projection
+        return @_select_related.all_with_related(self.class._execute_sql(sql_select)) if @_select_related
+        @model.find_by_sql(sql_select)
+      end
+
+      # Loop through the results with a block
+      # @param block [Proc] Proc that will be applied to each object.
+      def each(&block)
+        self.all.each(&block)
       end
 
       # Get the left joins grouped by alias in a hash.
