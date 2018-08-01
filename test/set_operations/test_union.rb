@@ -36,15 +36,50 @@ class UnionTest < Minitest::Test
   end
 
   def teardown
-    User.destroy_all
+   # User.destroy_all
   end
 
-  def _test_union
+  def test_union
     claudia = User.objects.filter(last_name: 'Claudia')
     verturia = User.objects.filter(last_name: 'Veturia')
-    both_families = claudia.union(verturia).order_by(last_name: :DESC)
-    both_families_without_union = User.where(last_name: ['Claudia', 'Veturia']).order(last_name: :DESC)
-    assert_equal both_families_without_union.count, both_families.count
+    both_families = claudia.union(verturia).order_by!({ last_name: :DESC }, { first_name: :ASC })
+    both_families_without_union = User.where(last_name: ['Claudia', 'Veturia']).order(last_name: :DESC, first_name: :ASC)
+    _check_set_operation(both_families_without_union, both_families)
+  end
+
+  def test_deep_union
+    claudia = User.objects.filter(last_name: 'Claudia')
+    verturia = User.objects.filter(last_name: 'Veturia')
+    aemilia = User.objects.filter(last_name: 'Aemilia')
+    three_families = claudia.union(verturia).union(aemilia).order_by!({ last_name: :DESC }, { first_name: :ASC })
+    three_families_without_union = User
+                                   .where(last_name: ['Claudia', 'Veturia', 'Aemilia'])
+                                   .order(last_name: :DESC, first_name: :ASC)
+    _check_set_operation(three_families_without_union, three_families)
+  end
+
+  def test_intersection
+    first_user = User.objects.first
+    qs_with_intersection = User.objects.filter(first_name: first_user.first_name)
+                               .intersection(User.objects.filter(last_name: first_user.last_name))
+                               .order_by!({ last_name: :DESC }, { first_name: :ASC })
+    qs_without_intersection = User.where(first_name: first_user.first_name, last_name: first_user.last_name)
+                                      .order(last_name: :DESC, first_name: :ASC)
+    _check_set_operation(qs_without_intersection, qs_with_intersection)
+  end
+
+  def _check_set_operation(expected_qs, actual_qs)
+    record_count = 0
+    expected_qs.each_with_index do |expected_qs_record, expected_qs_record_index|
+      actual_qs_record = actual_qs[expected_qs_record_index]
+      assert_equal expected_qs_record.id, actual_qs_record.id
+      assert_equal expected_qs_record.last_name, actual_qs_record.last_name
+      assert_equal expected_qs_record.first_name, actual_qs_record.first_name
+      assert_equal expected_qs_record.last_name, actual_qs_record.last_name
+      record_count += 1
+    end
+    assert_equal expected_qs.count, actual_qs.count
+    assert_equal expected_qs.count, record_count
   end
 
 end

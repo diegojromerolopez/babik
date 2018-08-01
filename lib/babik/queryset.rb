@@ -35,8 +35,8 @@ require 'babik/queryset/lib/update/assignment'
 # Represents a new type of query result set
 module Babik
   module QuerySet
-    # Base class for QuerySet, implements a container for database results.
-    class Base
+    # Abstract Base class for QuerySet, implements a container for database results.
+    class AbstractBase
       include Enumerable
       include Babik::QuerySet::Aggregatable
       include Babik::QuerySet::Bounded
@@ -116,7 +116,42 @@ module Babik
       def self._execute_sql(sql)
         ActiveRecord::Base.connection.exec_query(sql)
       end
+    end
+
+    class Base < AbstractBase
 
     end
+
+    class SetOperation < AbstractBase
+
+      attr_reader :left_operand, :right_operand
+
+      def initialize(model, left_operand, right_operand)
+        @left_operand = left_operand
+        @right_operand = right_operand
+        super(model)
+      end
+
+      def operation
+        db_adapter = Babik::Database.config[:adapter]
+        operation_name = self.class.to_s.split('::').last.upcase
+        if %w[postgresql sqlite3].include?(db_adapter) || (%w[mysql2].include?(db_adapter) && operation_name == 'UNION')
+          return operation_name
+        end
+        raise "#{db_adapter} does not support operation #{operation_name}"
+      end
+
+      def operation_postgresql
+        self.class.to_s.split('::').last.upcase
+      end
+
+    end
+
+    class Minus < SetOperation; end
+
+    class Intersect < SetOperation; end
+
+    class Union < SetOperation; end
+
   end
 end
