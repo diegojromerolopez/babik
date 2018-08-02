@@ -10,8 +10,11 @@ A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querys
 
 See [Roadmap](#roadmap) to check what is keeping it from being stable.
 
+See the [QuerySet API](/doc/api/queryset.md) if you know this library and want to
+see the documentation.
+
 Contact [me](mailto:diegojromerolopez@gmail.com) if you are interested in
-helping me developing it.
+helping me developing it or make a PR with some feature or fix.
 
 ## What's this?
 
