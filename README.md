@@ -6,7 +6,7 @@
 
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
-**This project is in alpha phase. Use it with caution.**
+**This project is in beta phase. Use it with caution.**
 
 See [Roadmap](#roadmap) to check what is keeping it from being stable.
 
@@ -627,12 +627,6 @@ internals of this library.
 
 - [prefetch_related](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch_related)
 
-##### Set operations
-
-- [Difference](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#difference)
-- [Intersection](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#intersection)
-- [Union](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#union)
-
 #### Will not be implemented
 
 - [dates](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#dates): [project](/doc/api/queryset/methods/dont_return_queryset.md#project) allow transformer functions that can be used to get dates in the desired format.
@@ -687,16 +681,6 @@ extra keyword arguments in the aggregates for now.
 
 ## Roadmap
 
-### Implement remaining methods
-
-As you have seen in the earlier section, there are many methods
-that are not implemented yet. This is my aim at short-term.
-
-### Prefect
-
-[Object prefetching](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects)
-is not implemented yet.
-
 ### Increase code quality
 
 This project must follow Rubocop directives and pass Reek checks.
@@ -709,6 +693,11 @@ Make a repository with the test schema to check the library is really working.
 
 Deploy gem in rubygems.
 
+### Prefect
+
+[Object prefetching](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#prefetch-objects)
+is not implemented yet.
+
 ### Annotations
 
 [Annotations](https://docs.djangoproject.com/en/2.0/topics/db/aggregation/#aggregation)
@@ -718,6 +707,8 @@ are not implemented yet.
 
 Oracle is not supported at the moment because of they lack LIMIT clause
 in SELECT queries.
+
+MSSQL is supported in some operations.
 
 ## License
 

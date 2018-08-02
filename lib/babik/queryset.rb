@@ -142,10 +142,6 @@ module Babik
         raise "#{db_adapter} does not support operation #{operation_name}"
       end
 
-      def operation_postgresql
-        self.class.to_s.split('::').last.upcase
-      end
-
     end
 
     class Except < SetOperation; end

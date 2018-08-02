@@ -47,6 +47,18 @@ class BasicUsageTest < Minitest::Test
     _check_set_operation(both_families_without_union, both_families)
   end
 
+  def test_chained_union
+    families = User.objects.filter(last_name: 'Aebutia')
+                   .union(User.objects.filter(last_name: 'Fabia'))
+                   .union(User.objects.filter(last_name: 'Atilia'))
+                   .union(User.objects.filter(last_name: 'Claudia'))
+                   .union(User.objects.filter(last_name: 'Cloelia'))
+                   .order_by!({last_name: :DESC}, {first_name: :ASC})
+    families_without_union = User.where(last_name: ['Aebutia', 'Fabia', 'Atilia', 'Claudia', 'Cloelia'])
+                                  .order(last_name: :DESC, first_name: :ASC)
+    _check_set_operation(families_without_union, families)
+  end
+
   def test_deep_union
     claudia = User.objects.filter(last_name: 'Claudia')
     verturia = User.objects.filter(last_name: 'Veturia')

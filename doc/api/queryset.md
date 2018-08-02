@@ -69,6 +69,8 @@ end
   - [None](/doc/api/queryset/methods/dont_return_queryset.md#none): returns an empty query result.
   - [Project](/doc/api/queryset/methods/dont_return_queryset.md#project): returns a [Result](http://api.rubyonrails.org/classes/ActiveRecord/Result.html).
   - [Select related](/doc/api/queryset/methods/dont_return_queryset.md#select-related): returns a pair of ActiveRecord::Base object, Hash with the related objects.
+  - [Set operations](/doc/api/queryset/methods/dont_return_queryset.md#set-operations): construct a set operation between two QuerySet.
   - [Update](/doc/api/queryset/methods/dont_return_queryset.md#update): update the records that match the condition. Returns empty array.
+  
 
 

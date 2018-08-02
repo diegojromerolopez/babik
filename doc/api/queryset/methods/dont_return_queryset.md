@@ -381,6 +381,102 @@ Post.objects
 end
 ```
 
+## Set operations
+
+Set operations have the same interface than the QuerySet, so
+they can be **counted**, **limited**, **sorted** and of course
+accessed as if they were QuerySets.
+
+### Operations
+
+#### Union
+
+Makes a union between two QuerySets.
+
+**Implemented for database adapters mysql2, postgresql, sqlite3**.
+
+Given two QuerySets, over the same model, join the results (without repeated records)
+and return it.
+
+```ruby
+q1 = User.objects.filter(first_name: 'Antinous')
+q2 = User.objects.filter(first_name: 'Julius')
+union = q1.union(q2)
+# 
+# Get all users named 'Antinous' or 'Julius'
+# 
+# SELECT *
+# FROM users
+# WHERE first_name = 'Antinous' 
+# UNION
+# SELECT *
+# FROM users
+# WHERE first_name = 'Julius' 
+```
+
+#### Intersection
+
+Makes a intersection between two QuerySets.
+
+**Implemented for database adapters postgresql and sqlite3**.
+
+Compute the records that match the conditions defined in each
+one of the operand queries of the intersection.
+
+```ruby
+q1 = User.objects.filter(first_name: 'Julius')
+q2 = User.objects.filter(last_name: 'Fabia')
+intersection = q1.intersection(q2)
+# 
+# Get all users named 'Julius' of the family 'Fabia'
+# 
+# SELECT *
+# FROM users
+# WHERE first_name = 'Julius' 
+# INTERSECT
+# SELECT *
+# FROM users
+# WHERE first_name = 'Fabia' 
+```
+
+#### Difference
+
+Makes a difference between two QuerySets.
+
+**Implemented for database adapters postgresql and sqlite3**.
+
+Compute the records that match the conditions defined in the first
+query but not the ones that are present in the second.
+
+```ruby
+q1 = User.objects.filter(first_name: 'Julius')
+q2 = User.objects.filter(last_name: 'Fabia')
+difference = q1.difference(q2)
+# 
+# Get all users named 'Julius' of other families than 'Fabia'
+# 
+# SELECT *
+# FROM users
+# WHERE first_name = 'Julius' 
+# EXCEPT
+# SELECT *
+# FROM users
+# WHERE first_name = 'Fabia' 
+```
+
+### Set Operation Chaining
+
+It is also possible to chain several set operations:
+
+```ruby
+User.objects.filter(last_name: 'Aebutia')
+    .union(User.objects.filter(last_name: 'Fabia'))
+    .union(User.objects.filter(last_name: 'Atilia'))
+    .union(User.objects.filter(last_name: 'Claudia'))
+    .union(User.objects.filter(last_name: 'Cloelia'))
+# Computes the union of all QuerySets
+```
+
 ## Update
 
 Updates the objects according to the queryset filter/exclude condition.
