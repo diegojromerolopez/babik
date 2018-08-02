@@ -52,6 +52,7 @@ module Babik
           end
           final_field, final_operator, final_value = self.special_cases(field, operator, value)
           final_operator_class_name = Babik::Selection::Operation::CORRESPONDENCE[final_operator.to_sym]
+          raise "Unknown lookup #{final_operator}" unless final_operator_class_name
           final_operator_class = Object.const_get("Babik::Selection::Operation::#{final_operator_class_name}")
           # If there is a secondary operator, pass it to the operation
           if secondary_operator ||

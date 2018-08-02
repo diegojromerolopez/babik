@@ -35,11 +35,11 @@ module Babik
           transformed_record = {}
           record.each do |field, value|
             transform = @fields_hash[field].transform
-            if transform
-              transformed_record[field] = transform.call(value)
-            else
-              transformed_record[field] = value
-            end
+            transformed_record[field] = if transform
+                                          transform.call(value)
+                                        else
+                                          value
+                                        end
           end
           transformed_record
         end
@@ -105,8 +105,7 @@ module Babik
       #   posts_0.title AS post_title
       # @return [SQL] SQL code for field to appear in SELECT.
       def sql
-        return "#{@selection.target_alias}.#{@selection.selected_field} AS #{@alias}" if @alias
-        "#{@selection.target_alias}.#{@selection.selected_field}"
+        "#{@selection.target_alias}.#{@selection.selected_field} AS #{@alias}"
       end
     end
   end

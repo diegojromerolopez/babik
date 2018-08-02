@@ -100,7 +100,7 @@ module Babik
 
         def _init_sql_operation
           if @value.class == Array
-            if [@value[0], @value[1]].map { |v| v.class == DateTime || v.class == Date || v.class == Time } == [true, true]
+            if [@value[0], @value[1]].map { |v| [DateTime, Date, Time].include?(v.class) } == [true, true]
               value1 = "'#{@value[0].utc.to_s(:db)}'"
               value2 = "'#{@value[1].utc.to_s(:db)}'"
             else

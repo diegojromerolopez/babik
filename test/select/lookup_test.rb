@@ -123,6 +123,13 @@ class LookupTest < Minitest::Test
     assert_equal 9, this_hour_posts.count
   end
 
+  def test_hour_wrong_lookup
+    exception = assert_raises RuntimeError do
+      Post.objects.filter(created_at__hour__xx: Time.now.utc.hour)
+    end
+    assert_equal('Unknown lookup xx', exception.message)
+  end
+
   def test_minute
     this_minute_posts = Post.objects.filter(created_at__minute: Time.now.utc.strftime('%M'))
     assert_equal 9, this_minute_posts.count
