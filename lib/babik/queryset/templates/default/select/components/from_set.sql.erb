@@ -1,0 +1,3 @@
+(
+  (<%= queryset.left_operand.sql.select %>) <%= queryset.operation %> ( <%= queryset.right_operand.sql.select %>)
+) AS <%= queryset.model.table_name %>

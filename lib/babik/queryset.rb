@@ -122,6 +122,7 @@ module Babik
 
     end
 
+    # Each one of the set operations that can be executed in SQL
     class SetOperation < AbstractBase
 
       attr_reader :left_operand, :right_operand
@@ -147,7 +148,7 @@ module Babik
 
     end
 
-    class Minus < SetOperation; end
+    class Except < SetOperation; end
 
     class Intersect < SetOperation; end
 

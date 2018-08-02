@@ -60,6 +60,7 @@ module Babik
       # @return [String] Rendered SQL with QuerySet replacements completed
       def _render(template_path, extra_replacements = {})
         render = lambda do |partial_template_path, replacements|
+          replacements[:render] = render
           _base_render(partial_template_path, **replacements)
         end
         replacements = extra_replacements.clone

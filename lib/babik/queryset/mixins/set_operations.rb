@@ -6,7 +6,7 @@ module Babik
     module SetOperations
 
       def difference(other_queryset)
-        Babik::QuerySet::Difference.new(self.model, self, other_queryset)
+        Babik::QuerySet::Except.new(self.model, self, other_queryset)
       end
 
       def intersection(other_queryset)

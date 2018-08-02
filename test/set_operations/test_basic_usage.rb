@@ -3,8 +3,8 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
 
-# Class for Tests of union method
-class UnionTest < Minitest::Test
+# Class for basic set operation tests
+class BasicUsageTest < Minitest::Test
 
   def setup
 
@@ -36,7 +36,7 @@ class UnionTest < Minitest::Test
   end
 
   def teardown
-   # User.destroy_all
+    User.destroy_all
   end
 
   def test_union
@@ -68,6 +68,30 @@ class UnionTest < Minitest::Test
     _check_set_operation(qs_without_intersection, qs_with_intersection)
   end
 
+  def test_deep_intersection
+    first_user = User.objects.first
+    qs_with_intersection = User.objects.filter(first_name: first_user.first_name)
+                               .intersection(User.objects.filter(last_name: first_user.last_name))
+                               .intersection(User.objects.filter(created_at__lt: Time.now))
+                               .order_by!({ last_name: :DESC }, { first_name: :ASC })
+    qs_without_intersection = User.where(first_name: first_user.first_name, last_name: first_user.last_name)
+                                .order(last_name: :DESC, first_name: :ASC)
+    _check_set_operation(qs_without_intersection, qs_with_intersection)
+  end
+
+  def test_difference
+    first_user = User.objects.first
+    qs_with_minus = User.objects
+                        .filter(last_name: first_user.last_name)
+                        .difference(User.objects.filter(first_name: first_user.first_name))
+                        .order_by!({ last_name: :DESC }, { first_name: :ASC })
+    qs_without_minus = User.where(last_name: first_user.last_name)
+                           .where.not(first_name: first_user.first_name)
+                           .order(last_name: :DESC, first_name: :ASC)
+    _check_set_operation(qs_without_minus, qs_with_minus)
+  end
+
+  # Check a set-operation based queryset is correct
   def _check_set_operation(expected_qs, actual_qs)
     record_count = 0
     expected_qs.each_with_index do |expected_qs_record, expected_qs_record_index|

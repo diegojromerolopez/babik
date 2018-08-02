@@ -1,14 +1,13 @@
 
 <% if queryset.class == Babik::QuerySet::Base %>
 
-  FROM <%= queryset.model.table_name %>
+  FROM
+  <%= render.('select/components/from_table.sql.erb', {queryset: queryset}) %>
 
-<% elsif [Babik::QuerySet::Difference, Babik::QuerySet::Intersect, Babik::QuerySet::Union].include?(queryset.class) %>
+<% elsif queryset.is_a?(Babik::QuerySet::SetOperation) %>
 
   FROM
-  (
-    (<%= queryset.left_operand.sql.select %>) <%= queryset.operation %> ( <%= queryset.right_operand.sql.select %>)
-  ) AS <%= queryset.model.table_name %>
+  <%= render.('select/components/from_set.sql.erb', {queryset: queryset}) %>
 
 <% else %>
 
