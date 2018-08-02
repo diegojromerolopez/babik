@@ -125,7 +125,7 @@ class LookupTest < Minitest::Test
 
   def test_hour_wrong_lookup
     exception = assert_raises RuntimeError do
-      Post.objects.filter(created_at__hour__xx: Time.now.utc.hour)
+      Post.objects.filter(created_at__hour__xx: Time.now.utc.hour)[0]
     end
     assert_equal('Unknown lookup xx', exception.message)
   end
