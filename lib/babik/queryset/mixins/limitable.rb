@@ -48,6 +48,12 @@ module Babik
         self
       end
 
+      # Inform if this QuerySet is limited
+      # @return [Boolean] true if this QuerySet has a limit, false otherwise.
+      def limit?
+        @_limit && true
+      end
+
       # Destroy the current limit of this QuerySet
       # @return [QuerySet] Reference to this QuerySet.
       def unlimit!

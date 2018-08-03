@@ -72,6 +72,14 @@ class LimitTest < Minitest::Test
     assert_equal expected_first_user.first_name, first_user.first_name
   end
 
+  def test_is_limited
+    assert User.objects.filter!(last_name: 'LimitTest user').limit!(5, 10).limit?
+  end
+
+  def test_unlimit
+    refute User.objects.filter!(last_name: 'LimitTest user').limit!(5, 10).unlimit!.limit?
+  end
+
   def test_exists
     assert User.objects.filter(last_name: 'LimitTest user').exists?
     assert User.objects.filter(last_name: 'LimitTest user').exist?

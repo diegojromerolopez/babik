@@ -22,11 +22,6 @@ module Babik
         self
       end
 
-      # Inform if it is distinct QuerySet
-      # @return [Boolean] true if DISTINCT modifier will be applied to query, false otherwise.
-      def distinct?
-        @_distinct
-      end
     end
   end
 end
