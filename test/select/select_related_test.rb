@@ -43,6 +43,7 @@ class SelectRelatedTest < Minitest::Test
 
     User
       .objects
+      .filter(zone__in: [@corduba.id, @cartago.id])
       .select_related(:zone)
       .order_by('first_name')
       .each_with_index do |user_with_related, user_with_related_index|

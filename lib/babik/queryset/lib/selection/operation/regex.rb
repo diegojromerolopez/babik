@@ -7,7 +7,7 @@ module Babik
     # SQL operation module
     module Operation
 
-      # Match by regex
+      # Match by case sensitive regex
       class Regex < Base
         def initialize(field, value)
           value = value.inspect[1..-2] if value.class == Regexp
@@ -21,7 +21,7 @@ module Babik
           return 'REGEXP' if dbms_adapter == 'mysql2'
           return '~' if dbms_adapter == 'postgresql'
           return 'REGEXP' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
+          raise NotImplementedError, "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
         end
 
         def _mysql2_convert_regex(value)
@@ -33,14 +33,15 @@ module Babik
         end
       end
 
+      # Match by case insensitive regex
       class IRegex < Regex
 
         def initialize(field, value)
           value = value.inspect[1..-2] if value.class == Regexp
           value = value[1..-2] if value.class == String && value[0] == '/' && value[-1] == '/'
           value = "(?i)#{value}" if db_engine == 'sqlite3'
+          field = "LOWER(#{field})" if db_engine == 'mysql2'
           super(field, value)
-          @sql_operation = @sql_operation.sub('?field', 'LOWER(?field)') if db_engine == 'mysql2'
         end
 
         def operator
@@ -48,7 +49,7 @@ module Babik
           return 'REGEXP' if dbms_adapter == 'mysql2'
           return '~*' if dbms_adapter == 'postgresql'
           return 'REGEXP' if dbms_adapter == 'sqlite3'
-          raise "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
+          raise NotImplementedError, "Invalid dbms #{dbms_adapter}. Only mysql, postgresql, and sqlite3 are accepted"
         end
       end
 

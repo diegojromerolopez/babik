@@ -49,7 +49,7 @@ module Babik
           return 'YEAR(#field)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(YEAR FROM #field)' if dbms_adapter == 'postgresql'
           return 'strftime(\'%Y\', #field)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -60,7 +60,7 @@ module Babik
           return 'QUARTER(#field)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(QUARTER FROM #field)' if dbms_adapter == 'postgresql'
           return '(CAST(strftime(\'%m\', #field) AS INTEGER) + 2) / 3' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -76,7 +76,7 @@ module Babik
           return 'MONTH(#field)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(MONTH FROM #field)' if dbms_adapter == 'postgresql'
           return 'strftime(\'%m\', #field)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -92,7 +92,7 @@ module Babik
           return 'DAYOFMONTH(#field)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(DAY FROM #field)' if dbms_adapter == 'postgresql'
           return 'strftime(\'%d\', #field)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -109,7 +109,7 @@ module Babik
           return 'DAYOFWEEK(#field) -  1' if dbms_adapter == 'mysql2'
           return 'EXTRACT(DOW FROM #field)' if dbms_adapter == 'postgresql'
           return 'strftime(\'%w\', #field)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -122,7 +122,7 @@ module Babik
           return 'WEEK(#field, 3)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(WEEK FROM #field)' if dbms_adapter == 'postgresql'
           return '(strftime(\'%j\', date(#field, \'-3 days\', \'weekday 4\')) - 1) / 7 + 1' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -134,7 +134,7 @@ module Babik
           return 'HOUR(#field)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(HOUR FROM #field)' if dbms_adapter == 'postgresql'
           return 'CAST(strftime(\'%H\', #field) AS INTEGER)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -146,7 +146,7 @@ module Babik
           return 'MINUTE(#field)' if dbms_adapter == 'mysql2'
           return 'EXTRACT(MINUTE FROM #field)' if dbms_adapter == 'postgresql'
           return 'CAST(strftime(\'%M\', #field) AS INTEGER)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -158,7 +158,7 @@ module Babik
           return 'SECOND(#field)' if dbms_adapter == 'mysql2'
           return 'FLOOR(EXTRACT(SECOND FROM #field))' if dbms_adapter == 'postgresql'
           return 'CAST(strftime(\'%S\', #field) AS INTEGER)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
@@ -169,7 +169,7 @@ module Babik
           return 'DATE_FORMAT(#field, \'%H:%i:%s\')' if dbms_adapter == 'mysql2'
           return 'date_trunc(\'second\', #field::time)' if dbms_adapter == 'postgresql'
           return 'strftime(\'%H:%M:%S\', #field)' if dbms_adapter == 'sqlite3'
-          raise "#{self.class} lookup not implemented for #{dbms_adapter}"
+          raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
 
