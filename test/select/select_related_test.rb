@@ -36,6 +36,20 @@ class SelectRelatedTest < Minitest::Test
     Post.destroy_all
   end
 
+  def test_wrong_select_related
+    exception = assert_raises RuntimeError do
+      User
+        .objects
+        .filter(zone__in: [@corduba.id, @cartago.id])
+        .select_related(:xxxxx)[0]
+    end
+    assert_equal(
+      'Bad selection path: xxxxx. xxxxx not found in model User when filtering User objects',
+      exception.message
+    )
+
+  end
+
   def test_select_related
     users = User.objects.order_by('first_name')
     number_of_users = User.objects.count
