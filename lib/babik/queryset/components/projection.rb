@@ -2,13 +2,6 @@
 
 require 'babik/queryset/lib/selection/path/path'
 
-# Identity transform
-#IDENTITY_TRANSFORM = ->(value) { value }
-
-# Datetime transform
-#DATETIME_TRANSFORM = ->(db_datetime_string) { Time.parse("#{db_datetime_string} UTC") }
-
-
 module Babik
   # QuerySet module
   module QuerySet
@@ -72,28 +65,41 @@ module Babik
       #
       def initialize(model, field)
         @model = model
-        if field.class == Array
-          @name = field[0]
-          @alias = @name
-          [1, 2].each do |field_index|
-            next unless field[field_index]
-            field_i = field[field_index]
-            if [Symbol, String].include?(field_i.class)
-              @alias = field_i
-            elsif field_i.class == Proc
-              @transform = field_i
-            else
-              raise "#{self.class}.new only accepts String/Symbol or Proc. Passed a #{field_i.class}."
-            end
-          end
-        elsif [String, Symbol].include?(field.class)
-          @name = field
-          @alias = field
-          @transform = nil
-        else
+        method_name = "initialize_from_#{field.class.to_s.downcase}"
+        unless self.respond_to?(method_name)
           raise "No other parameter type is permitted in #{self.class}.new than Array, String and Symbol."
         end
+        self.send(method_name, field)
         @selection = Babik::Selection::Path::Factory.build(model, @name)
+      end
+
+      # Initialize from Array
+      def initialize_from_array(field)
+        @name = field[0]
+        @alias = @name
+        [1, 2].each do |field_index|
+          next unless field[field_index]
+          field_i = field[field_index]
+          if [Symbol, String].include?(field_i.class)
+            @alias = field_i
+          elsif field_i.class == Proc
+            @transform = field_i
+          else
+            raise "#{self.class}.new only accepts String/Symbol or Proc. Passed a #{field_i.class}."
+          end
+        end
+      end
+
+      # Initialize from String
+      def initialize_from_string(field)
+        @name = field.to_sym
+        @alias = field.to_sym
+        @transform = nil
+      end
+
+      # Initialize from Symbol
+      def initialize_from_symbol(field)
+        initialize_from_string(field)
       end
 
       # Return sql of the field to project.
