@@ -44,9 +44,20 @@ module Babik
       # IN operation
       class In < Base
         def initialize(field, value)
+          _init_value(value)
+          super(field, '?field IN ?value', @value)
+        end
+
+        def _init_value(value)
           if value.class == Array
             values = value.map do |value_i|
-              value_i.class == String ? self.class.escape(value_i) : value_i
+              if value_i.is_a?(String)
+                self.class.escape(value_i)
+              elsif value_i.is_a?(ActiveRecord::Base)
+                value_i.id
+              else
+                value_i
+              end
             end
             @value = "(#{values.join(', ')})"
           elsif value.class == Babik::QuerySet::Base
@@ -56,7 +67,6 @@ module Babik
           else
             @value = "(#{value})"
           end
-          super(field, '?field IN ?value', @value)
         end
 
         def _init_sql_operation

@@ -68,6 +68,10 @@ class LookupTest < Minitest::Test
     assert_equal 4, posts_with_odd_stars.count
   end
 
+  def test_in_and_equal
+    assert_equal Post.objects.filter(stars: 3).count, Post.objects.filter(stars__in: 3).count
+  end
+
   def test_between
     posts_3_4_stars = Post.objects.filter(stars__between: [3, 4]).order_by(created_at: :ASC)
     posts_3_4_stars_range = Post.objects.filter(stars__range: [3, 4]).order_by(created_at: :ASC)

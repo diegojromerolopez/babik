@@ -50,6 +50,8 @@ module Babik
             secondary_operator = operator[1]
             operator = operator[0]
           end
+          # The field, operator or value can change in some special cases, e.g. if operator is equals and the value
+          # is an array, the operator should be 'in' actually.
           final_field, final_operator, final_value = self.special_cases(field, operator, value)
           final_operator_class_name = Babik::Selection::Operation::CORRESPONDENCE[final_operator.to_sym]
           raise "Unknown lookup #{final_operator}" unless final_operator_class_name
@@ -65,7 +67,7 @@ module Babik
 
         # Special conversion of operations
         def self.special_cases(field, operator, value)
-          return field, 'in', value if operator == 'equal' && value.is_a?(Babik::QuerySet::Base)
+          return field, 'in', value if operator == 'equal' && [Babik::QuerySet::Base, Array].include?(value.class)
           self.date_special_cases(field, operator, value)
         end
 

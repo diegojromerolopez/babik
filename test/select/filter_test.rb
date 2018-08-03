@@ -106,6 +106,19 @@ class FilterTest < Minitest::Test
     assert_equal asturian_kings.count, user_count
   end
 
+  # Different ways of querying with in lookup
+  def test_foreign_in
+    first_users = [
+      User.objects.filter(zone: [@cangas_de_onis, @cantabria]).order_by(created_at: :ASC)[0],
+      User.objects.filter(zone_id__in: [@cangas_de_onis, @cantabria]).order_by(created_at: :ASC)[0],
+      User.objects.filter(zone__in: [@cangas_de_onis, @cantabria]).order_by(created_at: :ASC)[0],
+      User.objects.filter(zone: [@cangas_de_onis.id, @cantabria.id]).order_by(created_at: :ASC)[0],
+      User.objects.filter(zone__in: [@cangas_de_onis.id, @cantabria.id]).order_by(created_at: :ASC)[0],
+    ]
+    different_user_ids = Set.new(first_users.map(&:id))
+    assert_equal 1, different_user_ids.length
+  end
+
   def test_many_to_many_foreign_filter
     tags = Tag.objects.distinct.filter('posts::title__contains': 'an ass').order_by(%i[name ASC])
     tag_names = ['asturias', 'battle', 'victory']
@@ -167,6 +180,16 @@ class FilterTest < Minitest::Test
     end
     assert_equal(
       'Bad selection path: posts::bad_association::name. bad_association not found in model Post when filtering Tag objects',
+      exception.message
+    )
+  end
+
+  def test_wrong_field_name_of_foreign_model
+    exception = assert_raises RuntimeError do
+      Tag.objects.filter('posts::category::xxx': 'Dialogues').order_by(%i[name ASC])
+    end
+    assert_equal(
+      'Unrecognized field xxx for model Category in filter/exclude',
       exception.message
     )
   end
