@@ -13,10 +13,11 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://rubygems.org/gems/babik'
   spec.metadata    = { 'source_code_uri' => 'https://github.com/diegojromerolopez/babik' }
   spec.require_path = 'lib'
-  spec.add_development_dependency 'activerecord', '>= 5.2.0'
+  spec.add_runtime_dependency 'activerecord', '>= 5.2.0'
+  spec.add_runtime_dependency 'rails'
+  spec.add_runtime_dependency 'ruby_deep_clone'
   spec.add_development_dependency 'minitest', '>= 4.7.3'
   spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'ruby_deep_clone'
   spec.add_development_dependency 'simplecov'
 end
 
