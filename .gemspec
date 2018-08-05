@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir[
       '{app,lib,config}/**/*', 'MIT-LICENSE', 'Rakefile', 'Gemfile', '*.md'
   ]
-  spec.test_files = Dir['spec/**/*']
+  spec.test_files = Dir['test/**/*']
   spec.homepage    = 'https://rubygems.org/gems/babik'
   spec.metadata    = { 'source_code_uri' => 'https://github.com/diegojromerolopez/babik' }
   spec.require_path = 'lib'
