@@ -8,15 +8,13 @@
 
 A Django [queryset-like](https://docs.djangoproject.com/en/2.0/ref/models/querysets/) API for [Ruby on Rails](https://rubyonrails.org/).
 
-**This project is in beta phase. Use it with caution.**
-
-See [Roadmap](#roadmap) to check what is keeping it from being stable.
+See [Roadmap](#roadmap) to check future enhancements.
 
 See the [QuerySet API](/doc/api/queryset.md) if you know this library and want to
 see the documentation.
 
 Contact [me](mailto:diegojromerolopez@gmail.com) if you are interested in
-helping me developing it or make a PR with some feature or fix.
+helping me developing it or **make a PR with some feature or fix**.
 
 ## What's this?
 
@@ -59,10 +57,15 @@ The second alternative is done by using the powerful [Babik querysets](/doc/api/
 Add to Gemfile:
 
 ```
+gem install babik
+```
+
+or
+
+```
 gem install babik, git: 'git://github.com/diegojromerolopez/babik.git'
 ```
 
-No rubygem version for the moment.
 
 ## Requirements
 
