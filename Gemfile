@@ -5,6 +5,8 @@ gem 'rails'
 gem 'ruby_deep_clone'
 
 group :development, :test do
+  gem 'tiny_tds'
+  gem 'activerecord-sqlserver-adapter'
   gem 'mysql2'
   gem 'overcommit'
   gem 'pg'

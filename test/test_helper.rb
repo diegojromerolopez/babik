@@ -29,6 +29,19 @@ when 'mysql2', 'postgresql'
   }
   ActiveRecord::Tasks::DatabaseTasks.create(config.stringify_keys)
   ActiveRecord::Base.establish_connection(config)
+when 'sqlserver'
+  config = {
+    host: '127.0.0.1',
+    database: 'babik_test',
+    mode: 'dblib',
+    encoding: 'utf8',
+    min_messages: 'WARNING',
+    adapter: adapter,
+    username: 'SA',
+    password: ENV['DB_PASSWORD']
+  }
+  #ActiveRecord::Tasks::DatabaseTasks.create(config.stringify_keys)
+  ActiveRecord::Base.establish_connection(config)
 when 'sqlite3'
   ActiveRecord::Base.establish_connection adapter: adapter, database: ':memory:'
 else
