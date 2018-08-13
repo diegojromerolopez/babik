@@ -721,7 +721,8 @@ are not implemented yet.
 Oracle is not supported at the moment because of they lack LIMIT clause
 in SELECT queries.
 
-MSSQL is supported in some operations.
+MSSQL support development is stalled by [this issue](https://github.com/rails-sqlserver/activerecord-sqlserver-adapter/issues/636).
+As soon as it is fixed, development will be re-started.
 
 ## License
 
