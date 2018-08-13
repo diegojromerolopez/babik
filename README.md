@@ -85,11 +85,16 @@ No configuration is needed, Babik automatically includes two methods for your mo
 
 ## Database support
 
-PostgreSQL, MySQL and Sqlite are fully supported.
+**PostgreSQL, MySQL and Sqlite are fully supported**.
 
-MariaDB and MSSQL should work as well (happy to solve any reported issues).
+**MariaDB should work** as well (happy to solve any reported issues).
 
-Accepting contributors to port this library to Oracle.
+**Babik MSSQL support development is stalled** by [activerecord-sqlserver-adapter Rails 5.2 support issue](https://github.com/rails-sqlserver/activerecord-sqlserver-adapter/issues/636).
+As soon as that issue is resolved, I will start working in providing full support to Babik to MSSQL.
+
+No plan to offer Oracle support. Accepting contributors to port this library to Oracle.
+
+Contributors can make PRs to support other RDBMS. 
 
 ## Documentation
 
