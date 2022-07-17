@@ -1,6 +1,7 @@
 AllCops:
   Exclude:
     - test/db/schema.rb
+    - vendor/bundle/**/*
   NewCops: enable
   TargetRubyVersion: 3.1.2
 
