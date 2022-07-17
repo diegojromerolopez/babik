@@ -5,6 +5,7 @@ gem 'rails'
 gem 'ruby_deep_clone'
 
 group :development, :test do
+  gem 'minitest'
   gem 'mysql2'
   gem 'overcommit'
   gem 'pg'

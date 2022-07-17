@@ -5,7 +5,7 @@ module Babik
     # Functionality related to the DELETE operation
     module Filterable
       # Exclude objects according to some criteria.
-      # @return [QuerySet] Reference to self.
+      # @return [QuerySet::Filterable] Reference to self.
       def exclude!(filter)
         _filter(filter, 'exclusion')
         self
@@ -14,7 +14,7 @@ module Babik
       # Select objects according to some criteria.
       # @param filter [Array, Hash] if array, it is considered an disjunction (OR clause),
       #        if a hash, it is considered a conjunction (AND clause).
-      # @return [QuerySet] Reference to self.
+      # @return [QuerySet::Filterable] Reference to self.
       def filter!(filter)
         _filter(filter, 'inclusion')
         self

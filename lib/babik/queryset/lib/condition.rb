@@ -11,10 +11,10 @@ module Babik
       #        If a Hash, it would be a conjunction.
       # @raise [RuntimeError] if the class of filters is not an Array or a Hash.
       def self.factory(model, filter)
-        if filter.class == Array
+        if filter.instance_of?(Array)
           return Disjunction.new(model, filter.map { |filter_i| Conjunction.new(model, filter_i) })
         end
-        if filter.class == Hash
+        if filter.instance_of?(Hash)
           return Conjunction.new(model, filter)
         end
         raise '`filter\' parameter must be an Array for OR-based AND-conditions or a hash for a lone AND-condition'
@@ -99,5 +99,3 @@ module Babik
 
   end
 end
-
-

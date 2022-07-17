@@ -16,7 +16,7 @@ module Babik
       # Clone this QuerySet and apply the 'mutator_method' to it.
       # @param mutator_method [Symbol] Name of the method.
       # @param parameters [Array] Parameters passed to the method
-      # @return [QuerySet] The resultant QuerySet of applying the mutator to the clone of the caller object.
+      # @return [QuerySet::Clonable] The resultant QuerySet of applying the mutator to the clone of the caller object.
       def mutate_clone(mutator_method, parameters = [])
         clone_ = clone
         if parameters.empty?
@@ -32,7 +32,7 @@ module Babik
       # @param name [String] method name
       # @param args [String] method arguments
       # @param _block [Proc] Proc that could be passed to the method. Not used.
-      # @return [QuerySet] Clone of this QuerySet (with method 'name' called on ), an empty QuerySet.
+      # @return [QuerySet::Clonable] Clone of this QuerySet (with method 'name' called on ), an empty QuerySet.
       def method_missing(name, *args, &_block)
         modifying_method = "#{name}!"
         return mutate_clone(modifying_method.to_sym, args) if self.respond_to?(modifying_method)

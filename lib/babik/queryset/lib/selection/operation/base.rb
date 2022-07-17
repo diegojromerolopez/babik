@@ -68,7 +68,7 @@ module Babik
         #         the secondary operation. If there is no secondary operation, the second item will be nil.
         def self.initialize_operators(operator)
           secondary_operator = nil
-          if operator.class == Array
+          if operator.instance_of?(Array)
             secondary_operator = operator[1]
             operator = operator[0]
           end

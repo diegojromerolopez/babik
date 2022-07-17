@@ -31,7 +31,7 @@ module Babik
       # @param index [Integer] Position of the element want to return. No negative number is allowed.
       # @param default_value [Object] Anything that will be returned if no record is found at the index position.
       #        By default it takes a nil value (in that case, it will raise the IndexError exception).
-      # @raise [IndexError] When there is no default value
+      # @raise [IndexError] When there is no default value.
       def fetch(index, default_value = nil)
         element = self.[](index)
         return element if element
@@ -42,7 +42,7 @@ module Babik
       # Configure a limit this QuerySet
       # @param size [Integer] Number of elements to be selected.
       # @param offset [Integer] Position where the selection will start. By default is 0. No negative number is allowed.
-      # @return [QuerySet] Reference to this QuerySet.
+      # @return [QuerySet::Limitable] Reference to this QuerySet.
       def limit!(size, offset = 0)
         @_limit = Babik::QuerySet::Limit.new(size, offset)
         self
@@ -55,7 +55,7 @@ module Babik
       end
 
       # Destroy the current limit of this QuerySet
-      # @return [QuerySet] Reference to this QuerySet.
+      # @return [QuerySet::Limitable] Reference to this QuerySet.
       def unlimit!
         @_limit = nil
         self
@@ -75,7 +75,7 @@ module Babik
       # Get a QuerySet with a slice of the original QuerySet
       # @param param [Range] first_element..last_element will be selected.
       # @api private
-      # @return [QuerySet] QuerySet with a slice of the caller QuerySet.
+      # @return [QuerySet::Limitable] QuerySet with a slice of the caller QuerySet.
       def limit_range!(param)
         offset = param.min
         size = param.max.to_i - param.min.to_i

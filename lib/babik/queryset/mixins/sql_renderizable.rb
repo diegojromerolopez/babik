@@ -6,10 +6,9 @@ module Babik
     module SQLRenderizable
 
       # Get the SQL renderer for this QuerySet.
-      # @return [QuerySet] SQL Renderer for this QuerySet.
+      # @return [QuerySet::SQLRenderer] SQL Renderer for this QuerySet.
       def sql
-        renderer = SQLRenderer.new(self)
-        renderer
+        SQLRenderer.new(self)
       end
 
     end
