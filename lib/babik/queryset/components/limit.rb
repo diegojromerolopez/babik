@@ -14,9 +14,6 @@ module Babik
         @size = size.to_i
         @offset = offset.to_i
       end
-
     end
   end
 end
-
-

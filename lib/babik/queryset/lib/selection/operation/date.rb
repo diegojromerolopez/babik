@@ -6,13 +6,14 @@ module Babik
   module Selection
     # SQL operation module
     module Operation
-
       # Check the DBMS is one of the supported ones
       module ValidDBMS
         SUPPORTED_DB_ADAPTERS = %i[mariadb mysql2 postgresql sqlite3].freeze
         def assert_dbms
           dbms = db_engine.to_sym
-          raise "Invalid dbms #{db_engine}. Only mysql, postgresql, and sqlite3 are accepted" unless SUPPORTED_DB_ADAPTERS.include?(dbms)
+          unless SUPPORTED_DB_ADAPTERS.include?(dbms)
+            raise "Invalid dbms #{db_engine}. Only mysql, postgresql, and sqlite3 are accepted"
+          end
         end
       end
 
@@ -98,7 +99,6 @@ module Babik
 
       # WeekDay (1-7, sunday to monday) date operation
       class WeekDay < DateOperation
-
         def initialize(field, operator, value)
           value = format('%d', value) if db_engine == 'sqlite3'
           super(field, operator, value)
@@ -116,7 +116,6 @@ module Babik
       # ISO Week of year (1-52/53) from date operation
       #
       class Week < DateOperation
-
         def sql_function
           dbms_adapter = db_engine
           return 'WEEK(#field, 3)' if dbms_adapter == 'mysql2'
@@ -128,7 +127,6 @@ module Babik
 
       # Hour date operation
       class Hour < DateOperation
-
         def sql_function
           dbms_adapter = db_engine
           return 'HOUR(#field)' if dbms_adapter == 'mysql2'
@@ -140,7 +138,6 @@ module Babik
 
       # Minute date operation
       class Minute < DateOperation
-
         def sql_function
           dbms_adapter = db_engine
           return 'MINUTE(#field)' if dbms_adapter == 'mysql2'
@@ -152,7 +149,6 @@ module Babik
 
       # Second date operation
       class Second < DateOperation
-
         def sql_function
           dbms_adapter = db_engine
           return 'SECOND(#field)' if dbms_adapter == 'mysql2'
@@ -172,7 +168,6 @@ module Babik
           raise NotImplementedError, "#{self.class} lookup not implemented for #{dbms_adapter}"
         end
       end
-
     end
   end
 end

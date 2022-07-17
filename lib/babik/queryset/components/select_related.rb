@@ -7,7 +7,6 @@ module Babik
   module QuerySet
     # Delegate object that must deals with all the select_related particularities.
     class SelectRelated
-
       attr_reader :model, :associations
 
       # Creates a new SelectRelated
@@ -62,7 +61,7 @@ module Babik
         target_object = target_model.new
 
         # First, get the attributes that have the desired prefix (the association path)
-        target_attributes_with_prefix = record.select { |attr, value| attr.start_with?("#{association.id}__") }
+        target_attributes_with_prefix = record.select { |attr, _value| attr.start_with?("#{association.id}__") }
 
         # Second, convert it to a hash
         target_attributes = (target_attributes_with_prefix.map do |attribute, value|
@@ -74,5 +73,5 @@ module Babik
         target_object
       end
     end
-    end
   end
+end

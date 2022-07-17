@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of first, last, earliest and latest methods
 class BoundsTest < Minitest::Test
-
   def setup
     @cervantes = User.create!(first_name: 'Miguel', last_name: 'De Cervantes y Saavedra')
     Post.create!(title: 'La Galatea', author: @cervantes, stars: 3)
@@ -42,5 +41,4 @@ class BoundsTest < Minitest::Test
     assert_equal 5, last_with_less_stars.stars
     assert_equal 5, latest_with_less_stars.stars
   end
-
 end

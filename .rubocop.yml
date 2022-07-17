@@ -1,8 +1,43 @@
 AllCops:
-  TargetRubyVersion: 2.5
+  Exclude:
+    - test/db/schema.rb
+    - vendor/bundle/**/*
+  NewCops: enable
+  TargetRubyVersion: 3.1.2
 
-Metrics/LineLength:
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/LineLength:
   Max: 120
+
+Metrics/AbcSize:
+  Enabled: true
+  Exclude:
+    - test/**/*.rb
+
+Metrics/BlockLength:
+  Enabled: true
+  Exclude:
+    - test/**/*.rb
+
+Metrics/ClassLength:
+  Enabled: true
+  Exclude:
+    - test/**/*.rb
+
+Metrics/MethodLength:
+  Enabled: true
+  Exclude:
+    - test/**/*.rb
+  Max: 20
+
+Style/GuardClause:
+  Enabled: false
 
 Style/RedundantSelf:
   Enabled: false
+
+Style/HashSyntax:
+  Enabled: true
+  EnforcedShorthandSyntax: never

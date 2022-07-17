@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of aggregate method
 class AggregateTest < Minitest::Test
-
   def setup
     @caesar = User.create!(first_name: 'Julius', last_name: 'Caesar', email: 'backstabbed@example.com')
     (1..7).each do |book_i|
@@ -119,7 +118,6 @@ class AggregateTest < Minitest::Test
     max_stars = @caesar.objects(:posts).map(&:stars).max
     min_stars = @caesar.objects(:posts).map(&:stars).min
 
-
     max_min_stars_agg = @caesar.objects(:posts)
                                .aggregate(
                                  sum_stars: Babik::QuerySet::Sum.new('stars'),
@@ -132,13 +130,13 @@ class AggregateTest < Minitest::Test
   end
 
   def test_std_dev
-    if %w[postgres, mysql2].include?(Babik::Database.config[:adapter])
+    if %w[postgres mysql2].include?(Babik::Database.config[:adapter])
       std_dev_var_agg = @caesar.objects(:posts)
                                .aggregate(
                                  std_dev_stars: Babik::QuerySet::StdDev.new('stars'),
                                  std_dev_sample_stars: Babik::QuerySet::StdDevSample.new('stars'),
                                  var_stars: Babik::QuerySet::Var.new('stars'),
-                                 var_sample_stars: Babik::QuerySet::VarSample.new('stars'),
+                                 var_sample_stars: Babik::QuerySet::VarSample.new('stars')
                                )
 
       assert_in_delta 1.4982983545287878, std_dev_var_agg[:std_dev_stars]
@@ -147,5 +145,4 @@ class AggregateTest < Minitest::Test
       assert_in_delta 2.244897959183673, std_dev_var_agg[:var_sample_stars]
     end
   end
-
 end

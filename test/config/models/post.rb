@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 class Post < ActiveRecord::Base
   belongs_to :author, foreign_key: 'author_id', class_name: 'User', inverse_of: :posts
@@ -6,10 +7,7 @@ class Post < ActiveRecord::Base
   has_many :tags, through: :post_tags, inverse_of: :posts
 
   def add_tag(tag)
-    begin
-      PostTag.create!(post: self, tag: tag)
-    rescue ActiveRecord::RecordNotUnique
-    end
+    PostTag.create!(post: self, tag: tag)
   end
 
   def add_tag_by_name(tag_name)
@@ -20,5 +18,4 @@ class Post < ActiveRecord::Base
     end
     add_tag(new_tag)
   end
-
 end

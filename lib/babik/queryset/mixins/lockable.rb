@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Lock functionality of QuerySet
     module Lockable
-
       # Lock the table for writes
       # This must be inside a transaction
       def for_update!
@@ -25,7 +24,6 @@ module Babik
         return true if @_lock_type
         false
       end
-
     end
   end
 end

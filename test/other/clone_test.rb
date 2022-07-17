@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Class for Tests of clone method
 class CloneTest < Minitest::Test
-
   def test_filter
     filter = { first_name: 'whatever1' }
     exclusion = { last_name: 'whatever1' }
@@ -125,5 +124,4 @@ class CloneTest < Minitest::Test
     original = User.objects.filter(filter)
     original.clone.clone
   end
-
 end

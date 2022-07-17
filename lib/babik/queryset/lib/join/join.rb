@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Join between two tables
     module Join
-
       # Construct a new Join from an association
       # @param association Association between two ActiveRecord::Base objects.
       # @param association_position Association position. Used when the relationship is a many-to-many through.
@@ -59,6 +58,7 @@ module Babik
       # Target table of the join
       class TargetTable
         attr_reader :name, :table_alias, :key
+
         # Constructor
         # @param name [String] target table name
         # @param table_alias [String] target table alias
@@ -73,6 +73,7 @@ module Babik
       # Origin table of the join
       class OriginTable
         attr_reader :table_alias, :key
+
         # Constructor
         # @param table_alias [String] origin table alias
         # @param key [String] field that serves as key.

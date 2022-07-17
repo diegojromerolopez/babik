@@ -1,6 +1,5 @@
 # Babik
 
-[![Build Status](https://travis-ci.com/diegojromerolopez/babik.svg?branch=master)](https://travis-ci.com/diegojromerolopez/babik)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8a64e9a43c77d31a0df1/maintainability)](https://codeclimate.com/github/diegojromerolopez/babik/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8a64e9a43c77d31a0df1/test_coverage)](https://codeclimate.com/github/diegojromerolopez/babik/test_coverage)
 
@@ -21,6 +20,14 @@ helping me developing it or **make a PR with some feature or fix**.
 This is a library to help you to make queries based on associations without having
 to worry about doing joins or writing the exact name of the related table as a prefix
 of the foreign field conditions.
+
+### Dependencies
+
+mysql2 requires MySQL dev libraries to be installed:
+
+```sh
+sudo apt install libmysqlclient-dev
+```
 
 ### Example: Blog platform in Rails
 

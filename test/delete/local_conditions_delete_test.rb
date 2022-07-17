@@ -6,7 +6,6 @@ require_relative 'delete_test'
 
 # Tests of delete with local conditions method
 class LocalConditionsDeleteTest < DeleteTest
-
   def test_deletion_from_model
     User.objects.filter(first_name: 'Aulus').delete
     assert_operator 0, :<, User.objects.count
@@ -16,5 +15,4 @@ class LocalConditionsDeleteTest < DeleteTest
     assert_equal 0, User.objects.filter(first_name: 'Aulus').count
     assert_equal false, User.objects.filter(first_name: 'Aulus').exists?
   end
-
 end

@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of none method
 class NoneTest < Minitest::Test
-
   def setup
     [1..100].each do |i|
       Post.create!(title: "Post #{i}", stars: 5)
@@ -35,6 +34,4 @@ class NoneTest < Minitest::Test
     end
     assert_equal 100, i
   end
-
-
 end

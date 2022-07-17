@@ -41,7 +41,9 @@ module Babik
 
         # Initialize associations
         def _initialize_associations
-          @association_chain = Babik::Association::ForeignAssociationChain.new(@model, @association_path, @selection_path)
+          @association_chain = Babik::Association::ForeignAssociationChain.new(
+            @model, @association_path, @selection_path
+          )
           @association_joiner = Babik::QuerySet::Join::AssociationJoiner.new(@association_chain.associations)
         end
       end

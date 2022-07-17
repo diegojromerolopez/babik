@@ -6,7 +6,6 @@ require_relative 'delete_test'
 
 # Tests of delete with foreign conditions method
 class ForeignConditionsDeleteTest < DeleteTest
-
   def test_delete_from_model
     Post.objects.filter('author::first_name': 'Aulus').delete
     assert_equal 0, Post.objects.filter('author::first_name': 'Aulus').count
@@ -53,5 +52,4 @@ class ForeignConditionsDeleteTest < DeleteTest
       refute_equal tag_to_delete, aulus_tag.name
     end
   end
-
 end

@@ -4,13 +4,11 @@ require 'babik/queryset/lib/association/foreign_association_chain'
 
 module Babik
   module Association
-
     # Association chain for association paths
     # An association chain is a chain of associations
     # where the target model of association i is the origin model of association i + 1
     # Remember, an association path is of the form: zone::parent_zone, category::posts::tags
     class SelectRelatedAssociationChain < ForeignAssociationChain
-
       # Each one of the association
       # @param association_i [AssociationReflection] ith association.
       # @return [ActiveRecord::Base] target model of ith association.
@@ -25,8 +23,6 @@ module Babik
         raise "Bad association path: #{association_i.name} in model #{association_i.klass} " \
               "is not belongs_to or has_one when constructing select_related for #{@model} objects"
       end
-
     end
-
   end
 end

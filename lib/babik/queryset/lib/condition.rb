@@ -4,19 +4,16 @@ module Babik
   module QuerySet
     # Each one of the conditions that can appear in a SQL WHERE.
     module Condition
-
       # Return the Disjunction or Conjunction according to what class the filters parameter is.
       # @param model [ActiveRecord::Base] Model owner of this condition.
       # @param filter [Array, Hash] if it is an Array, it would be a disjunction.
       #        If a Hash, it would be a conjunction.
       # @raise [RuntimeError] if the class of filters is not an Array or a Hash.
       def self.factory(model, filter)
-        if filter.class == Array
+        if filter.instance_of?(Array)
           return Disjunction.new(model, filter.map { |filter_i| Conjunction.new(model, filter_i) })
         end
-        if filter.class == Hash
-          return Conjunction.new(model, filter)
-        end
+        return Conjunction.new(model, filter) if filter.instance_of?(Hash)
         raise '`filter\' parameter must be an Array for OR-based AND-conditions or a hash for a lone AND-condition'
       end
 
@@ -54,7 +51,6 @@ module Babik
           @selections.map(&:sql_where_condition).join(" AND\n")
         end
       end
-
     end
 
     # Disjunction in Disjunctive Normal Form
@@ -96,8 +92,5 @@ module Babik
         "(\n#{@conjunctions.map(&:sql).join(" OR\n")}\n)"
       end
     end
-
   end
 end
-
-

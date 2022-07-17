@@ -4,7 +4,6 @@ require 'minitest/autorun'
 require_relative '../test_helper'
 
 class ForeignSelectionTest < Minitest::Test
-
   def test_equal_in_belongs_to_relationship
     foreign_selection = Babik::Selection::ForeignSelection.new(User, 'zone::name', 'Rome')
     assert_equal foreign_selection.model, User
@@ -56,5 +55,4 @@ class ForeignSelectionTest < Minitest::Test
       end
     end
   end
-
 end

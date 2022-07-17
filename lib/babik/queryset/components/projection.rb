@@ -5,10 +5,8 @@ require 'babik/queryset/lib/selection/path/path'
 module Babik
   # QuerySet module
   module QuerySet
-
     # Manages the projection of a SELECT QuerySet
     class Projection
-
       # Constructs a projection
       # @param model [ActiveRecord::Base] model the projection is based on.
       # @param fields [Array] array of fields that will be projected.
@@ -82,7 +80,7 @@ module Babik
           field_i = field[field_index]
           if [Symbol, String].include?(field_i.class)
             @alias = field_i
-          elsif field_i.class == Proc
+          elsif field_i.instance_of?(Proc)
             @transform = field_i
           else
             raise "#{self.class}.new only accepts String/Symbol or Proc. Passed a #{field_i.class}."

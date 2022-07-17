@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Test for get method of QuerySet
 class GetTest < Minitest::Test
-
   def setup
     User.create!(first_name: 'Rollo', last_name: 'Lothbrok')
     User.create!(first_name: 'Ragnar', last_name: 'Lothbrok')

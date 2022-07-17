@@ -5,7 +5,6 @@ require_relative 'babik/queryset'
 
 # Babik module
 module Babik
-
   # @!method included(base)
   # Inject both class methods and instance methods to classes that include this mixin
   # @param [Class] base Class to be extended by mixin.
@@ -16,7 +15,6 @@ module Babik
 
   # All instance methods that are injected to ActiveRecord models
   module InstanceMethods
-
     # @!method objects(selection_path = nil)
     # Get a queryset that contains the foreign model filtered by the current instance
     # @param [String] selection_path Association name whose objects we want to return.
@@ -40,6 +38,7 @@ module Babik
     #   If nil, a QuerySet with the current object selected will be returned. Otherwise, a QuerySet with the selection
     #   described by the __ and :: operators.
     # @return [QuerySet] QuerySet for the selection_path passed as parameter.
+    # rubocop:disable Metrics/AbcSize
     def _objects_with_selection_path(selection_path = nil)
       # By default, a nil selection_path means the caller object wants to return a QuerySet with only itself
       return self.class.objects.filter(id: self.id) unless selection_path
@@ -71,6 +70,7 @@ module Babik
       instance_selection_path = instance_selection_path_parts.join(Babik::Selection::Config::RELATIONSHIP_SEPARATOR)
       model_i.objects.filter("#{instance_selection_path}::id": self.id)
     end
+    # rubocop:enable Metrics/AbcSize
 
     # @!method _objects_to_one(association_name)
     # Return a QuerySet with the relationship to one
@@ -95,7 +95,7 @@ module Babik
       target = Object.const_get(association.class_name)
       begin
         inverse_relationship = association.options.fetch(:inverse_of)
-      rescue KeyError => _exception
+      rescue KeyError => _e
         raise "Relationship #{association.name} of model #{self.class} has no inverse_of option."
       end
       target.objects.filter("#{inverse_relationship}#{Babik::Selection::Config::RELATIONSHIP_SEPARATOR}id": self.id)
@@ -104,19 +104,15 @@ module Babik
 
   # All class methods that are injected to ActiveRecord models
   module ClassMethods
-
     # @!method objects
     # QuerySet for the current model.
     # @return [QuerySet] queryset for the current model.
     def objects
       Babik::QuerySet::Base.new(self)
     end
-
   end
-
 end
 
-
 # Include mixin into parent of all active record models (ActiveRecord::Base)
-ActiveRecord::Base.send(:include, Babik)
-ActiveRecord::Base.send(:include, ActiveModel::AttributeAssignment)
+ActiveRecord::Base.include Babik
+ActiveRecord::Base.include ActiveModel::AttributeAssignment

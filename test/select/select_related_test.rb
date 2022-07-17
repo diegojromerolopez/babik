@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Select related method test
 class SelectRelatedTest < Minitest::Test
-
   def setup
     @baetica = GeoZone.create!(name: 'Baetica')
     @corduba = GeoZone.create!(name: 'Corduba', parent_zone: @baetica)
@@ -47,7 +46,6 @@ class SelectRelatedTest < Minitest::Test
       'Bad selection path: xxxxx. xxxxx not found in model User when filtering User objects',
       exception.message
     )
-
   end
 
   def test_select_related
@@ -84,7 +82,7 @@ class SelectRelatedTest < Minitest::Test
     posts = Post.objects
                 .filter(author: @seneca_sr)
                 .order_by(title: :DESC)
-                .select_related([:author, :category])
+                .select_related(%i[author category])
     _test_select_related_posts(expected_posts, posts)
   end
 
@@ -92,7 +90,7 @@ class SelectRelatedTest < Minitest::Test
     expected_posts = Post.objects.filter(author: @seneca_sr).order_by(title: :DESC)
     posts = @seneca_sr.objects(:posts)
                       .order_by(title: :DESC)
-                      .select_related([:author, :category])
+                      .select_related(%i[author category])
     _test_select_related_posts(expected_posts, posts)
   end
 
@@ -118,7 +116,4 @@ class SelectRelatedTest < Minitest::Test
       assert_equal post.category, category
     end
   end
-
-
-
 end

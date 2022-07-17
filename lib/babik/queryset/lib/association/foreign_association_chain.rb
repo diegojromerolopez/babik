@@ -2,13 +2,11 @@
 
 module Babik
   module Association
-
     # Association chain for association paths
     # An association chain is a chain of associations
     # where the target model of association i is the origin model of association i + 1
     # Remember, an association path is of the form: zone::parent_zone, category::posts::tags
     class ForeignAssociationChain
-
       attr_reader :model, :associations, :target_model, :selection_path
 
       # Construct the association chain
@@ -78,13 +76,13 @@ module Babik
 
         # Check the association exists
         unless association
-          raise "Bad selection path: #{@selection_path}. #{association_name} not found "\
+          raise "Bad selection path: #{@selection_path}. #{association_name} not found " \
                 "in model #{association_model} when filtering #{@model} objects"
         end
 
         # Check the association is no a has-and belongs-to-many
         # These associations are discouraged by Rails Community
-        if association.class == ActiveRecord::Reflection::HasAndBelongsToManyReflection
+        if association.instance_of?(ActiveRecord::Reflection::HasAndBelongsToManyReflection)
           raise "Relationship #{association.name} is has_and_belongs_to_many. Convert it to has_many-through"
         end
 
@@ -92,6 +90,5 @@ module Babik
         association
       end
     end
-
   end
 end

@@ -8,7 +8,6 @@ module Babik
   module Selection
     # SQL operation module
     module Operation
-
       # When two values are not equal
       class Different < BinaryOperation
         SQL_OPERATOR = '<>'
@@ -49,20 +48,21 @@ module Babik
         end
 
         def _init_value(value)
-          if value.class == Array
+          if value.instance_of?(Array)
             values = value.map do |value_i|
-              if value_i.is_a?(String)
+              case value_i
+              when String
                 self.class.escape(value_i)
-              elsif value_i.is_a?(ActiveRecord::Base)
+              when ActiveRecord::Base
                 value_i.id
               else
                 value_i
               end
             end
             @value = "(#{values.join(', ')})"
-          elsif value.class == Babik::QuerySet::Base
+          elsif value.instance_of?(Babik::QuerySet::Base)
             @value = "(#{value.sql.select})"
-          elsif value.class == String
+          elsif value.instance_of?(String)
             @value = "('#{self.class.escape(value)}')"
           else
             @value = "(#{value})"
@@ -108,22 +108,22 @@ module Babik
           super(field, '?field BETWEEN ?value1 AND ?value2', value)
         end
 
+        # rubocop:disable Metrics/AbcSize
         def _init_sql_operation
-          if @value.class == Array
-            if [@value[0], @value[1]].map { |v| [DateTime, Date, Time].include?(v.class) } == [true, true]
-              value1 = "'#{@value[0].utc.to_s(:db)}'"
-              value2 = "'#{@value[1].utc.to_s(:db)}'"
-            else
-              value1 = self.class.escape(@value[0])
-              value2 = self.class.escape(@value[1])
-            end
-            @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value1', value1).sub('?value2', value2)
+          raise 'Array is needed if operator is between' unless @value.instance_of?(Array)
+          if [@value[0], @value[1]].map { |v| [DateTime, Date, Time].include?(v.class) } == [true, true]
+            value1 = "'#{@value[0].utc.to_s(:db)}'"
+            value2 = "'#{@value[1].utc.to_s(:db)}'"
           else
-            raise 'Array is needed if operator is between'
+            value1 = self.class.escape(@value[0])
+            value2 = self.class.escape(@value[1])
           end
+          @sql_operation = @sql_operation_template.sub('?field', @field).sub('?value1', value1).sub('?value2', value2)
         end
       end
+      # rubocop:enable Metrics/AbcSize
 
+      # "Starts with" db search: search if the value starts by a given string.
       class StartsWith < BinaryOperation
         SQL_OPERATOR = 'LIKE'
         def _init_sql_operation
@@ -132,10 +132,12 @@ module Babik
         end
       end
 
+      # "Starts with (case search)" db operation: search if the value starts by a given string.
       class IStartsWith < StartsWith
         SQL_OPERATOR = 'ILIKE'
       end
 
+      # "Ends with" db search: search if the value ends by a given string.
       class EndsWith < BinaryOperation
         SQL_OPERATOR = 'LIKE'
         def _init_sql_operation
@@ -144,10 +146,12 @@ module Babik
         end
       end
 
+      # "Ends with (case insensitive)" db search: search if the value ends by a given string.
       class IEndsWith < StartsWith
         SQL_OPERATOR = 'ILIKE'
       end
 
+      # String search: search if the value contains a given string.
       class Contains < BinaryOperation
         SQL_OPERATOR = 'LIKE'
         def _init_sql_operation
@@ -156,10 +160,12 @@ module Babik
         end
       end
 
+      # String search (case insensitive): search if the value contains a given string.
       class IContains < Contains
         SQL_OPERATOR = 'ILIKE'
       end
 
+      # Map between operation names and operation classes.
       CORRESPONDENCE = {
         default: Equal,
         equal: Equal,
@@ -195,7 +201,6 @@ module Babik
         second: Second,
         time: Babik::Selection::Operation::Time
       }.freeze
-
     end
   end
 end

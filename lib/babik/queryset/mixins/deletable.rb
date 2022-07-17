@@ -6,7 +6,7 @@ module Babik
     module Deletable
       # Delete the selected records
       def delete
-        result = @model.connection.execute(sql.delete)
+        @model.connection.execute(sql.delete)
       end
     end
   end

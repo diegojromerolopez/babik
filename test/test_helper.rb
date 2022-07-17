@@ -11,8 +11,8 @@ FileUtils.mkpath 'log' unless File.directory? 'log'
 ActiveRecord::Base.logger = Logger.new('log/test-queries.log')
 
 DEFAULT_DB_ADAPTER = 'sqlite3'
-#DEFAULT_DB_ADAPTER = 'mysql2'
-#DEFAULT_DB_ADAPTER = 'postgresql'
+# DEFAULT_DB_ADAPTER = 'mysql2'
+# DEFAULT_DB_ADAPTER = 'postgresql'
 
 # Make a connection
 adapter = ENV.fetch('DB', DEFAULT_DB_ADAPTER)
@@ -24,8 +24,8 @@ when 'mysql2', 'postgresql'
     encoding: 'utf8',
     min_messages: 'WARNING',
     adapter: adapter,
-    username: ENV['DB_USERNAME'] || 'postgres',
-    password: ENV['DB_PASSWORD'] || 'postgres'
+    username: ENV.fetch('DB_USERNAME', 'postgres'),
+    password: ENV.fetch('DB_PASSWORD', 'postgres')
   }
   ActiveRecord::Tasks::DatabaseTasks.create(config.stringify_keys)
   ActiveRecord::Base.establish_connection(config)
@@ -50,6 +50,3 @@ require 'config/models/post'
 require 'config/models/post_tag'
 require 'config/models/bad_tag'
 require 'config/models/bad_post'
-
-
-

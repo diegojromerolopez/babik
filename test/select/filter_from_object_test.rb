@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of filter method when being called from an ActiveRecord object
 class FilterFromObjectTest < Minitest::Test
-
   def setup
     @asturias = GeoZone.new(name: 'Asturias')
     @cantabria = GeoZone.new(name: 'Cantabria')
@@ -93,7 +92,7 @@ class FilterFromObjectTest < Minitest::Test
     assert_equal post_titles.count, post_count
   end
 
-  def test_through_has_many_1
+  def test_through_has_many1
     # has_many through relationship
     assert_equal 5, @pelayo.objects('posts::tags').count
     assert_equal 3, @pelayo.objects('posts::tags').distinct.count
@@ -106,7 +105,7 @@ class FilterFromObjectTest < Minitest::Test
     assert_equal tag_names.count, tag_count
   end
 
-  def test_through_has_many_2
+  def test_through_has_many2
     main_distinct_tags = @main_category.objects('posts::tags').distinct.order_by(name: :ASC)
     main_tags = @main_category.objects('posts::tags').order_by(name: :ASC)
 
@@ -121,5 +120,4 @@ class FilterFromObjectTest < Minitest::Test
     end
     assert_equal main_distinct_tags.count, tag_count
   end
-
 end

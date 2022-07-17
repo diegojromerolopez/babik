@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of distinct method
 class DistinctTest < Minitest::Test
-
   def setup
     User.create!(first_name: 'Diego', last_name: 'de Siloé')
     User.create!(first_name: 'Diego', last_name: 'Velazquez')
@@ -34,5 +33,4 @@ class DistinctTest < Minitest::Test
     assert_equal 2, diegos.count
     assert_equal diegos.count, diegos.distinct.undistinct.count
   end
-
 end

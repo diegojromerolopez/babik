@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveRecord::Schema.define do
   self.verbose = false
 
@@ -75,9 +77,9 @@ ActiveRecord::Schema.define do
   end
 
   add_index :users, :email, unique: true
-  add_index :group_users, [:group_id, :user_id], unique: true
+  add_index :group_users, %i[group_id user_id], unique: true
   add_index :categories, :name, unique: true
-  add_index :post_tags, [:post_id, :tag_id], unique: true
-  add_index :posts, [:title, :author_id], unique: true
+  add_index :post_tags, %i[post_id tag_id], unique: true
+  add_index :posts, %i[title author_id], unique: true
   add_index :tags, :name, unique: true
 end

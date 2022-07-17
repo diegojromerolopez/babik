@@ -90,8 +90,8 @@ module Babik
 
       # Loop through the results with a block
       # @param block [Proc] Proc that will be applied to each object.
-      def each(&block)
-        self.all.each(&block)
+      def each(&)
+        self.all.each(&)
       end
 
       # Get the left joins grouped by alias in a hash.
@@ -119,12 +119,10 @@ module Babik
     end
 
     class Base < AbstractBase
-
     end
 
     # Each one of the set operations that can be executed in SQL
     class SetOperation < AbstractBase
-
       attr_reader :left_operand, :right_operand
 
       def initialize(model, left_operand, right_operand)
@@ -141,7 +139,6 @@ module Babik
         end
         raise "#{db_adapter} does not support operation #{operation_name}"
       end
-
     end
 
     class Except < SetOperation; end
@@ -149,6 +146,5 @@ module Babik
     class Intersect < SetOperation; end
 
     class Union < SetOperation; end
-
   end
 end

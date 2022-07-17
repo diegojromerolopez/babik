@@ -5,7 +5,6 @@ require_relative '../../../../test/test_helper'
 
 # Class for testing regex lookups
 class RegexLookupTest < Minitest::Test
-
   def test_regex_operator
     sql_by_db_adapter = {
       mysql2: { operator: 'REGEXP', operation: 'my_field REGEXP \'my_value\'' },
@@ -24,7 +23,7 @@ class RegexLookupTest < Minitest::Test
     _test_regex('IRegex', sql_by_db_adapter)
   end
 
-  def _test_regex(regex_operation_name, sql_by_adapter, unimplemented_db_adapters = %w[mssql, oracle])
+  def _test_regex(regex_operation_name, sql_by_adapter, unimplemented_db_adapters = %w[mssql oracle])
     regex_class = Object.const_get("Babik::Selection::Operation::#{regex_operation_name.camelize}")
     _test_regex_sql(regex_class, sql_by_adapter)
     _test_regex_not_implemented(regex_class, unimplemented_db_adapters)
@@ -36,10 +35,10 @@ class RegexLookupTest < Minitest::Test
       regex_operation = klass.new('my_field', 'my_value')
       assert_equal db_adapter.to_s, regex_operation.db_engine
       assert_equal sql[:operator], regex_operation.operator, "Failed on checking #{klass} operator on #{db_adapter}"
-      assert_equal sql[:operation], regex_operation.sql_operation, "Failed on checking #{klass} operation on #{db_adapter}"
+      assert_equal sql[:operation], regex_operation.sql_operation,
+                   "Failed on checking #{klass} operation on #{db_adapter}"
     end
   end
-
 
   def _test_regex_not_implemented(klass, unimplemented_db_adapters)
     date_operation = klass.new('my_field', 'my_value')
@@ -51,5 +50,4 @@ class RegexLookupTest < Minitest::Test
       end
     end
   end
-
 end

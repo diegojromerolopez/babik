@@ -5,7 +5,6 @@ require_relative '../../../../test/test_helper'
 
 # Class for testing date lookups
 class DateLookupTest < Minitest::Test
-
   def test_abstract_date_operation
     assert_raises NotImplementedError do
       Babik::Selection::Operation::DateOperation.new('my_field', 'equal', 'my_value')
@@ -102,7 +101,7 @@ class DateLookupTest < Minitest::Test
     _test_date_operation('Time', sql_by_db_adapter)
   end
 
-  def _test_date_operation(date_operation_name, sql_by_adapter, unimplemented_db_adapters = %w[mssql, oracle])
+  def _test_date_operation(date_operation_name, sql_by_adapter, unimplemented_db_adapters = %w[mssql oracle])
     date_operation_class = Object.const_get("Babik::Selection::Operation::#{date_operation_name.camelize}")
     _test_date_operation_sql(date_operation_class, sql_by_adapter)
     _test_date_operation_not_implemented(date_operation_class, unimplemented_db_adapters)
@@ -127,5 +126,4 @@ class DateLookupTest < Minitest::Test
       end
     end
   end
-
 end

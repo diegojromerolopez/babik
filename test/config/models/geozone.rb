@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 class GeoZone < ActiveRecord::Base
   has_many :users, foreign_key: 'zone_id', inverse_of: :zone

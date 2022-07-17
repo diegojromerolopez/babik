@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'minitest/autorun'
 require_relative '../test_helper'
 
 class LocalSelectionTest < Minitest::Test
-
   def test_equal_selection
     local_selection = Babik::Selection::LocalSelection.new(User, 'first_name', 'Pepe')
     assert_equal local_selection.model, User
@@ -20,5 +21,4 @@ class LocalSelectionTest < Minitest::Test
     assert_equal local_selection.value, 'Pepe'
     assert_equal local_selection.operator, 'icontains'
   end
-
 end

@@ -6,7 +6,6 @@ module Babik
   module Selection
     # Foreign selection
     class ForeignSelection < Babik::Selection::Path::ForeignPath
-
       attr_reader :model, :selection_path, :selected_field,
                   :sql_where_condition,
                   :value, :operator

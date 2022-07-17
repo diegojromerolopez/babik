@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Every QuerySet is bounded by its first and last items
     module Bounded
-
       # Return the first element given some order
       # @param order [Array, String, Hash] ordering that will be applied to the QuerySet.
       #              See {Babik::QuerySet::Sortable#order_by}.
@@ -32,7 +31,6 @@ module Babik
       def latest(*order)
         self.order_by(*order).last
       end
-
     end
   end
 end

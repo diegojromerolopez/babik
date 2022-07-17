@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of different lookups available in both methods filter and exclude
 class LookupTest < Minitest::Test
-
   def setup
     Post.create!(title: 'This other post of 5 stars', stars: 5)
     Post.create!(title: 'This a post of 5 stars', stars: 5)
@@ -204,5 +203,4 @@ class LookupTest < Minitest::Test
     assert_equal 'This a post of 5 stars', other_posts[2].title
     assert_equal 3, other_posts.count
   end
-
 end

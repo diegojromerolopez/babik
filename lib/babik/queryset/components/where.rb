@@ -6,7 +6,6 @@ module Babik
   module QuerySet
     # Where conditions
     class Where
-
       attr_reader :model, :inclusion_filters, :exclusion_filters
 
       def initialize(model)
