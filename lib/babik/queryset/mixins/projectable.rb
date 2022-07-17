@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Project functionality of QuerySet
     module Projectable
-
       # Prepares a projection of only some attributes
       # @param *attributes [Array] Attributes that will be projected.
       #        Each one of these can be a local field, or a foreign entity field.
@@ -28,7 +27,6 @@ module Babik
         return true if @_projection
         false
       end
-
     end
   end
 end

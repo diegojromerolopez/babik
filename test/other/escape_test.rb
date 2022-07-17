@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Check the quotes and strings ar correctly escaped.
 class EscapeTest < Minitest::Test
-
   def setup
     User.create!(first_name: 'Athos')
     User.create!(first_name: 'Porthos')
@@ -17,5 +16,4 @@ class EscapeTest < Minitest::Test
     users = User.objects.filter(first_name: "D'Artagnan")
     assert_equal 1, users.count
   end
-
 end

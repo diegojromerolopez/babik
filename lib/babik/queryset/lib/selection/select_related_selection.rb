@@ -9,7 +9,6 @@ require 'babik/queryset/lib/selection/path/foreign_path'
 
 module Babik
   module Selection
-
     # Abstraction of a selection used in select_related operation
     class SelectRelatedSelection
       RELATIONSHIP_SEPARATOR = Babik::Selection::Config::RELATIONSHIP_SEPARATOR
@@ -29,10 +28,10 @@ module Babik
       end
 
       def _initialize_associations
-        @association_chain = Babik::Association::SelectRelatedAssociationChain.new(@model, @association_path, @selection_path)
+        @association_chain = Babik::Association::SelectRelatedAssociationChain.new(@model, @association_path,
+                                                                                   @selection_path)
         @association_joiner = Babik::QuerySet::Join::AssociationJoiner.new(@association_chain.associations)
       end
-
     end
   end
 end

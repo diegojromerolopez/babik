@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Limit method tests
 class LimitTest < Minitest::Test
-
   def setup
     i = 0
     while i < 100
@@ -51,7 +50,6 @@ class LimitTest < Minitest::Test
     exception = assert_raises IndexError do
       User.objects.filter(last_name: 'LimitTest user').fetch(non_existent_index)
     end
-    limit_test_count = User.objects.filter(last_name: 'LimitTest user').count
 
     assert_equal("Index #{non_existent_index} outside of QuerySet bounds", exception.message)
     assert_equal User, limit_test_user.class
@@ -60,7 +58,9 @@ class LimitTest < Minitest::Test
 
     second_page_offset = page_size
     second_page = User.objects.filter(last_name: 'LimitTest user').limit(page_size, second_page_offset)
-    second_page_with_brackets = User.objects.filter(last_name: 'LimitTest user')[second_page_offset..(second_page_offset+page_size)]
+    second_page_with_brackets = User.objects.filter(
+      last_name: 'LimitTest user'
+    )[second_page_offset..(second_page_offset + page_size)]
     assert_equal page_size, second_page.count
     assert_equal second_page.count, second_page_with_brackets.count
   end
@@ -105,5 +105,4 @@ class LimitTest < Minitest::Test
     end
     assert_equal('Index 1000 outside of QuerySet bounds', exception.message)
   end
-
 end

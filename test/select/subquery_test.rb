@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Subquery test
 class SubqueryTest < Minitest::Test
-
   def setup
     @baetica = GeoZone.create!(name: 'Baetica')
     @corduba = GeoZone.create!(name: 'Corduba', parent_zone: @baetica)
@@ -46,5 +45,4 @@ class SubqueryTest < Minitest::Test
     end
     assert_equal seneca_sr_posts_count, seneca_sr_posts.count
   end
-
 end

@@ -5,7 +5,6 @@ require 'babik/queryset/lib/selection/config'
 module Babik
   module Selection
     module Path
-
       # Local path
       class LocalPath
         OPERATOR_SEPARATOR = Babik::Selection::Config::OPERATOR_SEPARATOR
@@ -14,7 +13,8 @@ module Babik
 
         # Construct a local field path
         # @param model [ActiveRecord::Base] model whose field will be used.
-        # @param selection_path [String] selection path. Of the form <field>__<operator>. e.g. first_name__equal, stars__gt
+        # @param selection_path [String] selection path. Of the form <field>__<operator>.
+        #        e.g. first_name__equal, stars__gt.
         #        If no operator is given (first_name), 'equal' will be used.
         def initialize(model, selection_path)
           @model = model
@@ -37,7 +37,6 @@ module Babik
         def left_joins_by_alias
           {}
         end
-
       end
     end
   end

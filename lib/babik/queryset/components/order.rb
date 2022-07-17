@@ -7,7 +7,6 @@ module Babik
   module QuerySet
     # Manages the order of the QuerySet
     class Order
-
       attr_reader :order_fields
 
       # Construct the order manager
@@ -27,7 +26,7 @@ module Babik
         order_as_array_or_pairs = ordering.map do |order|
           if [Hash, String, Symbol].include?(order.class)
             self.send("_order_from_#{order.class.to_s.downcase}", order)
-          elsif order.class == Array
+          elsif order.instance_of?(Array)
             order
           else
             raise "Invalid type of order: #{order}"
@@ -42,7 +41,7 @@ module Babik
       # @return [Array] Conversion of order as string to array.
       def _order_from_string(order)
         return [order, :ASC] if order[0] != '-'
-        [order[1..-1], :DESC]
+        [order[1..], :DESC]
       end
 
       # Get order from symbol

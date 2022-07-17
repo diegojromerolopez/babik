@@ -6,7 +6,6 @@ module Babik
     module Operation
       # Base class
       class Base
-
         attr_reader :field, :value, :sql_operation, :sql_operation_template
 
         # Construct a SQL operation
@@ -101,8 +100,14 @@ module Babik
 
         # Special conversion of operations for date lookup
         def self.date_special_cases(field, operator, value)
-          return field, 'between', [value.beginning_of_day, value.end_of_day] if operator == 'date' && value.is_a?(::Date)
-          return field, 'between', [Time(value.year, 1, 1).beginning_of_day, Time(value.year, 12, 31).end_of_day] if operator == 'year' && value.is_a?(::Date)
+          if operator == 'date' && value.is_a?(::Date)
+            return field, 'between', [value.beginning_of_day,
+                                      value.end_of_day]
+          end
+          if operator == 'year' && value.is_a?(::Date)
+            return field, 'between', [Time(value.year, 1, 1).beginning_of_day,
+                                      Time(value.year, 12, 31).end_of_day]
+          end
           [field, operator, value]
         end
 
@@ -120,7 +125,6 @@ module Babik
           super(field, "?field #{self.class::SQL_OPERATOR} ?value", value)
         end
       end
-
     end
   end
 end

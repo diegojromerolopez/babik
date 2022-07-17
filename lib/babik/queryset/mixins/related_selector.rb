@@ -2,10 +2,8 @@
 
 module Babik
   module QuerySet
-
     # select_related functionality of QuerySet
     module RelatedSelector
-
       # Load the related objects of each model object specified by the association_paths
       #
       # e.g.
@@ -21,8 +19,6 @@ module Babik
         @_select_related = Babik::QuerySet::SelectRelated.new(@model, association_paths)
         self
       end
-
     end
-
   end
 end

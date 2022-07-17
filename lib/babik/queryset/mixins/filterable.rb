@@ -45,7 +45,6 @@ module Babik
       def _filter(filter, filter_type)
         @_where.send("add_#{filter_type}_filter", filter)
       end
-
     end
   end
 end

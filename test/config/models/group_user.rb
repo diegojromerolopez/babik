@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 class GroupUser < ActiveRecord::Base
   belongs_to :group, inverse_of: :group_users

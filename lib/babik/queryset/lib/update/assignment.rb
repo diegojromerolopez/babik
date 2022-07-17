@@ -28,7 +28,9 @@ module Babik
         #        Otherwise, the value as-is will be returned.
         # @return [String] Field prepared to be inserted in the left part of a SQL UPDATE assignment.
         def self.sql_value(update_field_value)
-          return update_field_value.sql_value if update_field_value.is_a?(Operation) || update_field_value.is_a?(Function)
+          if update_field_value.is_a?(Operation) || update_field_value.is_a?(Function)
+            return update_field_value.sql_value
+          end
           return _escape(update_field_value) if update_field_value.is_a?(String)
           return update_field_value.id if update_field_value.is_a?(ActiveRecord::Base)
           update_field_value
@@ -101,7 +103,6 @@ module Babik
             super(field, '/', value)
           end
         end
-
       end
     end
   end

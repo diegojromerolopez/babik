@@ -18,7 +18,8 @@ module Babik
             # Important, this variable will take the last joined table to chain the join, in the first loop, will take
             # the association origin table name.
             last_table_alias ||= association.active_record.table_name
-            left_join = Babik::QuerySet::Join.new_from_association(association, association_path_index, last_table_alias)
+            left_join = Babik::QuerySet::Join.new_from_association(association, association_path_index,
+                                                                   last_table_alias)
 
             @left_joins_by_alias[left_join.target_alias] = left_join
             last_table_alias = left_join.target_alias

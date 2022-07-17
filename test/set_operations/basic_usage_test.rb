@@ -5,9 +5,7 @@ require_relative '../test_helper'
 
 # Class for basic set operation tests
 class BasicUsageTest < Minitest::Test
-
   def setup
-
     patrician_families = %w[
       Aebutia Aemilia Aquillia Atilia Claudia Cloelia Cornelia Curtia
       Fabia Foslia Furia Gegania Genucia Herminia Horatia Julia Lartia
@@ -32,7 +30,6 @@ class BasicUsageTest < Minitest::Test
         User.create!(first_name: roman_name, last_name: family_name) if random_generator.rand(0..1) == 1
       end
     end
-
   end
 
   def teardown
@@ -43,7 +40,8 @@ class BasicUsageTest < Minitest::Test
     claudia = User.objects.filter(last_name: 'Claudia')
     verturia = User.objects.filter(last_name: 'Veturia')
     both_families = claudia.union(verturia).order_by!({ last_name: :DESC }, { first_name: :ASC })
-    both_families_without_union = User.where(last_name: ['Claudia', 'Veturia']).order(last_name: :DESC, first_name: :ASC)
+    both_families_without_union = User.where(last_name: %w[Claudia Veturia]).order(last_name: :DESC,
+                                                                                   first_name: :ASC)
     _check_set_operation(both_families_without_union, both_families)
   end
 
@@ -53,9 +51,9 @@ class BasicUsageTest < Minitest::Test
                    .union(User.objects.filter(last_name: 'Atilia'))
                    .union(User.objects.filter(last_name: 'Claudia'))
                    .union(User.objects.filter(last_name: 'Cloelia'))
-                   .order_by!({last_name: :DESC}, {first_name: :ASC})
-    families_without_union = User.where(last_name: ['Aebutia', 'Fabia', 'Atilia', 'Claudia', 'Cloelia'])
-                                  .order(last_name: :DESC, first_name: :ASC)
+                   .order_by!({ last_name: :DESC }, { first_name: :ASC })
+    families_without_union = User.where(last_name: %w[Aebutia Fabia Atilia Claudia Cloelia])
+                                 .order(last_name: :DESC, first_name: :ASC)
     _check_set_operation(families_without_union, families)
   end
 
@@ -65,7 +63,7 @@ class BasicUsageTest < Minitest::Test
     aemilia = User.objects.filter(last_name: 'Aemilia')
     three_families = claudia.union(verturia).union(aemilia).order_by!({ last_name: :DESC }, { first_name: :ASC })
     three_families_without_union = User
-                                   .where(last_name: ['Claudia', 'Veturia', 'Aemilia'])
+                                   .where(last_name: %w[Claudia Veturia Aemilia])
                                    .order(last_name: :DESC, first_name: :ASC)
     _check_set_operation(three_families_without_union, three_families)
   end
@@ -76,7 +74,7 @@ class BasicUsageTest < Minitest::Test
                                .intersection(User.objects.filter(last_name: first_user.last_name))
                                .order_by!({ last_name: :DESC }, { first_name: :ASC })
     qs_without_intersection = User.where(first_name: first_user.first_name, last_name: first_user.last_name)
-                                      .order(last_name: :DESC, first_name: :ASC)
+                                  .order(last_name: :DESC, first_name: :ASC)
     _check_set_operation(qs_without_intersection, qs_with_intersection)
   end
 
@@ -87,7 +85,7 @@ class BasicUsageTest < Minitest::Test
                                .intersection(User.objects.filter(created_at__lt: Time.now))
                                .order_by!({ last_name: :DESC }, { first_name: :ASC })
     qs_without_intersection = User.where(first_name: first_user.first_name, last_name: first_user.last_name)
-                                .order(last_name: :DESC, first_name: :ASC)
+                                  .order(last_name: :DESC, first_name: :ASC)
     _check_set_operation(qs_without_intersection, qs_with_intersection)
   end
 
@@ -117,5 +115,4 @@ class BasicUsageTest < Minitest::Test
     assert_equal expected_qs.count, actual_qs.count
     assert_equal expected_qs.count, record_count
   end
-
 end

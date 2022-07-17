@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of filter method
 class FilterTest < Minitest::Test
-
   def setup
     @asturias = GeoZone.new(name: 'Asturias')
     @cantabria = GeoZone.new(name: 'Cantabria')
@@ -56,7 +55,7 @@ class FilterTest < Minitest::Test
 
   def test_local_or_filter
     kings = User.objects
-                .filter([{ first_name: 'Pelayo' }, {'last_name': 'Católico'}])
+                .filter([{ first_name: 'Pelayo' }, { last_name: 'Católico' }])
                 .order_by(%i[first_name ASC])
     asturian_kings = ['Alfonso I', 'Pelayo']
     user_count = 0
@@ -95,7 +94,7 @@ class FilterTest < Minitest::Test
 
   def test_foreign_or_filter
     kings = User.objects
-                .filter([{first_name: 'Pelayo'}, {'zone::name': 'Cantabria'}])
+                .filter([{ first_name: 'Pelayo' }, { 'zone::name': 'Cantabria' }])
                 .order_by(%i[first_name ASC])
     asturian_kings = ['Alfonso I', 'Pelayo']
     user_count = 0
@@ -113,7 +112,7 @@ class FilterTest < Minitest::Test
       User.objects.filter(zone_id__in: [@cangas_de_onis, @cantabria]).order_by(created_at: :ASC)[0],
       User.objects.filter(zone__in: [@cangas_de_onis, @cantabria]).order_by(created_at: :ASC)[0],
       User.objects.filter(zone: [@cangas_de_onis.id, @cantabria.id]).order_by(created_at: :ASC)[0],
-      User.objects.filter(zone__in: [@cangas_de_onis.id, @cantabria.id]).order_by(created_at: :ASC)[0],
+      User.objects.filter(zone__in: [@cangas_de_onis.id, @cantabria.id]).order_by(created_at: :ASC)[0]
     ]
     different_user_ids = Set.new(first_users.map(&:id))
     assert_equal 1, different_user_ids.length
@@ -121,7 +120,7 @@ class FilterTest < Minitest::Test
 
   def test_many_to_many_foreign_filter
     tags = Tag.objects.distinct.filter('posts::title__contains': 'an ass').order_by(%i[name ASC])
-    tag_names = ['asturias', 'battle', 'victory']
+    tag_names = %w[asturias battle victory]
     tag_count = 0
     tags.each_with_index do |tag, tag_index|
       assert_equal tag_names[tag_index], tag.name
@@ -132,7 +131,7 @@ class FilterTest < Minitest::Test
 
   def test_deep_many_to_many_foreign_filter
     tags = Tag.objects.distinct.filter('posts::category::name': 'Dialogues').order_by(%i[name ASC])
-    tag_names = ['asturias', 'battle', 'victory']
+    tag_names = %w[asturias battle victory]
     tag_count = 0
     tags.each_with_index do |tag, tag_index|
       assert_equal tag_names[tag_index], tag.name
@@ -150,7 +149,7 @@ class FilterTest < Minitest::Test
   end
 
   def test_foreign_filter_by_object
-    cangueses = User.objects.distinct.filter('zone': @cangas_de_onis).order_by(%i[first_name ASC])
+    cangueses = User.objects.distinct.filter(zone: @cangas_de_onis).order_by(%i[first_name ASC])
     names = ['Favila', 'Fruela I', 'Pelayo']
     cangueses.each_with_index do |cangues, cangues_index|
       assert_equal names[cangues_index], cangues.first_name
@@ -179,7 +178,8 @@ class FilterTest < Minitest::Test
       Tag.objects.filter('posts::bad_association::name': 'Dialogues').order_by(%i[name ASC])
     end
     assert_equal(
-      'Bad selection path: posts::bad_association::name. bad_association not found in model Post when filtering Tag objects',
+      'Bad selection path: \
+posts::bad_association::name. bad_association not found in model Post when filtering Tag objects',
       exception.message
     )
   end
@@ -203,5 +203,4 @@ class FilterTest < Minitest::Test
       exception.message
     )
   end
-
 end

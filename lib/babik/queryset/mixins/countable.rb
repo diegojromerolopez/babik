@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Functionality related to the size of the QuerySet
     module Countable
-
       # Return the number of elements that match the condition defined by successive calls of filter and exclude.
       # @return [Integer] Number of elements that match the condition defined in this QuerySet.
       def count
@@ -38,7 +37,6 @@ module Babik
       def size
         self.count
       end
-
     end
   end
 end

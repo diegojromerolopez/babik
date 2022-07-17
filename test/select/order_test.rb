@@ -5,9 +5,7 @@ require_relative '../test_helper'
 
 # Ordering tests
 class OrderTest < Minitest::Test
-
   def setup
-
     @frankish_kingdom = GeoZone.create!(name: 'Frankish Kingdom')
 
     frankish_king_names = [
@@ -35,7 +33,6 @@ class OrderTest < Minitest::Test
     goth_king_names.each do |goth_king|
       @goth_kings << User.create!(first_name: goth_king, zone: @hispania)
     end
-
   end
 
   def teardown
@@ -159,7 +156,7 @@ class OrderTest < Minitest::Test
     exception = assert_raises RuntimeError do
       User.objects.filter('zone::name': 'Hispania').order_by([1111, :ASC])
     end
-    assert_equal('field_path of class Integer not valid. A Symbol/String/Babik::Selection::Base expected', exception.message)
+    assert_equal('field_path of class Integer not valid. A Symbol/String/Babik::Selection::Base expected',
+                 exception.message)
   end
-
 end

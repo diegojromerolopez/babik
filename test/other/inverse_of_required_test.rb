@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Check that inverse_of is required in all associations
 class InverseOfRequiredTest < Minitest::Test
-
   def setup
     main_category = Category.create!(name: 'Category not used')
     bad_post = BadPost.create!(title: 'This is a bad post', category: main_category)
@@ -29,5 +28,4 @@ class InverseOfRequiredTest < Minitest::Test
       exception.message
     )
   end
-
 end

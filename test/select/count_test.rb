@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Tests of count method
 class CountTest < Minitest::Test
-
   def setup
     @parthian_empire = GeoZone.create!(name: 'Parthian Empire')
     @syria = GeoZone.create!(name: 'Syria', parent_zone: @parthian_empire)
@@ -22,7 +21,8 @@ class CountTest < Minitest::Test
 
     @tiberius = User.create!(first_name: 'Tiberius', email: 'tiberius@example.com', zone: @rome)
     @pilate = User.create!(first_name: 'Pontius', last_name: 'Pilate', email: 'pontious@example.com', zone: @jerusalem)
-    @flavio = User.create!(first_name: 'Flavio', last_name: 'Josefo', email: 'flaviojosefo@example.com', zone: @jerusalem)
+    @flavio = User.create!(first_name: 'Flavio', last_name: 'Josefo', email: 'flaviojosefo@example.com',
+                           zone: @jerusalem)
 
     @noah = User.create!(first_name: 'Noah')
     @noah.created_at = Time.now - 1000.days
@@ -40,36 +40,39 @@ class CountTest < Minitest::Test
   end
 
   # Test the count is well implemented when the returned value is 0
-  def test_count_0
-    zone_non_existant_description = 'This description does not appear in any zone'
+  def test_count1
+    zone_non_existent_description = 'This description does not appear in any zone'
     queryset = User.objects.filter(
       first_name: 'Flavio',
       last_name: 'Josefo',
-      "zone::name__different": 'Rome',
-      "zone::description": zone_non_existant_description
+      'zone::name__different': 'Rome',
+      'zone::description': zone_non_existent_description
     )
     active_record_set = User
                         .joins(:zone)
-                        .where(first_name: 'Flavio', last_name: 'Josefo', "geo_zones.description": zone_non_existant_description)
-                        .where.not("geo_zones.name": 'Rome')
+                        .where(
+                          first_name: 'Flavio',
+                          last_name: 'Josefo',
+                          'geo_zones.description': zone_non_existent_description
+                        ).where.not('geo_zones.name': 'Rome')
     assert_equal active_record_set.count, queryset.count
-    assert_equal queryset.length,queryset.count
-    assert_equal queryset.length,queryset.size
+    assert_equal queryset.length, queryset.count
+    assert_equal queryset.length, queryset.size
     assert queryset.empty?
     assert_equal false, queryset.exists?
   end
 
   # Test the count is well implemented when the returned value is 1
-  def test_count_1
+  def test_count2
     queryset = User.objects.filter(
       first_name: 'Flavio',
       last_name: 'Josefo',
-      "zone::name__different": 'Madrid'
+      'zone::name__different': 'Madrid'
     )
     active_record_set = User
                         .joins(:zone)
                         .where(first_name: 'Flavio', last_name: 'Josefo')
-                        .where.not("geo_zones.name": 'Madrid')
+                        .where.not('geo_zones.name': 'Madrid')
     assert_equal active_record_set.count, queryset.count
     assert_equal queryset.length, queryset.count
     assert_equal queryset.length, queryset.size
@@ -80,7 +83,7 @@ class CountTest < Minitest::Test
   # Test the count from a deep belongs to relationship
   def test_from_deep_belongs_to
     queryset = User.objects.filter(
-      "zone::parent_zone::parent_zone::name__equals": 'Roman Empire'
+      'zone::parent_zone::parent_zone::name__equals': 'Roman Empire'
     )
     assert_equal 3, queryset.count
     assert_equal 3, queryset.size
@@ -90,8 +93,8 @@ class CountTest < Minitest::Test
   def test_or
     queryset = User.objects.filter(
       [
-        { "zone::parent_zone::parent_zone::name__equals": 'Roman Empire' },
-        { "zone::parent_zone::parent_zone::name__equals": 'Parthian Empire' }
+        { 'zone::parent_zone::parent_zone::name__equals': 'Roman Empire' },
+        { 'zone::parent_zone::parent_zone::name__equals': 'Parthian Empire' }
       ]
     )
     number_of_users = 0
@@ -105,9 +108,12 @@ class CountTest < Minitest::Test
 
   # Count the objects using contains
   def test_lookups
-    assert_equal User.where('first_name LIKE ?', '%avi%').length, User.objects.filter(first_name__contains: 'avi').length
-    assert_equal User.where('first_name LIKE ?', 'Fla%').length, User.objects.filter(first_name__startswith: 'Fla').length
-    assert_equal User.where('first_name LIKE ?', '%vio').length, User.objects.filter(first_name__startswith: 'Fla').length
+    assert_equal User.where('first_name LIKE ?', '%avi%').length,
+                 User.objects.filter(first_name__contains: 'avi').length
+    assert_equal User.where('first_name LIKE ?', 'Fla%').length,
+                 User.objects.filter(first_name__startswith: 'Fla').length
+    assert_equal User.where('first_name LIKE ?', '%vio').length,
+                 User.objects.filter(first_name__startswith: 'Fla').length
     assert_equal User.where(first_name: 'Flavio').length, User.objects.filter(first_name: 'Flavio').length
     assert_equal User.where(first_name: 'Flavio').length, User.objects.filter(first_name__exact: 'Flavio').length
     assert_equal User.where(first_name: 'Flavio').length, User.objects.filter(first_name__equal: 'Flavio').length
@@ -143,5 +149,4 @@ class CountTest < Minitest::Test
              .filter([{ first_name: 'Tiberius' }, { first_name: 'Pontius' }]).count
     )
   end
-
 end

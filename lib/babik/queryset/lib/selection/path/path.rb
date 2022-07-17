@@ -9,14 +9,12 @@ module Babik
     module Path
       # Represents a factory class for ForeignPath & LocalPath
       class Factory
-
         # Factory Method used to create local and foreign selections
         def self.build(model, selection_path)
           is_foreign = selection_path.match?(Babik::Selection::Config::RELATIONSHIP_SEPARATOR)
           return Babik::Selection::Path::ForeignPath.new(model, selection_path) if is_foreign
           Babik::Selection::Path::LocalPath.new(model, selection_path)
         end
-
       end
     end
   end

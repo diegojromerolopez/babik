@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Abstract class for Tests of delete method
 class DeleteTest < Minitest::Test
-
   def setup
     war_tag = Tag.create!(name: 'war')
     tribes_tag = Tag.create!(name: 'tribes')
@@ -56,5 +55,4 @@ class DeleteTest < Minitest::Test
     assert_nil @caesar.objects(:posts).filter(title: 'Commentarii de Bello Gallico 2').first
     assert_equal 6, @caesar.objects(:posts).count
   end
-
 end

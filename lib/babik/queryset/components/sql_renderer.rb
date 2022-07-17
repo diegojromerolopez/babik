@@ -7,7 +7,6 @@ module Babik
   module QuerySet
     # SQL renderer
     class SQLRenderer
-
       attr_reader :queryset
 
       # Where the SQL templates are
@@ -30,7 +29,7 @@ module Babik
       # @return [String] SQL UPDATE statement for this QuerySet.
       def update(update_command)
         @queryset.project!(['id'])
-        sql = _render('update/main.sql.erb', {update_command: update_command})
+        sql = _render('update/main.sql.erb', { update_command: update_command })
         @queryset.unproject!
         sql
       end
@@ -85,7 +84,7 @@ module Babik
                           "#{TEMPLATE_PATH}/default/#{template_path}"
                         end
         template_content = File.read(template_path)
-        ::ERB.new(template_content).result_with_hash(**replacements).gsub(/[ ]+/, ' ').gsub(/[\n ]{2,}/, "\n")
+        ::ERB.new(template_content).result_with_hash(**replacements).gsub(/ +/, ' ').gsub(/[\n ]{2,}/, "\n")
       end
 
       # Return the DBMS adapter.
@@ -93,7 +92,6 @@ module Babik
       def _dbms_adapter
         Babik::Database.config[:adapter]
       end
-
     end
   end
 end

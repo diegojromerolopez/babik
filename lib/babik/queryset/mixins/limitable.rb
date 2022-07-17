@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Limit functionality of QuerySet
     module Limitable
-
       # Configure a limit this QuerySet
       # @param param [Range, Integer]
       #        If it is a range, first_element..last_element will be selected.
@@ -82,7 +81,6 @@ module Babik
         @_limit = Babik::QuerySet::Limit.new(size, offset)
         self
       end
-
     end
   end
 end

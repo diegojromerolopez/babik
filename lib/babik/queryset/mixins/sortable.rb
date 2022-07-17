@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Sort functionality of QuerySet
     module Sortable
-
       # Sort QuerySet according to an order
       # @param order [Array, String, Hash] ordering that will be applied to the QuerySet.
       #        See {Babik::QuerySet::Order#order_by}.

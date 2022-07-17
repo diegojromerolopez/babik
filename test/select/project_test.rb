@@ -5,18 +5,17 @@ require_relative '../test_helper'
 
 # Project method test
 class ProjectTest < Minitest::Test
-
   def setup
-    if GeoZone.objects.filter(name: 'Castilla').exists?
-      return
-    end
+    return if GeoZone.objects.filter(name: 'Castilla').exists?
     @castille = GeoZone.create!(name: 'Castilla')
     ['Juan II', 'Isabel I', 'Juana I'].each do |name|
-      User.create!(first_name: name, last_name: 'de Castilla', email: "#{name.downcase.delete(' ')}@example.com", zone: @castille)
+      User.create!(first_name: name, last_name: 'de Castilla', email: "#{name.downcase.delete(' ')}@example.com",
+                   zone: @castille)
     end
     @spain = GeoZone.create!(name: 'España')
     ['Carlos I', 'Felipe II', 'Felipe III'].each do |name|
-      User.create!(first_name: name, last_name: 'de Austria', email: "#{name.downcase.delete(' ')}@example.com", zone: @spain)
+      User.create!(first_name: name, last_name: 'de Austria', email: "#{name.downcase.delete(' ')}@example.com",
+                   zone: @spain)
     end
   end
 
@@ -73,7 +72,7 @@ class ProjectTest < Minitest::Test
     users = User.objects.filter('zone::name': 'Castilla').order_by('first_name')
     users_projection = users.project(
       ['first_name', ->(s) { s.upcase }], 'email',
-      ['created_at', 'creation_date', ->(d) { datetime_transformer.call(Time.parse(d.to_s + 'UTC')) }]
+      ['created_at', 'creation_date', ->(d) { datetime_transformer.call(Time.parse("#{d}UTC")) }]
     )
     users_projection.each_with_index do |user_projection, user_index|
       assert_equal users[user_index].first_name.upcase, user_projection[:first_name]
@@ -90,10 +89,11 @@ class ProjectTest < Minitest::Test
       users = User.objects.filter('zone::name': 'Castilla').order_by('first_name')
       users.project(
         ['first_name', 2], 'email',
-        ['created_at', 'creation_date', ->(d) { datetime_transformer.call(Time.parse(d.to_s + 'UTC')) }]
+        ['created_at', 'creation_date', ->(d) { datetime_transformer.call(Time.parse("#{d}UTC")) }]
       )
     end
-    assert_equal('Babik::QuerySet::ProjectedField.new only accepts String/Symbol or Proc. Passed a Integer.', exception.message)
+    assert_equal('Babik::QuerySet::ProjectedField.new only accepts String/Symbol or Proc. Passed a Integer.',
+                 exception.message)
   end
 
   def test_wrong_params
@@ -101,7 +101,9 @@ class ProjectTest < Minitest::Test
       users = User.objects.filter('zone::name': 'Castilla').order_by('first_name')
       users.project('first_name', 'email', 2222)
     end
-    assert_equal('No other parameter type is permitted in Babik::QuerySet::ProjectedField.new than Array, String and Symbol.', exception.message)
+    assert_equal(
+      'No other parameter type is permitted in Babik::QuerySet::ProjectedField.new than Array, String and Symbol.',
+      exception.message
+    )
   end
-
 end

@@ -5,7 +5,6 @@ require_relative '../test_helper'
 
 # Class for Tests of update method
 class UpdateTest < Minitest::Test
-
   def setup
     @castille = GeoZone.create!(name: 'Castilla')
     @leon = GeoZone.create!(name: 'León')
@@ -89,5 +88,4 @@ class UpdateTest < Minitest::Test
     assert_equal 0, User.objects.filter(zone: @burgos).count
     assert_equal 2, User.objects.filter(zone: @castille).count
   end
-
 end

@@ -4,7 +4,6 @@ module Babik
   module QuerySet
     # Distinguishable functionality for QuerySet
     module Distinguishable
-
       # Mark this QuerySet as distinguishable.
       # Modify this object
       # (i.e. DISTINCT keyword will be applied to the final SQL query).
@@ -21,7 +20,6 @@ module Babik
         @_distinct = false
         self
       end
-
     end
   end
 end

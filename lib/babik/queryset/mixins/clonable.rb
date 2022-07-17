@@ -6,7 +6,6 @@ module Babik
   module QuerySet
     # Clone operation for the QuerySet
     module Clonable
-
       # Clone the queryset using ruby_deep_clone {https://github.com/gmodarelli/ruby-deepclone}.
       # @return [QuerySet] Deep copy of this QuerySet.
       def clone
@@ -33,7 +32,7 @@ module Babik
       # @param args [String] method arguments
       # @param _block [Proc] Proc that could be passed to the method. Not used.
       # @return [QuerySet::Clonable] Clone of this QuerySet (with method 'name' called on ), an empty QuerySet.
-      def method_missing(name, *args, &_block)
+      def method_missing(name, *args, &)
         modifying_method = "#{name}!"
         return mutate_clone(modifying_method.to_sym, args) if self.respond_to?(modifying_method)
         super
@@ -42,11 +41,10 @@ module Babik
       # Check if the called method has a modifying version (a bang method).
       # @return [Boolean] True if  there is a modifying method with the requested method name
       #         in that case, return true, otherwise, return false.
-      def respond_to_missing?(name, *_args, &_block)
+      def respond_to_missing?(name, *_args, &)
         modifying_method = "#{name}!"
         self.respond_to?(modifying_method)
       end
-
     end
   end
 end
