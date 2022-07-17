@@ -11,7 +11,7 @@ module Babik
       attr_reader :queryset
 
       # Where the SQL templates are
-      TEMPLATE_PATH = "#{__dir__}/../templates"
+      TEMPLATE_PATH = "#{__dir__}/../templates".freeze
 
       # Construct a new SQL rendered for a QuerySet
       # @param queryset [QuerySet] QuerySet to be rendered.

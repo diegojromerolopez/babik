@@ -18,5 +18,3 @@ module Babik
     end
   end
 end
-
-

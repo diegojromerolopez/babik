@@ -74,5 +74,5 @@ module Babik
         target_object
       end
     end
-    end
   end
+end
